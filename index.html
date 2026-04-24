@@ -54,17 +54,17 @@
   --fbod:    'Outfit',sans-serif;
 }
 
-[data-theme="cyberpunk"] {
-  --primary-rgb: 0, 240, 255; --secondary-rgb: 112, 0, 255;
-  --success-rgb: 57, 255, 20; --accent-rgb: 255, 0, 128;
+[data-theme="ember"] {
+  --primary-rgb:  255, 120, 30; --secondary-rgb: 255, 200, 50;
+  --success-rgb:   0, 245, 160; --accent-rgb:  255, 45, 100;
 }
-[data-theme="toxic"] {
-  --primary-rgb: 57, 255, 20; --secondary-rgb: 0, 212, 160;
-  --success-rgb: 0, 240, 255; --accent-rgb: 168, 255, 0;
+[data-theme="nature"] {
+  --primary-rgb:  50, 220, 120; --secondary-rgb:  0, 200, 150;
+  --success-rgb:   0, 240, 255; --accent-rgb:  255, 100, 50;
 }
-[data-theme="synthwave"] {
-  --primary-rgb: 255, 0, 255; --secondary-rgb: 0, 255, 255;
-  --success-rgb: 255, 255, 0; --accent-rgb: 138, 43, 226;
+[data-theme="rose"] {
+  --primary-rgb:  255, 80, 160; --secondary-rgb:  180, 50, 255;
+  --success-rgb:   100, 255, 200; --accent-rgb:  255, 150, 50;
 }
 
 html {
@@ -498,6 +498,60 @@ select.input {
 select.input option { background: #0a0a1e; color: #fff; }
 
 /* ═══════════════════════════════════════════════════════════
+   CARTE RETOURNABLE (FLIP CARD)
+═══════════════════════════════════════════════════════════ */
+.flip-container {
+  perspective: 1000px;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 1.5rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flip-card {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+/* Classe ajoutée en JS quand on clique */
+.flip-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.fc-front, .fc-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+}
+
+/* Face Cachée (Smiley) */
+.fc-front {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* Face Visible (Numéro) */
+.fc-back {
+  transform: rotateY(180deg);
+  background: rgba(0,0,0,0.6);
+  display: flex;          /* ✅ Active Flexbox */
+  flex-direction: column; /* ✅ Empile le numéro et le texte verticalement */
+  align-items: center;    /* ✅ Centre horizontalement */
+  justify-content: center;/* ✅ Centre verticalement (ce qui remonte ton texte !) */
+}
+
+/* ═══════════════════════════════════════════════════════════
    8. SCREENS
 ═══════════════════════════════════════════════════════════ */
 .screen {
@@ -505,6 +559,7 @@ select.input option { background: #0a0a1e; color: #fff; }
   flex-direction: column;
   min-height: 100dvh;
   padding: 1.25rem;
+  padding-bottom: 6rem; /* 👈 AJOUT : Marge de sécurité globale en bas */
   max-width: 640px;
   margin: 0 auto;
   width: 100%;
@@ -525,11 +580,21 @@ select.input option { background: #0a0a1e; color: #fff; }
   font-size: 1.4rem;
   transition: all .35s ease;
   filter: drop-shadow(0 0 7px rgba(var(--accent-rgb),.65));
+  display: inline-block;
 }
 .life-heart.lost {
   opacity: .18;
   filter: grayscale(1);
   transform: scale(.82);
+}
+/* Animation pour la toute dernière vie */
+.life-heart.critical {
+  animation: criticalPulse 0.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 12px rgba(var(--accent-rgb), 0.9));
+}
+@keyframes criticalPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.25); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -892,23 +957,23 @@ select.input option { background: #0a0a1e; color: #fff; }
 .timer-bar {
   position: relative; height: 6px; border-radius: 3px;
   background: rgba(255,255,255,.06);
-  overflow: hidden;
+  overflow: visible; /* ✅ Permet au halo coloré de déborder joliment */
   margin-top: .55rem;
 }
 .timer-fill {
   height: 100%;
-  background: linear-gradient(90deg, rgb(var(--success-rgb)), rgb(var(--gold-rgb)));
+  border-radius: 3px;
+  background: hsl(120, 90%, 55%);
   transform-origin: left center;
-  transition: transform 1s linear, background .4s ease;
+  /* ✅ Transition fluide de la couleur et de la taille */
+  transition: transform 0.25s linear, background 0.25s linear, box-shadow 0.25s linear;
 }
-.timer-fill.warn { background: linear-gradient(90deg, rgb(var(--gold-rgb)), rgb(var(--accent-rgb))); }
 .timer-fill.danger {
-  background: linear-gradient(90deg, rgb(var(--accent-rgb)), #ff0);
-  animation: timerDanger .6s ease-in-out infinite alternate;
+  animation: timerDanger .4s ease-in-out infinite alternate;
 }
 @keyframes timerDanger {
   from { filter: brightness(1); }
-  to   { filter: brightness(1.5) drop-shadow(0 0 10px rgba(var(--accent-rgb),.6)); }
+  to   { filter: brightness(1.5); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1051,42 +1116,42 @@ select.input option { background: #0a0a1e; color: #fff; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   20. DUEL UI — 1 and 10 only (Extreme picks)
+   20. EXTREME UI — 1 and 10 only (Extreme picks)
 ═══════════════════════════════════════════════════════════ */
-.duel-wrap {
+.extreme-wrap {
   display: flex; flex-direction: column; gap: 1.1rem;
 }
-.duel-section {
+.extreme-section {
   padding: 1rem 1.1rem;
   border-radius: var(--radius-md);
   border: 1px solid rgba(255,255,255,.08);
   border-top: 1px solid rgba(255,255,255,.22);
-  background: linear-gradient(145deg, var(--duelBg1), var(--duelBg2));
+  background: linear-gradient(145deg, var(--extremeBg1), var(--extremeBg2));
   backdrop-filter: blur(var(--blur-sm));
   box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
 }
-.duel-section--low  { --duelBg1: rgba(0,150,255,.13); --duelBg2: rgba(0,150,255,.02); }
-.duel-section--high { --duelBg1: rgba(255,60,90,.13); --duelBg2: rgba(255,60,90,.02); }
-.duel-head {
+.extreme-section--low  { --extremeBg1: rgba(0,150,255,.13); --extremeBg2: rgba(0,150,255,.02); }
+.extreme-section--high { --extremeBg1: rgba(255,60,90,.13); --extremeBg2: rgba(255,60,90,.02); }
+.extreme-head {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: .7rem;
 }
-.duel-num {
+.extreme-num {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 900; font-size: 2.2rem;
   text-shadow: 0 0 18px currentColor;
   line-height: 1;
 }
-.duel-label {
+.extreme-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: .65rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .18em;
   color: var(--muted);
 }
-.duel-pick-grid {
+.extreme-pick-grid {
   display: flex; flex-direction: column; gap: .4rem;
 }
-.duel-opt {
+.extreme-opt {
   padding: .7rem .85rem;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(255,255,255,.08);
@@ -1095,13 +1160,13 @@ select.input option { background: #0a0a1e; color: #fff; }
   transition: all .2s ease;
   font-weight: 600;
 }
-.duel-opt:hover { background: rgba(255,255,255,.09); transform: translateX(3px); }
-.duel-opt.picked--low {
+.extreme-opt:hover { background: rgba(255,255,255,.09); transform: translateX(3px); }
+.extreme-opt.picked--low {
   background: rgba(0,150,255,.14);
   border-color: rgba(0,150,255,.55);
   box-shadow: 0 0 16px rgba(0,150,255,.26), inset 0 1px 0 rgba(0,150,255,.3);
 }
-.duel-opt.picked--high {
+.extreme-opt.picked--high {
   background: rgba(255,60,90,.14);
   border-color: rgba(255,60,90,.55);
   box-shadow: 0 0 16px rgba(255,60,90,.26), inset 0 1px 0 rgba(255,60,90,.3);
@@ -1249,41 +1314,46 @@ select.input option { background: #0a0a1e; color: #fff; }
 .dots span:nth-child(3) { animation-delay:.4s; background:rgb(var(--accent-rgb)); }
 
 /* ═══════════════════════════════════════════════════════════
-   24. TOASTS
+   24. TOASTS (Style Top Ten)
 ═══════════════════════════════════════════════════════════ */
 #toasts {
-  position:fixed; bottom:1.75rem; left:50%; transform:translateX(-50%);
-  z-index:999; display:flex; flex-direction:column; gap:.5rem;
-  pointer-events:none; width:90%; max-width:380px;
+  position: fixed;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centré au milieu de l'écran */
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  pointer-events: none;
+  width: 90%;
+  max-width: 380px;
 }
+
 .toast {
-  padding:.88rem 1.2rem; border-radius:18px;
-  font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.88rem;
-  text-align:center; animation: toastAnim 2.8s cubic-bezier(.16,1,.3,1) forwards;
+  padding: 14px 28px;
+  border-radius: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
-  box-shadow: 0 20px 55px rgba(0,0,0,.88), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 26px 65px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.09);
+  opacity: 0;
+  animation: toastLife 2.8s cubic-bezier(.16,1,.3,1) forwards;
 }
-.toast.info {
-  background: rgba(0,0,0,.82);
-  border: 1px solid rgba(var(--primary-rgb),.28);
-  color: rgb(var(--primary-rgb));
-}
-.toast.ok {
-  background: rgba(0,0,0,.82);
-  border: 1px solid rgba(var(--success-rgb),.28);
-  color: rgb(var(--success-rgb));
-}
-.toast.err {
-  background: rgba(0,0,0,.82);
-  border: 1px solid rgba(var(--accent-rgb),.28);
-  color: rgb(var(--accent-rgb));
-}
-@keyframes toastAnim {
-  0%   { opacity:0; transform:translateY(28px) scale(.88); filter:blur(8px); }
-  12%  { opacity:1; transform:translateY(0)    scale(1);   filter:blur(0);   }
-  84%  { opacity:1; transform:translateY(0)    scale(1);   filter:blur(0);   }
-  100% { opacity:0; transform:translateY(-16px) scale(.94); filter:blur(3px); }
+
+/* Couleurs selon le type */
+.toast.info { background: rgba(10,10,18,0.92); border: 1px solid rgba(var(--primary-rgb), 0.3); color: #fff; }
+.toast.ok   { background: rgba(10,10,18,0.92); border: 1px solid rgba(var(--success-rgb), 0.3); color: rgb(var(--success-rgb)); }
+.toast.err  { background: rgba(10,10,18,0.92); border: 1px solid rgba(var(--accent-rgb), 0.3); color: rgb(var(--accent-rgb)); }
+
+@keyframes toastLife {
+  0%   { opacity:0; transform:translateY(28px) scale(.86); filter:blur(8px); }
+  12%  { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+  84%  { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+  100% { opacity:0; transform:translateY(-18px) scale(.95); filter:blur(4px); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1571,7 +1641,7 @@ html.light-mode .sniper-answer {
 html.light-mode .sniper-answer-text { color: #14121e; }
 html.light-mode .sniper-answer-name { color: rgba(20,18,30,.55); }
 html.light-mode .lb-row { background: rgba(255,255,255,.7); color: #14121e; }
-html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
+html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e; }
 
 /* Responsive tweaks */
 @media (max-width: 420px) {
@@ -1584,6 +1654,13 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
   .podium-block.p1 { font-size: 2.2rem; height: 150px; }
   .podium-block.p2 { font-size: 1.8rem; height: 110px; }
   .podium-block.p3 { font-size: 1.6rem; height: 85px; }
+}
+
+/* Animation de vote de theme */
+@keyframes popInWinner {
+    0% { opacity:0; transform: scale(0.5); }
+    70% { opacity:1; transform: scale(1.15); }
+    100% { opacity:1; transform: scale(1.05); }
 }
 </style>
 </head>
@@ -1632,7 +1709,7 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       <div class="rule-line"><span>🎯</span><span><strong>Classique</strong> · Coop · Range 1→10</span></div>
       <div class="rule-line"><span>🏹</span><span><strong>Sniper</strong> · Compétitif · Précision</span></div>
       <div class="rule-line"><span>⚡</span><span><strong>Éclair</strong> · Coop · Sous chrono</span></div>
-      <div class="rule-line"><span>🎭</span><span><strong>Duel</strong> · Compétitif · Trouve 1 &amp; 10</span></div>
+      <div class="rule-line"><span>🎭</span><span><strong>Extrême</strong> · Compétitif · Trouve 1 &amp; 10</span></div>
     </div>
 
     <button class="btn btn-primary btn-full" onclick="closeWelcome()" style="margin-top:.5rem;">J'ai compris ✦</button>
@@ -1650,57 +1727,78 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
 
 <!-- ════════════════════════ SCREEN: HOME ════════════════════════ -->
 <div id="screen-home" class="screen active">
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:2rem;padding:1.5rem 0;">
-    <div>
-      <div class="game-title">Top<br>Ten</div>
-      <p style="margin-top:.85rem;font-size:1.05rem;">Le jeu de l'échelle infernale ✦ Multijoueur</p>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;padding:1.5rem 0;">
+
+    <div style="text-align:center;margin-bottom:.5rem;">
+      <div class="game-title" style="font-size:clamp(4.5rem,18vw,7rem);line-height:0.85;letter-spacing:-0.05em;">TOP<br>TEN</div>
+      <p style="margin-top:1rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);">Le jeu de l'échelle ✦ Multijoueur</p>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:.75rem;">
-      <button class="btn btn-primary btn-full" onclick="openCreate()">✦ Créer un salon</button>
-      <button class="btn btn-secondary btn-full" onclick="openJoin()">↗ Rejoindre un salon</button>
-    </div>
+    <div class="glass" style="padding:1.75rem 1.5rem;width:100%;max-width:380px;">
 
-    <div class="glass" style="padding:1.25rem 1.5rem;">
-      <p style="font-size:.88rem;line-height:1.75;">
-        Chaque joueur reçoit un <strong style="color:rgb(var(--primary-rgb));-webkit-text-fill-color:rgb(var(--primary-rgb));">numéro secret</strong> de 1 à 10.<br>
-        Répondez au thème selon votre intensité.<br>
-        Le <strong style="color:rgb(var(--gold-rgb));-webkit-text-fill-color:rgb(var(--gold-rgb));">Cap'ten</strong> devine le bon ordre !
-      </p>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:.6rem;">Ton pseudo</div>
+      
+      <input id="inp-name" type="text" class="input" placeholder="Ex: Maxou, Juju, Seb…" maxlength="20"
+        autocomplete="off" autocorrect="off" spellcheck="false" style="margin-bottom:1.2rem;"
+        onkeydown="if(event.key==='Enter')document.getElementById('btn-create').click()">
+
+      <button id="btn-create" class="btn btn-primary btn-full" onclick="createRoom()">✦ Créer un salon</button>
+
+      <div style="display:flex;align-items:center;gap:1rem;margin:1.25rem 0;">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.09);"></div>
+        <span style="font-size:.65rem;color:rgba(255,255,255,.3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-family:'Space Grotesk',sans-serif;">Ou rejoindre</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.09);"></div>
+      </div>
+
+      <div style="display:flex;gap:.65rem;">
+        <input id="inp-code" type="text" class="input" placeholder="CODE" maxlength="6"
+          style="width:45%;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;letter-spacing:.15em;text-transform:uppercase;"
+          autocomplete="off" autocorrect="off" spellcheck="false"
+          onkeydown="if(event.key==='Enter')document.getElementById('btn-join').click()">
+        <button id="btn-join" class="btn btn-secondary" style="flex:1;" onclick="joinRoom()">Rejoindre ↗</button>
+      </div>
+
     </div>
   </div>
 </div>
 
 <!-- ════════════════════════ SCREEN: LOBBY ════════════════════════ -->
 <div id="screen-lobby" class="screen">
-  <div style="padding-top:1.25rem;display:flex;flex-direction:column;gap:1.2rem;flex:1;">
-    <div>
-      <h3>Code du salon</h3>
-      <div style="margin-top:.55rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-        <div class="room-code" id="lby-code">———</div>
-        <button class="btn btn-secondary btn-sm" onclick="copyCode()">Copier 📋</button>
+  <div style="padding-top:1.25rem; padding-bottom:5rem; display:flex; flex-direction:column; gap:1.2rem; flex:1;">
+    
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem;">
+      <div class="game-title" style="font-size:2rem; line-height:0.85; text-align:left;">Top<br>Ten</div>
+      <div style="display:flex; align-items:center; gap:.6rem;">
+        <div class="room-code" id="lby-code" style="font-size:2.2rem; cursor:pointer;" onclick="copyCode()" title="Copier le code">———</div>
+        <button class="btn btn-secondary btn-sm" onclick="copyCode()" style="padding:.4rem .6rem; border-radius:10px; min-width:unset;" title="Copier">📋</button>
       </div>
     </div>
 
-    <div>
-      <h3 style="margin-bottom:.55rem;">Joueurs connectés · <span id="lby-count">0</span></h3>
+    <div class="glass" style="padding: 1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="margin:0;">Joueurs connectés</h3>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:.7rem; font-weight:700; color:#fff;">
+          <span id="lby-count">0</span> joueur(s)
+        </div>
+      </div>
+      
       <div id="lby-players" class="player-list"></div>
+      
+      <p id="lby-warn" style="font-size:.72rem; color:rgb(var(--gold-rgb)); text-align:center; margin-top:1rem; font-family:'Space Grotesk',sans-serif; font-weight:700;">⚠️ 3 joueurs minimum pour jouer</p>
     </div>
 
     <div class="spacer"></div>
 
-    <!-- HOST CONTROLS -->
     <div id="lby-host-ctrl" style="display:none;">
-      <button id="btn-config" class="btn btn-primary btn-full" onclick="goToConfig()">Configurer la partie ✦</button>
+      <button id="btn-config" class="btn btn-primary btn-full" onclick="goToConfig()">⚙️ Configurer la partie</button>
     </div>
 
-    <!-- GUEST WAIT -->
     <div id="lby-guest-ctrl" style="display:none;text-align:center;padding:.75rem 0;">
       <p>En attente que l'hôte configure la partie…</p>
       <div class="dots" style="margin-top:.55rem;"><span></span><span></span><span></span></div>
     </div>
 
-    <button class="btn btn-secondary btn-sm" onclick="leaveRoom()" style="align-self:center;margin-top:.5rem;">← Quitter le salon</button>
+    <button class="btn btn-secondary btn-sm" onclick="leaveRoom()" style="align-self:center; margin-top:1rem;">← Quitter le salon</button>
   </div>
 </div>
 
@@ -1713,38 +1811,43 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       <p style="margin-top:.35rem;font-size:.82rem;" id="cfg-role-hint">Choisis les règles du show</p>
     </div>
 
-    <!-- Mode selection -->
     <div>
       <h3 style="margin-bottom:.6rem;">🎮 Mode de jeu</h3>
       <div class="mode-grid" id="cfg-modes">
         <div class="mode-card selected" data-mode="classic" onclick="cfgSetMode('classic')">
           <div class="mode-emoji">🎯</div>
           <div class="mode-name">Classique</div>
-          <div class="mode-desc">Range 1→10</div>
-          <div class="mode-badge coop">Coop · 3 vies</div>
+          <div class="mode-badge coop">Coop</div>
+        </div>
+        <div class="mode-card" data-mode="survival" onclick="cfgSetMode('survival')">
+          <div class="mode-emoji">💀</div>
+          <div class="mode-name">Survie</div>
+          <div class="mode-badge time">Coop · Record</div>
         </div>
         <div class="mode-card" data-mode="sniper" onclick="cfgSetMode('sniper')">
           <div class="mode-emoji">🏹</div>
           <div class="mode-name">Sniper</div>
-          <div class="mode-desc">Devine le numéro exact</div>
           <div class="mode-badge comp">PvP · Points</div>
         </div>
-        <div class="mode-card" data-mode="blitz" onclick="cfgSetMode('blitz')">
-          <div class="mode-emoji">⚡</div>
-          <div class="mode-name">Éclair</div>
-          <div class="mode-desc">Classique sous chrono</div>
-          <div class="mode-badge time">Coop · Stress</div>
+        <div class="mode-card" data-mode="extreme" onclick="cfgSetMode('extreme')">
+          <div class="mode-emoji">🎭</div>
+          <div class="mode-name">Extrême</div>
+          <div class="mode-badge coop">Coop · 1 & 10</div>
+        </div>
+        <div class="mode-card" data-mode="blind" onclick="cfgSetMode('blind')">
+          <div class="mode-emoji">🙈</div>
+          <div class="mode-name">Aveugle</div>
+          <div class="mode-badge coop">1 par 1</div>
         </div>
         <div class="mode-card" data-mode="duel" onclick="cfgSetMode('duel')">
-          <div class="mode-emoji">🎭</div>
+          <div class="mode-emoji">⚔️</div>
           <div class="mode-name">Duel</div>
-          <div class="mode-desc">Trouve juste 1 &amp; 10</div>
-          <div class="mode-badge comp">PvP · Rapide</div>
+          <div class="mode-badge comp">1v1</div>
         </div>
       </div>
+      <p id="cfg-mode-desc" style="font-size:.78rem;line-height:1.65;margin-top:.85rem;padding:.75rem .85rem;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.8);"></p>
     </div>
 
-    <!-- Level -->
     <div>
       <h3 style="margin-bottom:.6rem;">🎨 Niveau</h3>
       <div class="level-grid">
@@ -1761,34 +1864,19 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       </div>
     </div>
 
-    <!-- Rounds (competitive modes) / Timer (blitz) -->
-    <div id="cfg-extra" style="display:flex;flex-direction:column;gap:.9rem;">
-      <div id="cfg-rounds-wrap" style="display:none;">
-        <h3 style="margin-bottom:.5rem;">🏁 Nombre de manches</h3>
-        <select class="input" id="cfg-rounds">
-          <option value="3">3 manches</option>
-          <option value="5" selected>5 manches</option>
-          <option value="7">7 manches</option>
-          <option value="10">10 manches</option>
-        </select>
-      </div>
-      <div id="cfg-timer-wrap" style="display:none;">
-        <h3 style="margin-bottom:.5rem;">⏱️ Chrono du Cap'ten</h3>
-        <select class="input" id="cfg-timer">
-          <option value="45">45 secondes (sueurs)</option>
-          <option value="60" selected>60 secondes (normal)</option>
-          <option value="90">90 secondes (confort)</option>
-          <option value="120">120 secondes (tranquille)</option>
-        </select>
-      </div>
+    <div id="cfg-params-container" style="margin-top:.5rem;">
+      <h3 style="margin-bottom:.8rem;">⚙️ Paramètres de la partie</h3>
+      <div id="params-grid" class="glass" style="padding:1.25rem;">
+        </div>
     </div>
 
     <div class="spacer"></div>
 
     <div id="cfg-host-actions" style="display:none;flex-direction:column;gap:.6rem;">
       <button id="btn-start" class="btn btn-success btn-full" onclick="startGame()">🚀 Lancer la partie</button>
-      <button class="btn btn-secondary btn-sm" onclick="backToLobby()" style="align-self:center;">← Retour au lobby</button>
+      <button class="btn btn-secondary btn-sm" onclick="backToLobby()" style="align-self:center;">← Retour au salon</button>
     </div>
+    
     <div id="cfg-guest-actions" style="display:none;text-align:center;">
       <p>L'hôte configure la partie…</p>
       <div class="dots" style="margin-top:.5rem;"><span></span><span></span><span></span></div>
@@ -1826,55 +1914,114 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
   </div>
 </div>
 
+<div id="screen-duel-challenge" class="screen">
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:1.5rem;">
+    <div id="dc-challenger-view" style="display:none; text-align:center;">
+      <div style="font-size:3.5rem; margin-bottom:.5rem;">🎯</div>
+      <h2 style="color:#fff; margin-bottom:.5rem;">Tu es le Challenger !</h2>
+      <p style="margin-bottom:1.5rem; color:var(--muted); font-size:.85rem; line-height:1.4;">
+        Le compte est impair... Tu es le dernier joueur !<br>Qui veux-tu affronter pour ce duel ?
+      </p>
+      <div id="dc-player-grid" style="display:grid; grid-template-columns:1fr; gap:.6rem;"></div>
+    </div>
+    
+    <div id="dc-wait-view" style="display:none; text-align:center;">
+      <div class="wait-center">
+        <div class="wait-icon">⚔️</div>
+        <h2 style="color:#fff;">Défi en cours...</h2>
+        <p id="dc-wait-text">Le challenger choisit sa cible.</p>
+        <div class="dots" style="margin-top:1rem;"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════════════ SCREEN: THEME CHOICE ════════════════════════ -->
 <div id="screen-theme-choice" class="screen">
   <div style="padding-top:.75rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;">
     <div class="game-hdr">
       <div>
         <div class="hdr-round-label">Manche</div>
-        <div class="hdr-round-val" id="tc-round">1</div>
+        <div class="hdr-round-val"><span id="tc-round">1</span><span id="tc-prog" style="font-size:0.65em;color:rgba(255,255,255,.5);margin-left:8px;"></span></div>
       </div>
-      <div class="badge badge-cap">👑 Cap'ten</div>
+      <div id="tc-center-hdr" class="lives-bar"></div>
       <div class="badge badge-mode" id="tc-mode">🎯 Classique</div>
     </div>
 
-    <!-- Captain view: choose theme -->
     <div id="tc-captain" style="display:none;">
-      <h2 style="color:#fff;text-align:center;">Choisis un thème</h2>
-      <p style="text-align:center;margin-bottom:1rem;font-size:.88rem;">Pioche dans la banque ou invente le tien !</p>
-
-      <div class="glass2" style="padding:1rem;margin-bottom:.85rem;">
-        <div class="theme-label" style="margin-bottom:.45rem;">🎲 Thème suggéré</div>
-        <div class="theme-text" id="tc-drawn" style="min-height:56px;display:flex;align-items:center;justify-content:center;text-align:center;">…</div>
-        <button class="btn btn-secondary btn-full" onclick="drawNewTheme()" style="margin-top:.8rem;">🎲 Piocher un autre thème</button>
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <h2 style="color:#fff;">Choisis un thème</h2>
+        <p style="margin-top:.35rem;font-size:.88rem;">Pioche dans la banque ou invente le tien !</p>
       </div>
 
-      <div style="position:relative;text-align:center;margin:.85rem 0;">
-        <div style="height:1px;background:rgba(255,255,255,.1);position:absolute;top:50%;left:0;right:0;"></div>
-        <span style="position:relative;background:var(--bg-dark);padding:0 .8rem;font-family:'Space Grotesk',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);">ou</span>
+      <div class="glass2" style="padding:1.3rem;margin-bottom:1rem;">
+        <textarea id="tc-custom" class="input" rows="4" placeholder="Écris ton propre sujet..." style="margin-bottom:.85rem; font-size:1rem; line-height:1.4; resize:none;"></textarea>
+        <button id="btn-draw-theme" class="btn btn-secondary btn-full" onclick="drawThemeAndFill()" style="border-radius:12px; font-size:.82rem;">
+          🎲 Piocher un sujet
+        </button>
       </div>
-
-      <div class="glass2" style="padding:1rem;">
-        <div class="theme-label" style="margin-bottom:.5rem;">✏️ Invente ton thème</div>
-        <textarea id="tc-custom" class="input" rows="2" placeholder="Ex: un surnom pour ton prof, du plus drôle au plus respectueux..." maxlength="120" style="resize:none;"></textarea>
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:.55rem;margin-top:1rem;">
-        <button class="btn btn-primary btn-full" onclick="validateTheme('drawn')">Utiliser le thème pioché ✓</button>
-        <button class="btn btn-gold btn-full" onclick="validateTheme('custom')">Utiliser mon thème ✎</button>
-      </div>
+      
+      <button id="btn-tc-submit" class="btn btn-primary btn-full" onclick="submitCapTheme()">Valider ce sujet ✓</button>
+      <button id="btn-tc-edit" class="btn btn-secondary btn-full" onclick="unsubmitCapTheme()" style="display:none; margin-top:0.5rem;">✏️ Modifier mon thème</button>
+      
+      <div id="tc-other-cap-status" style="display:none;"></div>
     </div>
 
-    <!-- Non-captain: waiting -->
     <div id="tc-wait" style="display:none;">
       <div class="wait-center">
         <div class="wait-icon">👑</div>
         <h2 style="color:#fff;">Le Cap'ten réfléchit…</h2>
         <p id="tc-wait-name">Il choisit le thème de la manche.</p>
-        <div class="dots"><span></span><span></span><span></span></div>
+        <div class="dots" id="tc-wait-dots"><span></span><span></span><span></span></div>
       </div>
     </div>
+
+    <div id="tc-countdown" style="display:none; text-align:center; padding:1.2rem 0; font-weight:700; color:rgb(var(--success-rgb)); font-family:'Space Grotesk',sans-serif; text-transform:uppercase; font-size:0.9rem;">
+        Vote des thèmes dans <span id="tc-cd-val">3</span>s...
+    </div>
   </div>
+</div>
+
+<div id="screen-theme-vote" class="screen">
+  <div style="padding-top:.75rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;">
+    <div class="game-hdr">
+      <div>
+        <div class="hdr-round-label">Manche</div>
+        <div class="hdr-round-val"><span id="tv-round">1</span></div>
+      </div>
+      <div class="badge badge-mode">⚔️ Duel</div>
+    </div>
+    
+    <div style="text-align:center;margin-bottom:1rem;">
+      <h2 style="color:#fff;">Votez pour le thème !</h2>
+      <p style="margin-top:.35rem;font-size:.88rem;">Lequel vous inspire le plus ?</p>
+    </div>
+
+    <div id="tv-options" style="display:flex; flex-direction:column; gap:1rem;"></div>
+
+    <div id="tv-wait" style="display:none; text-align:center; margin-top:2rem;">
+      <p id="tv-wait-msg" style="color:rgb(var(--success-rgb)); font-weight:bold;">Ton vote est enregistré !</p>
+      <p style="font-size:.85rem; color:var(--muted); margin-top:.5rem;">Attente des autres joueurs...</p>
+      <div class="dots" id="tv-wait-dots" style="margin-top:1rem;"><span></span><span></span><span></span></div>
+      <div id="tv-vote-count" style="margin-top:1rem; font-family:'Space Grotesk',sans-serif; font-weight:bold;">0/0 ont voté</div>
+    </div>
+
+    <div id="tv-countdown" style="display:none; text-align:center; padding:1.2rem 0; font-weight:700; color:rgb(var(--success-rgb)); font-family:'Space Grotesk',sans-serif; text-transform:uppercase; font-size:0.9rem;">
+        Fin des votes dans <span id="tv-cd-val">3</span>s...
+    </div>
+  </div>
+</div>
+
+<div id="screen-theme-vote-result" class="screen">
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+        <div style="font-size:5rem; animation: floatIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; filter:drop-shadow(0 0 30px rgba(var(--gold-rgb), 0.5));">🏆</div>
+        <h2 style="color:#fff; margin-top:1rem; font-size:2.2rem; text-transform:uppercase; letter-spacing:0.1em; animation: floatIn 0.8s ease forwards;">Thème Gagnant !</h2>
+        
+        <div class="theme-card" style="margin-top:2rem; width:100%; max-width:400px; transform:scale(1.1); animation: popInWinner 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;">
+            <div class="theme-label" style="color:rgb(var(--gold-rgb)); text-shadow:0 0 10px rgba(var(--gold-rgb),0.5);">Le peuple a parlé</div>
+            <div class="theme-text" id="tvr-winner-text" style="font-size:1.3rem;">...</div>
+        </div>
+    </div>
 </div>
 
 <!-- ════════════════════════ SCREEN: ANSWERING ════════════════════════ -->
@@ -1883,10 +2030,18 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
     <div class="game-hdr">
       <div>
         <div class="hdr-round-label">Manche</div>
-        <div class="hdr-round-val" id="ans-round">1</div>
+        <div class="hdr-round-val"><span id="ans-round">1</span><span id="ans-prog" style="font-size:0.65em;color:rgba(255,255,255,.5);margin-left:8px;"></span></div>
       </div>
       <div id="ans-center-hdr" class="lives-bar"></div>
       <div class="badge badge-mode" id="ans-mode">🎯 Classique</div>
+    </div>
+
+    <div id="ans-timer-wrap" style="display:none; margin-top: -0.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
+        <span style="font-size:.65rem;font-family:'Space Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);">Temps restant</span>
+        <span id="ans-timer-text" style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1rem;color:#fff;">--:--</span>
+      </div>
+      <div class="timer-bar"><div class="timer-fill" id="ans-timer-fill" style="transform:scaleX(1)"></div></div>
     </div>
 
     <div class="theme-card">
@@ -1894,21 +2049,51 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       <div class="theme-text" id="ans-theme">…</div>
     </div>
 
-    <!-- RESPONDANT form -->
     <div id="ans-form">
-      <div class="glass2" style="padding:1.6rem;text-align:center;margin-bottom:1rem;">
-        <p style="font-size:.62rem;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:.45rem;">Ton numéro secret</p>
-        <div class="number-display" id="ans-num">?</div>
-        <div class="gauge-track" style="margin:.65rem .5rem;">
-          <div class="gauge-fill" id="ans-gauge" style="width:0%"></div>
-        </div>
-        <div class="gauge-labels"><span>① Pire</span><span>⑩ Meilleur</span></div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 1.5rem 1rem; border-radius: 16px; text-align: center; margin-bottom: 1.2rem;">
+          <div style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.8rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700;">Ton Numéro Secret</div>
+          
+          <div class="flip-container" onclick="this.querySelector('.flip-card').classList.toggle('flipped')">
+            <div class="flip-card">
+              <div class="fc-front">
+                <div style="font-size: 3.5rem;">🤫</div>
+                <div style="font-size: 0.6rem; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-top: 0.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700;">👆 Toucher</div>
+              </div>
+              <div class="fc-back" id="ans-flip-back">
+                <div id="ans-num" style="font-size: 5rem; font-weight: 900; font-family: 'Space Grotesk', sans-serif; line-height: 1;">1</div>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 0.6rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                  <span style="font-size: 0.8rem;">👆</span> Cacher
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="padding: 0 0.5rem;">
+            <div style="position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #0099ff, #00f59a, #ffd600, #ff003c); margin-bottom: 0.6rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);"></div>
+            <div style="display: flex; justify-content: space-between; font-family: 'Space Grotesk', sans-serif;">
+              <div style="text-align: left;">
+                <div style="font-weight: 900; font-size: 1.1rem; color: #0099ff; line-height: 1;">1</div>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; margin-top: 4px;">Du moins</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 900; font-size: 1.1rem; color: #ff003c; line-height: 1;">10</div>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; margin-top: 4px;">Du plus</div>
+              </div>
+            </div>
+          </div>
       </div>
-      <textarea id="ans-text" class="input" rows="3" placeholder="Ta réponse ici…" maxlength="120" style="resize:none;"></textarea>
-      <button class="btn btn-primary btn-full" id="ans-btn" onclick="submitAnswer()" style="margin-top:.65rem;">Valider ✓</button>
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 0.4rem;">
+          <div class="section-lbl" style="margin:0;">Ta Réponse</div>
+          <div id="typing-counter" style="font-size:0.65rem; color:rgba(255,255,255,0.4); font-family: 'Space Grotesk', sans-serif; font-weight: 700;"></div>
+      </div>
+      
+      <textarea id="ans-text" class="input mb-2" rows="3" placeholder="Écris ta réponse ici..."></textarea>
+      
+      <button id="btn-submit-ans" class="btn btn-primary btn-full" onclick="submitAnswer()">Valider ✓</button>
+      <button id="btn-edit-ans" class="btn btn-secondary btn-full" onclick="unsubmitAnswer()" style="display:none;">✏️ Modifier ma réponse</button>
     </div>
 
-    <!-- RESPONDANT waiting -->
     <div id="ans-wait" style="display:none;">
       <div style="text-align:center;padding:.5rem 0;">
         <p style="color:rgb(var(--success-rgb));font-weight:700;font-size:1.05rem;-webkit-text-fill-color:rgb(var(--success-rgb));text-shadow:0 0 14px rgba(var(--success-rgb),.4);">✓ Réponse envoyée !</p>
@@ -1918,7 +2103,6 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       <div id="ans-wait-prog" class="player-list" style="margin-top:1rem;"></div>
     </div>
 
-    <!-- CAP'TEN waiting -->
     <div id="ans-cap" style="display:none;">
       <div class="wait-center">
         <div class="wait-icon">👑</div>
@@ -1926,11 +2110,19 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
         <p>Attends que tous écrivent leur réponse…</p>
         <div class="dots"><span></span><span></span><span></span></div>
         <div style="width:100%;margin-top:.75rem;">
-          <h3 style="margin-bottom:.6rem;">Réponses reçues</h3>
+          <h3 style="margin-bottom:.6rem; display:flex; justify-content:space-between; align-items:center;">
+            <span>Réponses reçues</span>
+            <span id="cap-ans-count" style="color:rgb(var(--success-rgb)); font-size:0.85rem;">0/0</span>
+          </h3>
           <div id="ans-cap-prog" class="player-list"></div>
         </div>
       </div>
+    </div> 
+
+    <div id="ans-countdown-text" style="display:none; text-align:center; padding:1.2rem 0; font-weight:700; color:rgb(var(--success-rgb)); font-family:'Space Grotesk',sans-serif; text-transform:uppercase; font-size:0.9rem;">
+        Classement dans <span class="cd-timer-val">3</span>s...
     </div>
+
   </div>
 </div>
 
@@ -1940,10 +2132,10 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
     <div class="game-hdr">
       <div>
         <div class="hdr-round-label">Manche</div>
-        <div class="hdr-round-val" id="cap-round">1</div>
+        <div class="hdr-round-val"><span id="cap-round">1</span><span id="cap-prog" style="font-size:0.65em;color:rgba(255,255,255,.5);margin-left:8px;"></span></div>
       </div>
-      <div class="badge badge-cap">👑 Cap'ten</div>
-      <div id="cap-right-hdr" class="lives-bar"></div>
+      <div id="cap-center-hdr" class="lives-bar"></div>
+      <div class="badge badge-mode" id="cap-mode">🎯 Classique</div>
     </div>
     <div id="cap-timer-wrap" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
@@ -1962,12 +2154,12 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
 
     <!-- Mode CLASSIC / BLITZ -->
     <div id="cap-classic" style="display:none;">
-      <p style="font-size:.84rem;margin-bottom:.8rem;">
+      <p id="cap-classic-inst" style="font-size:.84rem;margin-bottom:.8rem;">
         Tape une carte puis un numéro, ou glisse-la sur la timeline.
         <span style="color:rgb(var(--primary-rgb));-webkit-text-fill-color:rgb(var(--primary-rgb));">1 pire</span> →
         <span style="color:rgb(var(--accent-rgb));-webkit-text-fill-color:rgb(var(--accent-rgb));">10 meilleur</span>.
       </p>
-      <h3 style="margin-bottom:.55rem;">Les réponses</h3>
+      <h3 id="cap-classic-pool-title" style="margin-bottom:.55rem;">Les réponses</h3>
       <div id="cap-cards" class="card-stack"></div>
       <div style="margin-top:1rem;">
         <h3 style="margin-bottom:.55rem;">Timeline 1 → 10</h3>
@@ -1980,11 +2172,9 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       </button>
     </div>
 
-    <!-- Mode SNIPER -->
     <div id="cap-sniper" style="display:none;">
       <p style="font-size:.84rem;margin-bottom:.85rem;">
-        Assigne le <strong style="color:rgb(var(--primary-rgb));-webkit-text-fill-color:rgb(var(--primary-rgb));">numéro exact</strong> à chaque réponse.
-        Plus tu es précis·e, plus tu marques !
+        Assigne le <strong style="color:rgb(var(--primary-rgb));">numéro exact</strong> à chaque réponse. Plus tu es précis, plus tu marques !
         <br><span style="color:var(--dim);font-size:.75rem;">+3 pour l'exact · +1 pour ±1 · 0 sinon</span>
       </p>
       <div class="sniper-board" id="cap-sniper-list"></div>
@@ -1993,32 +2183,53 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       </button>
     </div>
 
-    <!-- Mode DUEL -->
-    <div id="cap-duel" style="display:none;">
-      <p style="font-size:.84rem;margin-bottom:.85rem;">
-        Identifie <strong>juste</strong> la réponse "<span style="color:#0099ff;-webkit-text-fill-color:#0099ff;">1</span>" (la moins intense)
-        et la réponse "<span style="color:#ff003c;-webkit-text-fill-color:#ff003c;">10</span>" (la plus intense).
-        <br><span style="color:var(--dim);font-size:.75rem;">+2 pts si les deux trouvés · +1 si un seul · 0 sinon</span>
+    <div id="cap-blind" style="display:none;">
+      <p style="font-size:.84rem;margin-bottom:.8rem;text-align:center;">
+        Assigne un numéro à cette réponse. Tu ne pourras pas revenir en arrière !
       </p>
-      <div class="duel-wrap">
-        <div class="duel-section duel-section--low">
-          <div class="duel-head">
-            <div class="duel-label">Ta pire réponse</div>
-            <div class="duel-num n1">1</div>
-          </div>
-          <div id="cap-duel-low" class="duel-pick-grid"></div>
+      <div id="blind-container" style="display:flex;flex-direction:column;align-items:center;">
         </div>
-        <div class="duel-section duel-section--high">
-          <div class="duel-head">
-            <div class="duel-label">Ta meilleure réponse</div>
-            <div class="duel-num n10">10</div>
-          </div>
-          <div id="cap-duel-high" class="duel-pick-grid"></div>
+    </div>
+
+    <div id="cap-duel" style="display:none;">
+      
+      <div id="duel-cap-view" style="display:none;">
+        <p style="font-size:.84rem;margin-bottom:.8rem;text-align:center;">
+          Classe ces réponses sur ta timeline. <strong style="color:rgb(var(--primary-rgb));">Ne te concerte pas avec l'autre !</strong>
+        </p>
+        <div id="duel-cards" class="card-stack"></div>
+        <div style="margin-top:1rem;">
+          <h3 style="margin-bottom:.55rem;">Ta Timeline</h3>
+          <div class="timeline-wrap"><div class="timeline" id="duel-timeline"></div></div>
+        </div>
+        <button id="btn-validate-duel" class="btn btn-primary btn-full" onclick="validateDuel()" style="margin-top:1rem;" disabled>
+          Valider ma Timeline ✓
+        </button>
+      </div>
+
+      <div id="duel-cap-wait" style="display:none;" class="wait-center">
+         <div class="wait-icon">⏳</div>
+         <h2 style="color:#fff;">Timeline validée !</h2>
+         <p>Attente de l'autre Cap'ten...</p>
+         <div class="dots" style="margin-top:1rem;"><span></span><span></span><span></span></div>
+      </div>
+
+      <div id="duel-spec-view" style="display:none;">
+        <p style="font-size:.84rem;margin-bottom:1.5rem;text-align:center;color:rgb(var(--success-rgb));font-weight:bold;">
+          Les 2 Cap'tens classent en direct...
+        </p>
+        
+        <h3 id="duel-spec-name1" style="margin-bottom:.55rem; color:rgb(var(--primary-rgb));">Timeline 1</h3>
+        <div class="timeline-wrap" style="margin-bottom:1.5rem; border:1px solid rgba(var(--primary-rgb),0.3); border-radius:12px; background:rgba(var(--primary-rgb),0.05); padding:10px;">
+            <div class="timeline" id="duel-timeline-spec1"></div>
+        </div>
+        
+        <h3 id="duel-spec-name2" style="margin-bottom:.55rem; color:rgb(var(--accent-rgb));">Timeline 2</h3>
+        <div class="timeline-wrap" style="border:1px solid rgba(var(--accent-rgb),0.3); border-radius:12px; background:rgba(var(--accent-rgb),0.05); padding:10px;">
+            <div class="timeline" id="duel-timeline-spec2"></div>
         </div>
       </div>
-      <button id="btn-validate-duel" class="btn btn-primary btn-full" onclick="validateDuel()" style="margin-top:1rem;" disabled>
-        Valider mes choix 🎭
-      </button>
+
     </div>
 
     <!-- Non-captain waiting -->
@@ -2083,9 +2294,13 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       <div id="go-score" style="font-family:'Space Grotesk',sans-serif;font-size:3.5rem;font-weight:900;background:linear-gradient(120deg,rgb(var(--gold-rgb)) 0%,#ff8c00 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 18px rgba(var(--gold-rgb),.40));">0</div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:.55rem;margin-top:1rem;">
-      <button class="btn btn-primary btn-full" id="go-replay" onclick="restartGame()">🔁 Rejouer</button>
-      <button class="btn btn-secondary btn-full" onclick="goHome()">← Retour accueil</button>
+    <div id="go-host-actions" style="display:none;flex-direction:column;gap:.55rem;margin-top:1rem;">
+      <button class="btn btn-primary btn-full" id="go-replay" onclick="startGame()">🔁 Rejouer</button>
+      <button class="btn btn-secondary btn-full" onclick="backToLobby()">← Retour au salon</button>
+    </div>
+    <div id="go-guest-wait" style="display:none;text-align:center;margin-top:1.5rem;">
+      <p style="color:var(--muted); font-weight:700;">En attente du chef...</p>
+      <div class="dots" style="margin-top:.5rem;"><span></span><span></span><span></span></div>
     </div>
   </div>
 </div>
@@ -2135,19 +2350,19 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
           <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Top Ten</span>
         </label>
         <label class="theme-label-item">
-          <input type="radio" name="color-theme" value="cyberpunk">
-          <div class="theme-dot" style="background:linear-gradient(135deg,#00f0ff,#7000ff);"></div>
-          <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Cyberpunk</span>
+          <input type="radio" name="color-theme" value="ember">
+          <div class="theme-dot" style="background:linear-gradient(135deg,#ff781e,#ffc832);"></div>
+          <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Ember</span>
         </label>
         <label class="theme-label-item">
-          <input type="radio" name="color-theme" value="toxic">
-          <div class="theme-dot" style="background:linear-gradient(135deg,#39ff14,#00d4a0);"></div>
-          <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Toxique</span>
+          <input type="radio" name="color-theme" value="nature">
+          <div class="theme-dot" style="background:linear-gradient(135deg,#32dc78,#00c896);"></div>
+          <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Nature</span>
         </label>
         <label class="theme-label-item">
-          <input type="radio" name="color-theme" value="synthwave">
-          <div class="theme-dot" style="background:linear-gradient(135deg,#ff00ff,#00ffff);"></div>
-          <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Synthwave</span>
+          <input type="radio" name="color-theme" value="rose">
+          <div class="theme-dot" style="background:linear-gradient(135deg,#ff50a0,#b432ff);"></div>
+          <span style="font-size:.68rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Rose</span>
         </label>
       </div>
     </div>
@@ -2160,17 +2375,14 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       </label>
     </div>
 
-    <button onclick="openRules()" style="
-      width:100%;padding:.95rem;border-radius:14px;cursor:pointer;
-      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-      color:rgba(255,255,255,.82);
-      font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:700;
-      text-transform:uppercase;letter-spacing:.08em;
-      display:flex;align-items:center;justify-content:center;gap:.5rem;
-      transition:all .22s ease;margin-bottom:.5rem;
-    ">Comment jouer ? 📖</button>
+    <button class="btn btn-secondary btn-full" onclick="openRules()" style="margin-bottom:.5rem;">Comment jouer ? 📖</button>
 
-    <p style="text-align:center;font-size:.65rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.25);">Interface Liquid Glass ✦</p>
+    <div id="settings-session-btns" style="display:none; border-top:1px solid rgba(255,255,255,.07); padding-top:.85rem; margin-top:.35rem;">
+      <button class="btn btn-secondary btn-full" id="btn-return-lobby" style="color:rgba(255,170,30,.8); margin-bottom:.5rem;" onclick="settingsReturnLobby()">↩ Retourner au salon</button>
+      <button class="btn btn-secondary btn-full" style="color:rgb(var(--accent-rgb));" onclick="settingsLeaveGame()">✕ Quitter la partie</button>
+    </div>
+
+    <p style="text-align:center;font-size:.65rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.25);margin-top:1rem;">Interface Liquid Glass ✦ KSOS</p>
   </div>
 </div>
 
@@ -2199,7 +2411,7 @@ html.light-mode .duel-opt { background: rgba(255,255,255,.65); color: #14121e; }
       <div class="rule-line"><span>🎯</span><span><strong>Classique</strong> · Range toutes les réponses 1→10. 3 vies en équipe.</span></div>
       <div class="rule-line"><span>🏹</span><span><strong>Sniper</strong> · Devine le numéro exact de chaque réponse. Points de précision, classement final.</span></div>
       <div class="rule-line"><span>⚡</span><span><strong>Éclair</strong> · Classique mais avec un <strong>chrono</strong>. Si le temps passe → vie perdue.</span></div>
-      <div class="rule-line"><span>🎭</span><span><strong>Duel</strong> · Identifie juste le "1" et le "10". Rapide, compétitif, classement.</span></div>
+      <div class="rule-line"><span>🎭</span><span><strong>Extrême</strong> · Identifie juste le "1" et le "10". Rapide, compétitif, classement.</span></div>
     </div>
 
     <div class="rule-block">
@@ -2313,18 +2525,20 @@ const QUESTIONS = {
 // ═══════════════════════════════════════════════════════════
 //  3. LOCAL STATE
 // ═══════════════════════════════════════════════════════════
-let pid = sessionStorage.getItem('pid');
+let pid = sessionStorage.getItem('pid') || localStorage.getItem('tt-pid');
 if (!pid) {
   pid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-  sessionStorage.setItem('pid', pid);
 }
-let pname = sessionStorage.getItem('pname') || '';
+sessionStorage.setItem('pid', pid);
+localStorage.setItem('tt-pid', pid);
+
+let pname = sessionStorage.getItem('pname') || localStorage.getItem('tt-pname') || '';
 
 let room = { id: null, data: null, unsub: null };
 let db = null, fbReady = false;
 let dragState   = { selected: null, placed: {} };
 let sniperGuesses = {};
-let duelGuess     = { low: null, high: null };
+let extremeGuess     = { low: null, high: null };
 let revealAnimDone = false;
 let blitzTimerId = null;
 let lastStatus   = null;
@@ -2344,21 +2558,112 @@ try {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  5. SPLASH CONTROL
+//  5. SPLASH CONTROL + RECONNECTION CHECK
 // ═══════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const sp = document.getElementById('splash-screen');
-    if (!sp) return;
-    sp.classList.add('hide');
+window.addEventListener('DOMContentLoaded', async () => {
+  const inpName = document.getElementById('inp-name');
+  if (inpName && pname) inpName.value = pname;
+
+  const sp = document.getElementById('splash-screen');
+  if (sp) {
     setTimeout(() => {
-      sp.remove();
-      if (!localStorage.getItem('tt-welcomed')) {
-        document.getElementById('welcome-rules').classList.add('open');
-      }
-    }, 1100);
-  }, 2500);
+      sp.classList.add('hide');
+      setTimeout(async () => {
+        sp.remove();
+        const reconnected = await checkReconnection();
+        if (!reconnected && !localStorage.getItem('tt-welcomed') && document.getElementById('welcome-rules')) {
+          document.getElementById('welcome-rules').classList.add('open');
+        }
+      }, 1000);
+    }, 2500);
+  }
 });
+
+// ═══════════════════════════════════════════════════════════
+//  5b. RECONNECTION SYSTEM
+// ═══════════════════════════════════════════════════════════
+async function checkReconnection() {
+  if (!fbReady) return false;
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem('tt-reconnect-state') || 'null'); } catch(e) { return false; }
+  if (!saved || !saved.disconnectedAt || !saved.roomId) return false;
+
+  const elapsed = Date.now() - saved.disconnectedAt;
+  if (elapsed > 60000) {
+    localStorage.removeItem('tt-reconnect-state');
+    return false;
+  }
+
+  // Restore identity in case sessionStorage was cleared (tab reopen)
+  if (saved.pid) { pid = saved.pid; sessionStorage.setItem('pid', pid); localStorage.setItem('tt-pid', pid); }
+  if (saved.pname) { pname = saved.pname; sessionStorage.setItem('pname', pname); localStorage.setItem('tt-pname', pname); }
+
+  if (elapsed < 5000) {
+    return await attemptReconnect(saved.roomId, true);
+  }
+
+  // 5–60 s → show modal
+  return new Promise(resolve => {
+    const secs = Math.floor((60000 - elapsed) / 1000);
+    openModal(`
+      <div style="text-align:center;padding:.5rem;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🔄</div>
+        <h2 style="color:#fff;margin-bottom:.75rem;">Reprendre la partie ?</h2>
+        <p style="margin-bottom:1.5rem;line-height:1.5;color:rgba(255,255,255,.75);">
+          Tu étais connecté au salon <strong style="color:rgb(var(--gold-rgb));">${escapeHtml(saved.roomId)}</strong>.<br>
+          <span style="font-size:.82rem;color:var(--muted);">Session expire dans ${secs}s</span>
+        </p>
+        <div style="display:flex;gap:.75rem;">
+          <button class="btn btn-secondary" style="flex:1;" id="rc-no">Nouvelle partie</button>
+          <button class="btn btn-primary" style="flex:1;" id="rc-yes">Reprendre ✦</button>
+        </div>
+      </div>
+    `);
+    document.getElementById('rc-yes').onclick = async () => {
+      closeModal();
+      const ok = await attemptReconnect(saved.roomId, false);
+      resolve(ok);
+    };
+    document.getElementById('rc-no').onclick = () => {
+      closeModal();
+      localStorage.removeItem('tt-reconnect-state');
+      resolve(false);
+    };
+  });
+}
+
+async function attemptReconnect(roomId, silent) {
+  try {
+    const snap = await get(ref(db, `rooms/${roomId}`));
+    if (!snap.exists()) {
+      localStorage.removeItem('tt-reconnect-state');
+      if (!silent) toast('Ce salon n\'existe plus.', 'err');
+      return false;
+    }
+    const d = snap.val();
+    if (!d.players?.[pid]) {
+      // Re-add player if they were removed while disconnected
+      await set(ref(db, `rooms/${roomId}/players/${pid}`), {
+        name: pname, number: null, answer: null, answered: false,
+        score: 0, ready: false, connectedAt: Date.now()
+      });
+    }
+    // Clear disconnectedAt but keep state alive
+    const state = JSON.parse(localStorage.getItem('tt-reconnect-state') || '{}');
+    delete state.disconnectedAt;
+    localStorage.setItem('tt-reconnect-state', JSON.stringify(state));
+
+    const inpName = document.getElementById('inp-name');
+    if (inpName && pname) inpName.value = pname;
+
+    enterRoom(roomId);
+    if (!silent) toast('Session restaurée ✓', 'ok');
+    return true;
+  } catch(e) {
+    if (!silent) toast('Impossible de se reconnecter.', 'err');
+    return false;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════
 //  6. UTILITIES
@@ -2371,12 +2676,20 @@ function showScreen(name) {
   if (target) target.classList.add('active');
 }
 
-function toast(msg, type='info') {
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toasts');
+  if (!container) return;
+  
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
-  $s('toasts').appendChild(el);
-  setTimeout(() => el.remove(), 2800);
+  
+  container.appendChild(el);
+  
+  // On supprime l'élément après l'animation (2.8s dans le CSS)
+  setTimeout(() => {
+    if (el.parentNode) el.remove();
+  }, 3000);
 }
 
 function openModal(html) { $s('overlay').classList.add('show'); $s('modal').innerHTML = html; }
@@ -2394,7 +2707,7 @@ function shuffle(arr) {
 
 function rndCode() {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 5 }, () => c[Math.floor(Math.random() * c.length)]).join('');
+  return Array.from({ length: 4 }, () => c[Math.floor(Math.random() * c.length)]).join('');
 }
 
 function numColor(n) {
@@ -2426,12 +2739,17 @@ function numGradient(n) {
 
 function gaugeW(n) { return ((n - 1) / 9 * 100).toFixed(1) + '%'; }
 
-function lives(el, n, max = 3) {
+function lives(el, n, max) {
   el.innerHTML = '';
-  for (let i = 0; i < max; i++) {
+  const totalHearts = max || 3; // Utilise le max défini, sinon 3 par défaut
+  for (let i = 0; i < totalHearts; i++) {
     const h = document.createElement('span');
-    h.className = 'life-heart' + (i >= n ? ' lost' : '');
-    h.textContent = '❤️';
+    const isLost = i >= n;
+    // C'est la dernière vie SI : il reste 1 vie en tout ET que ce cœur n'est pas perdu
+    const isLastLife = (n === 1 && !isLost);
+
+    h.className = 'life-heart' + (isLost ? ' lost' : '') + (isLastLife ? ' critical' : '');
+    h.textContent = isLastLife ? '💔' : '❤️';
     el.appendChild(h);
   }
 }
@@ -2441,36 +2759,67 @@ function checkFB() {
   return true;
 }
 
+// ─── INPUT DRAFT PERSISTENCE ───────────────────────────────
+function _inputKey() {
+  const d = room.data;
+  if (!d || !room.id) return null;
+  return `tt-ans-${room.id}-${pid}-${d.round || 0}-${d.captainId || ''}`;
+}
+function saveInputDraft(v) { const k = _inputKey(); if (k) localStorage.setItem(k, v); }
+function restoreInputDraft() { const k = _inputKey(); return k ? (localStorage.getItem(k) || '') : ''; }
+function clearInputDraft() { const k = _inputKey(); if (k) localStorage.removeItem(k); }
+
 function modeInfo(mode) {
   const m = {
-    classic: { emoji: '🎯', name: 'Classique',  coop: true,  ranked: false },
-    sniper:  { emoji: '🏹', name: 'Sniper',     coop: false, ranked: true  },
-    blitz:   { emoji: '⚡', name: 'Éclair',     coop: true,  ranked: false },
-    duel:    { emoji: '🎭', name: 'Duel',       coop: false, ranked: true  }
+    classic:  { emoji: '🎯', name: 'Classique', coop: true,  ranked: false },
+    survival: { emoji: '💀', name: 'Survie',    coop: true,  ranked: false }, 
+    sniper:   { emoji: '🏹', name: 'Sniper',    coop: false, ranked: true  },
+    extreme:  { emoji: '🎭', name: 'Extrême',   coop: true,  ranked: false },
+    blind:    { emoji: '🙈', name: 'Aveugle',   coop: true,  ranked: false },
+    duel:     { emoji: '⚔️', name: 'Duel',      coop: false, ranked: true  }
   };
   return m[mode] || m.classic;
 }
 
 // ═══════════════════════════════════════════════════════════
-//  7. MODAL — CREATE / JOIN
+//  FONCTION DE CONFIRMATION PERSONNALISÉE
 // ═══════════════════════════════════════════════════════════
-window.openCreate = () => {
-  openModal(`
-    <h2 style="margin-bottom:1.2rem;color:#fff;text-align:center;">Créer un salon</h2>
-    <div style="display:flex;flex-direction:column;gap:.8rem;">
-      <label style="font-size:.7rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.1em;">Ton pseudo</label>
-      <input id="m-name" class="input" placeholder="Entre ton pseudo…" maxlength="20" autofocus value="${pname}">
-      <button class="btn btn-primary btn-full" onclick="createRoom()">Créer ✦</button>
-      <button class="btn btn-secondary btn-full" onclick="closeModal()">Annuler</button>
+window.showConfirm = (text, onConfirm) => {
+  const html = `
+    <div style="text-align:center; padding: 0.5rem;">
+      <div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>
+      <h2 style="color:#fff; margin-bottom:1rem; font-size:1.4rem;">Confirmation</h2>
+      <p style="margin-bottom:2rem; line-height:1.5; color:rgba(255,255,255,0.7);">${text}</p>
+      <div style="display:flex; gap:0.75rem;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Annuler</button>
+        <button id="confirm-yes-btn" class="btn btn-primary" style="flex:1;">Confirmer</button>
+      </div>
     </div>
-  `);
+  `;
+  openModal(html);
+  
+  // On attache l'événement au bouton de confirmation
+  document.getElementById('confirm-yes-btn').onclick = () => {
+    closeModal();
+    onConfirm();
+  };
 };
 
+// ═══════════════════════════════════════════════════════════
+//  7. CREATE / JOIN ROOM (Direct from Home)
+// ═══════════════════════════════════════════════════════════
 window.createRoom = async () => {
   if (!checkFB()) return;
-  const name = $s('m-name')?.value.trim();
+  const name = $s('inp-name')?.value.trim();
   if (!name) { toast('Entre ton pseudo !', 'err'); return; }
-  pname = name; sessionStorage.setItem('pname', name);
+  
+  // Sauvegarde le pseudo
+  pname = name; 
+  sessionStorage.setItem('pname', name);
+  localStorage.setItem('tt-pname', name);
+
+  const btn = $s('btn-create');
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Création…'; }
 
   const id = rndCode();
   const data = {
@@ -2481,56 +2830,60 @@ window.createRoom = async () => {
     maxRounds: 5,
     timerSec: 60,
     lives: 3,
+    maxLives: 3,
     round: 0,
     captainId: null,
     theme: null,
     drawnTheme: null,
     roundResult: null,
     createdAt: Date.now(),
-    players: { [pid]: { name, number: null, answer: null, answered: false, score: 0, ready: false } }
+    players: { [pid]: { name, number: null, answer: null, answered: false, score: 0, ready: false, connectedAt: Date.now() } }
   };
+  
   try {
     await set(ref(db, `rooms/${id}`), data);
-    closeModal();
     enterRoom(id);
-  } catch (e) { toast('Erreur : ' + e.message, 'err'); }
-};
-
-window.openJoin = () => {
-  openModal(`
-    <h2 style="margin-bottom:1.2rem;color:#fff;text-align:center;">Rejoindre un salon</h2>
-    <div style="display:flex;flex-direction:column;gap:.8rem;">
-      <label style="font-size:.7rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.1em;">Ton pseudo</label>
-      <input id="m-name" class="input" placeholder="Entre ton pseudo…" maxlength="20" value="${pname}">
-      <label style="font-size:.7rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.1em;">Code du salon</label>
-      <input id="m-code" class="input" placeholder="Ex: XKZT9" maxlength="5"
-        style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;letter-spacing:.22em;text-transform:uppercase;">
-      <button class="btn btn-primary btn-full" onclick="joinRoom()">Rejoindre ↗</button>
-      <button class="btn btn-secondary btn-full" onclick="closeModal()">Annuler</button>
-    </div>
-  `);
+  } catch (e) { 
+    toast('Erreur : ' + e.message, 'err'); 
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '✦ Créer un salon'; }
+  }
 };
 
 window.joinRoom = async () => {
   if (!checkFB()) return;
-  const name = $s('m-name')?.value.trim();
-  const code = $s('m-code')?.value.trim().toUpperCase();
+  const name = $s('inp-name')?.value.trim();
+  const code = $s('inp-code')?.value.trim().toUpperCase();
+  
   if (!name) { toast('Entre ton pseudo !', 'err'); return; }
   if (!code || code.length < 4) { toast('Code de salon invalide !', 'err'); return; }
-  pname = name; sessionStorage.setItem('pname', name);
+  
+  pname = name; 
+  sessionStorage.setItem('pname', name);
+  localStorage.setItem('tt-pname', name);
 
-  const snap = await get(ref(db, `rooms/${code}`));
-  if (!snap.exists()) { toast('Salon introuvable !', 'err'); return; }
-  const d = snap.val();
-  if (d.status !== 'lobby' && d.status !== 'config') {
-    toast('La partie a déjà commencé !', 'err'); return;
+  const btn = $s('btn-join');
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Connexion…'; }
+
+  try {
+    const snap = await get(ref(db, `rooms/${code}`));
+    if (!snap.exists()) { toast('Salon introuvable !', 'err'); return; }
+    const d = snap.val();
+    
+    if (d.status !== 'lobby' && d.status !== 'config') {
+      toast('La partie a déjà commencé !', 'err'); return;
+    }
+
+    await set(ref(db, `rooms/${code}/players/${pid}`), {
+      name, number: null, answer: null, answered: false, score: 0, ready: false, connectedAt: Date.now()
+    });
+    
+    enterRoom(code);
+  } catch(e) {
+    toast('Erreur de connexion !', 'err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Rejoindre ↗'; }
   }
-
-  await set(ref(db, `rooms/${code}/players/${pid}`), {
-    name, number: null, answer: null, answered: false, score: 0, ready: false
-  });
-  closeModal();
-  enterRoom(code);
 };
 
 window.copyCode = () => {
@@ -2548,33 +2901,79 @@ function enterRoom(id) {
   $s('lby-code').textContent = id;
   showScreen('lobby');
 
+  // Persist connection state for reconnection
+  localStorage.setItem('tt-reconnect-state', JSON.stringify({ roomId: id, pid, pname }));
+
   const roomRef = ref(db, `rooms/${id}`);
   room.unsub = onValue(roomRef, snap => {
     if (!snap.exists()) {
       toast('Le salon a été fermé.', 'err');
       if (room.unsub) { try { room.unsub(); } catch(e){} }
       room.id = null; room.data = null;
+      localStorage.removeItem('tt-reconnect-state');
       showScreen('home');
       return;
     }
-    room.data = snap.val();
-    dispatch(room.data);
+    const d = snap.val();
+    // Auto-cleanup empty rooms (all players disconnected via onDisconnect)
+    if (!d.players || Object.keys(d.players).length === 0) {
+      remove(ref(db, `rooms/${id}`)).catch(() => {});
+      if (room.unsub) { try { room.unsub(); } catch(e){} }
+      room.id = null; room.data = null;
+      localStorage.removeItem('tt-reconnect-state');
+      showScreen('home');
+      return;
+    }
+    room.data = d;
+    dispatch(d);
   });
 
-  // Clean up on page close
+  // Remove player entry on connection drop
   onDisconnect(ref(db, `rooms/${id}/players/${pid}`)).remove();
-  window.addEventListener('beforeunload', () => {
-    try { remove(ref(db, `rooms/${id}/players/${pid}`)); } catch(e){}
-  });
 }
+
+// One-time beforeunload — save disconnect timestamp for reconnection logic
+window.addEventListener('beforeunload', () => {
+  if (room.id) {
+    try {
+      const state = JSON.parse(localStorage.getItem('tt-reconnect-state') || '{}');
+      state.disconnectedAt = Date.now();
+      localStorage.setItem('tt-reconnect-state', JSON.stringify(state));
+    } catch(e) {}
+  }
+});
 
 window.leaveRoom = async () => {
   if (!room.id) return;
-  try { await remove(ref(db, `rooms/${room.id}/players/${pid}`)); } catch(e){}
-  if (room.unsub) { try { room.unsub(); } catch(e){} }
-  room.id = null; room.data = null; room.unsub = null;
-  revealAnimDone = false; lastStatus = null;
-  showScreen('home');
+  
+  window.showConfirm("Es-tu sûr de vouloir quitter ce salon ?", async () => {
+    const d = room.data;
+    const updates = {};
+    const remaining = Object.entries((d?.players || {})).filter(([id]) => id !== pid);
+
+    // If we're the host and others remain, reassign host to longest-connected player
+    if (d && d.host === pid && remaining.length > 0) {
+      const newHost = remaining.sort((a, b) => (a[1].connectedAt || 0) - (b[1].connectedAt || 0))[0][0];
+      updates[`rooms/${room.id}/host`] = newHost;
+    }
+
+    try {
+      if (remaining.length === 0) {
+        // Last player — delete the whole room
+        await remove(ref(db, `rooms/${room.id}`));
+      } else {
+        updates[`rooms/${room.id}/players/${pid}`] = null;
+        await update(ref(db), updates);
+      }
+    } catch(e){}
+
+    if (room.unsub) { try { room.unsub(); } catch(e){} }
+    room.id = null; room.data = null; room.unsub = null;
+    revealAnimDone = false; lastStatus = null;
+    localStorage.removeItem('tt-reconnect-state');
+    showScreen('home');
+    toast("Tu as quitté le salon", "info");
+  });
 };
 
 window.goHome = () => {
@@ -2587,10 +2986,23 @@ window.goHome = () => {
 // ═══════════════════════════════════════════════════════════
 function dispatch(d) {
   if (!d) return;
+
+  // ── HOST REASSIGNMENT ──────────────────────────────────────
+  // If the current host has left, deterministically elect the longest-connected player.
+  // All clients compute the same result; only the elected player writes to avoid conflicts.
+  if (d.players && d.host && !d.players[d.host] && Object.keys(d.players).length > 0) {
+    const newHostId = Object.entries(d.players)
+      .sort((a, b) => (a[1].connectedAt || 0) - (b[1].connectedAt || 0))[0][0];
+    if (newHostId === pid) {
+      update(ref(db, `rooms/${room.id}`), { host: newHostId });
+    }
+    return; // Wait for Firebase to re-trigger with updated host
+  }
+  // ──────────────────────────────────────────────────────────
   // Detect status change → reset volatile local state
   if (d.status !== lastStatus) {
     if (d.status === 'reveal') revealAnimDone = false;
-    if (d.status === 'resolving') { dragState = { selected: null, placed: {} }; sniperGuesses = {}; duelGuess = { low: null, high: null }; }
+    if (d.status === 'resolving') { dragState = { selected: null, placed: {} }; sniperGuesses = {}; extremeGuess = { low: null, high: null }; window._capBoardBuilt = false; }
     if (d.status === 'theme-choice') { /* fresh state */ }
     if (d.status === 'answering' && blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
     lastStatus = d.status;
@@ -2600,11 +3012,14 @@ function dispatch(d) {
     case 'config':       renderConfig(d); break;
     case 'reveal':       renderNumberReveal(d); break;
     case 'theme-choice': renderThemeChoice(d); break;
+    case 'duel-challenge': renderDuelChallenge(d); break;
+    case 'theme-vote':   renderThemeVote(d); break;
     case 'answering':    renderAnswering(d); break;
     case 'resolving':    renderCaptain(d); break;
     case 'round-reveal': renderRoundReveal(d); break;
     case 'leaderboard':  renderLeaderboard(d); break;
     case 'gameover':     renderGameover(d); break;
+    case 'theme-vote-result': renderThemeVoteResult(d); break;
   }
 }
 
@@ -2619,18 +3034,29 @@ function renderLobby(d) {
 
   $s('lby-count').textContent = ids.length;
 
+  const warnEl = $s('lby-warn');
+  if (warnEl) warnEl.style.display = ids.length < 3 ? 'block' : 'none';
+
+  // ── Incremental player list — only rebuild when data actually changes ──
   const el = $s('lby-players');
-  el.innerHTML = '';
-  Object.entries(players).forEach(([id, p]) => {
-    const item = document.createElement('div');
-    item.className = 'player-item';
-    item.innerHTML = `
-      <div class="player-avatar">${(p.name || '?').charAt(0).toUpperCase()}</div>
-      <div class="player-name">${escapeHtml(p.name || '???')}</div>
-      ${id === d.host ? '<div class="player-host">Hôte</div>' : ''}
-    `;
-    el.appendChild(item);
-  });
+  const snapshot = JSON.stringify(
+    Object.entries(players).map(([id, p]) => ({ id, name: p.name, host: id === d.host }))
+  );
+  if (el.dataset.snapshot !== snapshot) {
+    el.dataset.snapshot = snapshot;
+    el.innerHTML = '';
+    Object.entries(players).forEach(([id, p]) => {
+      const item = document.createElement('div');
+      item.className = 'player-item';
+      item.style.animation = 'none';
+      item.innerHTML = `
+        <div class="player-avatar">${(p.name || '?').charAt(0).toUpperCase()}</div>
+        <div class="player-name">${escapeHtml(p.name || '???')}</div>
+        ${id === d.host ? '<div class="player-host">Hôte</div>' : ''}
+      `;
+      el.appendChild(item);
+    });
+  }
 
   $s('lby-host-ctrl').style.display  = isHost ? 'block' : 'none';
   $s('lby-guest-ctrl').style.display = isHost ? 'none'  : 'block';
@@ -2640,7 +3066,7 @@ window.goToConfig = async () => {
   if (!room.data) return;
   if (room.data.host !== pid) return;
   const ids = Object.keys(room.data.players || {});
-  if (ids.length < 2) { toast('Il faut au moins 2 joueurs !', 'err'); return; }
+  if (ids.length < 3) { toast('Il faut au moins 3 joueurs !', 'err'); return; }
   await update(ref(db, `rooms/${room.id}`), { status: 'config' });
 };
 
@@ -2656,29 +3082,21 @@ function renderConfig(d) {
   showScreen('config');
   const isHost = d.host === pid;
 
-  // Update mode selection UI
+  // Met à jour l'apparence des modes
   document.querySelectorAll('#cfg-modes .mode-card').forEach(card => {
     card.classList.toggle('selected', card.dataset.mode === d.mode);
     card.style.pointerEvents = isHost ? 'auto' : 'none';
     card.style.opacity = isHost ? '1' : '.7';
   });
 
-  // Level
+  // Met à jour les niveaux
   $s('cfg-lv-fam').className = 'level-opt' + (d.level === 'family' ? ' sel-fam' : '');
   $s('cfg-lv-adu').className = 'level-opt' + (d.level === 'adult'  ? ' sel-adu' : '');
   $s('cfg-lv-fam').style.pointerEvents = isHost ? 'auto' : 'none';
   $s('cfg-lv-adu').style.pointerEvents = isHost ? 'auto' : 'none';
 
-  // Extra options
-  const m = modeInfo(d.mode);
-  const showRounds = d.mode === 'sniper' || d.mode === 'duel';
-  const showTimer  = d.mode === 'blitz';
-  $s('cfg-rounds-wrap').style.display = showRounds ? 'block' : 'none';
-  $s('cfg-timer-wrap').style.display  = showTimer  ? 'block' : 'none';
-  if (showRounds) $s('cfg-rounds').value = String(d.maxRounds || 5);
-  if (showTimer)  $s('cfg-timer').value  = String(d.timerSec || 60);
-  $s('cfg-rounds').disabled = !isHost;
-  $s('cfg-timer').disabled  = !isHost;
+  // Injecte la description et les sliders
+  renderConfigParams(d.mode, d, isHost);
 
   $s('cfg-host-actions').style.display  = isHost ? 'flex' : 'none';
   $s('cfg-guest-actions').style.display = isHost ? 'none' : 'block';
@@ -2691,6 +3109,74 @@ window.cfgSetMode = async (mode) => {
   if (!room.data || room.data.host !== pid) return;
   await update(ref(db, `rooms/${room.id}`), { mode });
 };
+
+// --- NOUVEAU: Descriptions et Paramètres dynamiques ---
+function renderConfigParams(mode, d, isHost) {
+  const container = $s('params-grid');
+  if(!container) return;
+
+  const descs = {
+    classic: '🎯 <strong>Classique</strong> — Rangez les réponses de 1 à 10. Travaillez en équipe pour conserver vos vies !',
+    survival: '💀 <strong>Survie</strong> — Jouez en équipe pour durer le plus longtemps possible et battre le record mondial.',
+    sniper: '🏹 <strong>Sniper</strong> — Chacun pour soi. Devinez le numéro exact de TOUTES les réponses (l\'interface avec tous les boutons affichés en même temps).',
+    extreme: '🎭 <strong>Extrême</strong> — La timeline est bloquée ! Le Cap\'ten ne peut placer que la pire (1) et la meilleure (10) réponse.',
+    blind: '🙈 <strong>Aveugle (1 par 1)</strong> — Le Cap\'ten reçoit une seule réponse à la fois et doit la placer définitivement sans voir les autres !',
+    duel: '⚔️ <strong>Duel</strong> — Deux Cap\'tens s\'affrontent ! Les joueurs votent pour le thème. Le Cap\'ten le plus précis gagne, et les joueurs marquent des points si leur réponse est bien classée.'
+  };
+  const descEl = $s('cfg-mode-desc');
+  if (descEl) descEl.innerHTML = descs[mode] || descs.classic;
+
+  const showRounds = mode !== 'survival';
+  const showLives = mode !== 'sniper' && mode !== 'duel';
+  
+  let html = `<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:1.5rem;">`;
+
+  if (showRounds) {
+    html += `
+      <div style="display:flex; flex-direction:column; gap:.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label style="font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em;">Manches</label>
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:900; color:#fff;" id="val-rounds">${d.maxRounds || 5}</span>
+        </div>
+        <input type="range" min="1" max="10" value="${d.maxRounds || 5}" 
+               style="width:100%; accent-color:rgb(var(--primary-rgb)); cursor:pointer;" 
+               oninput="document.getElementById('val-rounds').textContent = this.value"
+               onchange="if(${isHost}) window.updateDbRounds(this.value)" 
+               ${!isHost ? 'disabled' : ''}>
+      </div>`;
+  }
+
+  if (showLives) {
+    html += `
+      <div style="display:flex; flex-direction:column; gap:.5rem;">
+        <label style="font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em;">Vies d'équipe</label>
+        <select class="input" style="padding:.6rem;" onchange="if(${isHost}) window.updateDbLives(this.value)" ${!isHost ? 'disabled' : ''}>
+          <option value="1" ${d.lives===1?'selected':''}>1 vie (Hard)</option>
+          <option value="3" ${d.lives===3||!d.lives?'selected':''}>3 vies (Normal)</option>
+          <option value="5" ${d.lives===5?'selected':''}>5 vies (Easy)</option>
+        </select>
+      </div>`;
+  }
+
+  html += `
+    <div style="display:flex; flex-direction:column; gap:.5rem;">
+      <label style="font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em;">Chrono Cap'ten</label>
+      <select class="input" style="padding:.6rem;" onchange="if(${isHost}) window.updateDbTimer(this.value)" ${!isHost ? 'disabled' : ''}>
+        <option value="0"   ${d.timerSec===0?'selected':''}>Sans chrono</option>
+        <option value="45"  ${d.timerSec===45?'selected':''}>45s (Rapide)</option>
+        <option value="60"  ${d.timerSec===60||!d.timerSec?'selected':''}>60s (Normal)</option>
+        <option value="120" ${d.timerSec===120?'selected':''}>2 min (Lent)</option>
+      </select>
+    </div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+// --- Sauvegarde des paramètres dans Firebase (déclenché par les sliders/selects) ---
+window.updateDbRounds = async (val) => { await update(ref(db, `rooms/${room.id}`), { maxRounds: parseInt(val) }); };
+window.updateDbLives  = async (val) => { await update(ref(db, `rooms/${room.id}`), { lives: parseInt(val) }); };
+window.updateDbTimer  = async (val) => { await update(ref(db, `rooms/${room.id}`), { timerSec: parseInt(val) }); };
 
 window.cfgSetLevel = async (lv) => {
   if (!room.data || room.data.host !== pid) return;
@@ -2717,39 +3203,84 @@ document.addEventListener('change', async e => {
 });
 
 window.startGame = async () => {
-  const d = room.data; if (!d) return;
-  if (d.host !== pid) return;
+  const d = room.data; 
+  if (!d || d.host !== pid) return;
 
   const players = d.players || {};
   const ids = Object.keys(players);
-  if (ids.length < 2) { toast('Il faut au moins 2 joueurs !', 'err'); return; }
+  if (ids.length < 3 && d.mode === 'duel') { toast('Il faut au moins 3 joueurs !', 'err'); return; }
 
-  // Pick captain
-  const captainId = ids[Math.floor(Math.random() * ids.length)];
-  const respondants = ids.filter(i => i !== captainId);
-  const numbers = shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0, respondants.length);
-
-  // Reset per-round state
   const u = {};
-  u[`rooms/${room.id}/status`]       = 'reveal';
-  u[`rooms/${room.id}/round`]        = 1;
-  u[`rooms/${room.id}/captainId`]    = captainId;
-  u[`rooms/${room.id}/theme`]        = null;
-  u[`rooms/${room.id}/drawnTheme`]   = pickRandomTheme(d.level);
-  u[`rooms/${room.id}/roundResult`]  = null;
-  u[`rooms/${room.id}/captainGuess`] = null;
-  u[`rooms/${room.id}/lives`]        = 3;
-  u[`rooms/${room.id}/timerEndsAt`]  = null;
+  u[`rooms/${room.id}/round`] = (d.status === 'gameover') ? 1 : (d.round || 1);
+  u[`rooms/${room.id}/startedAt`] = Date.now();
+  u[`rooms/${room.id}/liveSort`] = null;
+  u[`rooms/${room.id}/roundResult`] = null;
 
-  ids.forEach(i => {
-    u[`rooms/${room.id}/players/${i}/number`]   = null;
-    u[`rooms/${room.id}/players/${i}/answer`]   = null;
-    u[`rooms/${room.id}/players/${i}/answered`] = false;
-    u[`rooms/${room.id}/players/${i}/ready`]    = false;
-    u[`rooms/${room.id}/players/${i}/score`]    = 0;
-  });
-  respondants.forEach((id, idx) => {
-    u[`rooms/${room.id}/players/${id}/number`] = numbers[idx];
+  // --- MATCHMAKING NOUVEAU MODE DUEL ---
+  if (d.mode === 'duel') {
+    const shuffled = shuffle([...ids]);
+    const queue = [];
+    
+    while (shuffled.length >= 2) {
+      queue.push([shuffled.shift(), shuffled.shift()]);
+    }
+    
+    // Calcul du total de duels pour la barre de progression
+    // Si pair : N/2 | Si impair : (N-1)/2 + 1 (pour le challenger)
+    const totalDuels = queue.length + (shuffled.length === 1 ? 1 : 0);
+    u[`rooms/${room.id}/totalDuels`] = totalDuels;
+    u[`rooms/${room.id}/currentDuelNum`] = 1; // On commence au duel n°1
+
+    if (shuffled.length === 1) {
+      queue.push({ challenger: shuffled[0] });
+    }
+
+    const finalQueue = shuffle(queue); 
+    const firstMatch = finalQueue.shift();
+
+    u[`rooms/${room.id}/duelQueue`] = finalQueue;
+    u[`rooms/${room.id}/drawnTheme`] = [pickRandomTheme(d.level), pickRandomTheme(d.level), pickRandomTheme(d.level)];
+    
+    u[`rooms/${room.id}/lives`] = 0; 
+    u[`rooms/${room.id}/maxLives`] = 0;
+
+    if (firstMatch.challenger) {
+      u[`rooms/${room.id}/status`] = 'duel-challenge';
+      u[`rooms/${room.id}/challengerId`] = firstMatch.challenger;
+    } else {
+      u[`rooms/${room.id}/status`] = 'theme-choice';
+      u[`rooms/${room.id}/captainId`] = firstMatch[0];
+      u[`rooms/${room.id}/captainId2`] = firstMatch[1];
+    }
+  }
+  // --- MATCHMAKING DES AUTRES MODES ---
+  else {
+    const shuffledQueue = shuffle([...ids]);
+    const capId = shuffledQueue.shift();
+    u[`rooms/${room.id}/status`] = 'theme-choice';
+    u[`rooms/${room.id}/captainId`] = capId;
+    u[`rooms/${room.id}/captainQueue`] = shuffledQueue;
+    u[`rooms/${room.id}/drawnTheme`] = pickRandomTheme(d.level);
+
+    // Distribution des numéros (avec gestion de l'Extrême)
+    const respondants = ids.filter(i => i !== capId);
+    if (d.mode === 'extreme') {
+        const extremeNums = [1, 10];
+        const otherNums = shuffle([2,3,4,5,6,7,8,9]).slice(0, respondants.length - 2);
+        const finalNums = shuffle([...extremeNums, ...otherNums]);
+        respondants.forEach((id, idx) => { u[`rooms/${room.id}/players/${id}/number`] = finalNums[idx]; });
+    } else {
+        const numbers = shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0, respondants.length);
+        respondants.forEach((id, idx) => { u[`rooms/${room.id}/players/${id}/number`] = numbers[idx]; });
+    }
+  }
+
+  // Reset des joueurs
+  ids.forEach(id => {
+    u[`rooms/${room.id}/players/${id}/answered`] = false;
+    u[`rooms/${room.id}/players/${id}/answer`] = null;
+    u[`rooms/${room.id}/players/${id}/ready`] = false;
+    u[`rooms/${room.id}/players/${id}/themeProposal`] = null;
   });
 
   try { await update(ref(db), u); } catch(e) { toast('Erreur: ' + e.message, 'err'); }
@@ -2850,178 +3381,574 @@ window.nrContinue = async () => {
   toast('C\'est parti !', 'ok');
 };
 
+// Affiche l'écran du choix d'adversaire
+function renderDuelChallenge(d) {
+  showScreen('duel-challenge');
+  const isChallenger = d.challengerId === pid;
+  
+  if (isChallenger) {
+    $s('dc-challenger-view').style.display = 'block';
+    $s('dc-wait-view').style.display = 'none';
+    
+    const grid = $s('dc-player-grid');
+    grid.innerHTML = '';
+    
+    // Le challenger peut choisir n'importe qui d'autre
+    Object.entries(d.players).forEach(([id, p]) => {
+      if (id === pid) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-secondary';
+      btn.style.width = '100%';
+      btn.innerHTML = `Défier ${escapeHtml(p.name)} ⚔️`;
+      btn.onclick = () => window.confirmDuelChallenge(id);
+      grid.appendChild(btn);
+    });
+  } else {
+    $s('dc-challenger-view').style.display = 'none';
+    $s('dc-wait-view').style.display = 'block';
+    const cName = d.players[d.challengerId]?.name || 'Un joueur';
+    $s('dc-wait-text').textContent = `${cName} cherche sa cible...`;
+  }
+}
+
+// Fonction appelée quand le challenger clique sur un joueur
+window.confirmDuelChallenge = async (targetId) => {
+  if (!room.data || room.data.challengerId !== pid) return;
+  const d = room.data;
+  const updates = {};
+  
+  updates[`rooms/${room.id}/status`] = 'theme-choice';
+  updates[`rooms/${room.id}/captainId`]  = pid; // Le challenger
+  updates[`rooms/${room.id}/captainId2`] = targetId; // Le joueur ciblé
+  updates[`rooms/${room.id}/challengerId`] = null; // On nettoie le challenger
+  
+  updates[`rooms/${room.id}/drawnTheme`] = [pickRandomTheme(d.level), pickRandomTheme(d.level), pickRandomTheme(d.level)];
+  await update(ref(db), updates);
+};
+
+
 // ═══════════════════════════════════════════════════════════
 //  13. THEME CHOICE (captain picks/writes theme)
 // ═══════════════════════════════════════════════════════════
 function renderThemeChoice(d) {
   showScreen('theme-choice');
-  const isCap = d.captainId === pid;
-  const m = modeInfo(d.mode);
+  const me = d.players[pid] || {};
+  const isCap = (d.captainId === pid) || (d.mode === 'duel' && d.captainId2 === pid);
 
-  $s('tc-round').textContent = d.round;
-  $s('tc-mode').textContent  = `${m.emoji} ${m.name}`;
+  const maxStr = (d.mode === 'survival' || d.maxRounds > 9000) ? '∞' : (d.maxRounds || 5);
+  if ($s('tc-round')) $s('tc-round').textContent = d.round + ' / ' + maxStr;
+  
+  if ($s('tc-prog')) {
+      if (d.mode === 'duel') {
+          $s('tc-prog').innerHTML = `<span style="margin-left:8px; opacity:0.7;">⚔️ Duel ${d.currentDuelNum || 1}/${d.totalDuels || 1}</span>`;
+      } else {
+          const totalPlayers = Object.keys(d.players || {}).length;
+          const queueLen = (d.captainQueue || []).length;
+          $s('tc-prog').textContent = `👑 ${totalPlayers - queueLen}/${totalPlayers}`;
+      }
+  }
+
+  const m = modeInfo(d.mode);
+  if ($s('tc-mode')) $s('tc-mode').textContent = `${m.emoji} ${m.name}`;
+
+  const centerHdr = $s('tc-center-hdr');
+  if (centerHdr) {
+    centerHdr.innerHTML = '';
+    if (m.coop) { centerHdr.className = 'lives-bar'; lives(centerHdr, d.lives, d.maxLives); }
+    else { centerHdr.className = ''; }
+  }
+
+  const c1Ready = d.players[d.captainId]?.themeProposal;
+  const c2Ready = d.players[d.captainId2]?.themeProposal;
+  const bothReady = (d.mode === 'duel') && c1Ready && c2Ready;
 
   if (isCap) {
-    $s('tc-captain').style.display = 'block';
-    $s('tc-wait').style.display    = 'none';
-    $s('tc-drawn').textContent = d.drawnTheme || '(pioche un thème)';
-    $s('tc-custom').value = '';
+    if ($s('tc-captain')) $s('tc-captain').style.display = 'block';
+    if ($s('tc-wait')) $s('tc-wait').style.display = 'none';
+
+    const tcCustom = $s('tc-custom');
+    const turnKey = d.round + '_' + d.captainId + '_' + d.captainId2;
+    if (tcCustom && tcCustom.dataset.turn !== turnKey) {
+        tcCustom.value = '';
+        tcCustom.dataset.turn = turnKey;
+    }
+
+    const btnSubmit = $s('btn-tc-submit');
+    const btnEdit = $s('btn-tc-edit');
+    const btnDraw = $s('btn-draw-theme');
+
+    const otherCapStatus = $s('tc-other-cap-status');
+    if (otherCapStatus && d.mode === 'duel') {
+        otherCapStatus.style.display = 'block';
+        const otherCapId = (d.captainId === pid) ? d.captainId2 : d.captainId;
+        const otherTheme = d.players[otherCapId]?.themeProposal;
+        otherCapStatus.innerHTML = otherTheme 
+            ? `<div style="margin-top:1rem; padding:.5rem; border-radius:8px; background:rgba(var(--success-rgb),0.1); color:rgb(var(--success-rgb)); font-weight:bold; text-align:center;">✅ L'autre Cap'ten a validé son thème !</div>`
+            : `<div style="margin-top:1rem; color:var(--muted); font-size:0.85rem; text-align:center;">⏳ L'autre Cap'ten réfléchit...</div>`;
+    }
+
+    if (d.mode === 'duel' && me.themeProposal) {
+        if (tcCustom) { tcCustom.disabled = true; tcCustom.style.opacity = '0.5'; tcCustom.value = me.themeProposal; }
+        if (btnSubmit) btnSubmit.style.display = 'none';
+        if (btnDraw) btnDraw.style.display = 'none';
+        if (btnEdit) btnEdit.style.display = bothReady ? 'none' : 'block';
+    } else {
+        if (tcCustom) { tcCustom.disabled = false; tcCustom.style.opacity = '1'; }
+        if (btnSubmit) btnSubmit.style.display = bothReady ? 'none' : 'block';
+        if (btnDraw) btnDraw.style.display = 'block';
+        if (btnEdit) btnEdit.style.display = 'none';
+    }
   } else {
-    $s('tc-captain').style.display = 'none';
-    $s('tc-wait').style.display    = 'block';
-    const capName = d.players?.[d.captainId]?.name || 'Le Cap\'ten';
-    $s('tc-wait-name').textContent = `${capName} choisit le thème…`;
+    if ($s('tc-captain')) $s('tc-captain').style.display = 'none';
+    if ($s('tc-wait')) {
+        $s('tc-wait').style.display = 'block';
+        const titleEl = $s('tc-wait').querySelector('h2');
+        if (titleEl) titleEl.textContent = d.mode === 'duel' ? "Les Cap'tens réfléchissent..." : "Le Cap'ten réfléchit...";
+        if (d.mode === 'duel' && $s('tc-wait-name')) {
+            let readyCount = (c1Ready ? 1 : 0) + (c2Ready ? 1 : 0);
+            $s('tc-wait-name').innerHTML = `${d.players[d.captainId]?.name || "Un Cap'ten"} et ${d.players[d.captainId2]?.name || "un autre"} préparent leurs thèmes... <br>
+            <strong style="color:rgb(var(--success-rgb)); font-size:1.1rem; display:block; margin-top:0.5rem;">${readyCount}/2 prêts</strong>`;
+        }
+    }
+  }
+
+  // ✅ CHRONO 3S AVANT LE VOTE
+  if (bothReady) {
+      if ($s('tc-countdown')) $s('tc-countdown').style.display = 'block';
+      if ($s('tc-wait-dots')) $s('tc-wait-dots').style.display = 'none';
+      if ($s('tc-other-cap-status')) $s('tc-other-cap-status').style.display = 'none';
+
+      if (!window._tcActive) {
+          window._tcActive = true;
+          let timeLeft = 3;
+          if ($s('tc-cd-val')) $s('tc-cd-val').textContent = timeLeft;
+          
+          if (window._tcInterval) clearInterval(window._tcInterval);
+          window._tcInterval = setInterval(() => {
+              timeLeft--;
+              if ($s('tc-cd-val')) $s('tc-cd-val').textContent = timeLeft;
+              if (timeLeft <= 0) clearInterval(window._tcInterval);
+          }, 1000);
+
+          if (d.host === pid) {
+              if (window._tcTimeout) clearTimeout(window._tcTimeout);
+              window._tcTimeout = setTimeout(() => {
+                  window._tcActive = false;
+                  if (room.data?.status === 'theme-choice') update(ref(db, `rooms/${room.id}`), { status: 'theme-vote' });
+              }, 3000);
+          }
+      }
+  } else {
+      window._tcActive = false;
+      if ($s('tc-countdown')) $s('tc-countdown').style.display = 'none';
+      if ($s('tc-wait-dots')) $s('tc-wait-dots').style.display = 'inline-flex';
+      if (window._tcInterval) clearInterval(window._tcInterval);
+      if (window._tcTimeout) clearTimeout(window._tcTimeout);
   }
 }
 
-window.drawNewTheme = async () => {
-  if (!room.data || room.data.captainId !== pid) return;
-  const newTheme = pickRandomTheme(room.data.level);
-  await update(ref(db, `rooms/${room.id}`), { drawnTheme: newTheme });
-  toast('🎲 Nouveau thème pioché', 'info');
-};
-
-window.validateTheme = async (source) => {
-  if (!room.data || room.data.captainId !== pid) return;
+window.drawThemeAndFill = () => {
   const d = room.data;
-  let theme;
-  if (source === 'custom') {
-    theme = $s('tc-custom').value.trim();
-    if (!theme || theme.length < 3) { toast('Écris un vrai thème !', 'err'); return; }
-  } else {
-    theme = d.drawnTheme || pickRandomTheme(d.level);
+  if (!d) return;
+  
+  // ✅ On tire un thème aléatoire localement juste pour ce Cap'ten !
+  const newTheme = pickRandomTheme(d.level);
+  
+  const inp = $s('tc-custom');
+  if (inp) {
+    inp.value = newTheme;
+    // Petit effet visuel pour montrer que ça a changé
+    inp.style.transition = 'transform 0.1s ease';
+    inp.style.transform = 'scale(0.98)';
+    setTimeout(() => inp.style.transform = 'scale(1)', 100);
   }
-
-  // Reset players answered state
-  const players = d.players || {};
-  const u = {};
-  u[`rooms/${room.id}/theme`]        = theme;
-  u[`rooms/${room.id}/status`]       = 'answering';
-  u[`rooms/${room.id}/captainGuess`] = null;
-  u[`rooms/${room.id}/roundResult`]  = null;
-
-  // Blitz: arm timer at start (triggered when captain resolves later)
-  u[`rooms/${room.id}/timerEndsAt`]  = null;
-
-  Object.keys(players).forEach(id => {
-    u[`rooms/${room.id}/players/${id}/answer`]   = null;
-    u[`rooms/${room.id}/players/${id}/answered`] = false;
-  });
-
-  await update(ref(db), u);
 };
+
+window.submitCapTheme = async () => {
+  const d = room.data;
+  if (!d) return;
+  
+  const tcCustom = $s('tc-custom');
+  const theme = tcCustom ? tcCustom.value.trim() : '';
+  if (!theme || theme.length < 5) { toast('Le sujet est trop court !', 'err'); return; }
+
+  // LOGIQUE DUEL
+  if (d.mode === 'duel') {
+      // ✅ CORRECTION : On enregistre JUSTE le thème. C'est le chrono qui changera la page !
+      await update(ref(db, `rooms/${room.id}/players/${pid}`), { themeProposal: theme });
+  } 
+  // LOGIQUE CLASSIQUE
+  else {
+      if (d.captainId !== pid) return;
+      const players = d.players || {};
+      const u = {};
+      u[`rooms/${room.id}/theme`]        = theme;
+      u[`rooms/${room.id}/status`]       = 'answering';
+      
+      const timerVal = parseInt(d.timerSec) || 0;
+      u[`rooms/${room.id}/timerEndsAt`] = timerVal > 0 ? Date.now() + (timerVal * 1000) : null;
+      u[`rooms/${room.id}/captainGuess`] = null;
+      u[`rooms/${room.id}/roundResult`]  = null;
+
+      Object.keys(players).forEach(id => {
+        u[`rooms/${room.id}/players/${id}/answer`]   = null;
+        u[`rooms/${room.id}/players/${id}/answered`] = false;
+      });
+      await update(ref(db), u);
+  }
+};
+
+// Nouvelle fonction pour annuler sa validation en mode Duel
+window.unsubmitCapTheme = async () => {
+    if (!room.data) return;
+    await update(ref(db, `rooms/${room.id}/players/${pid}`), { themeProposal: null });
+};
+
+// ═══════════════════════════════════════════════════════════
+//  13.5 THEME VOTE (Players vote for the best Duel theme)
+// ═══════════════════════════════════════════════════════════
+function renderThemeVote(d) {
+    showScreen('theme-vote');
+    const maxStr = (d.mode === 'survival' || d.maxRounds > 9000) ? '∞' : (d.maxRounds || 5);
+    if ($s('tv-round')) $s('tv-round').textContent = d.round + ' / ' + maxStr;
+
+    const isCap = (d.captainId === pid || d.captainId2 === pid);
+    const me = d.players[pid] || {};
+    
+    const theme1 = d.players[d.captainId]?.themeProposal || 'Thème 1';
+    const theme2 = d.players[d.captainId2]?.themeProposal || 'Thème 2';
+
+    const respondants = Object.entries(d.players).filter(([id]) => id !== d.captainId && id !== d.captainId2);
+    const totalVoters = respondants.length;
+    
+    let votes = { theme1: 0, theme2: 0 };
+    let currentVotesCount = 0;
+
+    respondants.forEach(([id, p]) => {
+        if (p.vote === 'theme1') { votes.theme1++; currentVotesCount++; }
+        if (p.vote === 'theme2') { votes.theme2++; currentVotesCount++; }
+    });
+
+    if (isCap) {
+        $s('tv-options').style.display = 'none';
+        $s('tv-wait').style.display = 'block';
+        $s('tv-wait-msg').textContent = "Les joueurs votent pour le meilleur thème !";
+        $s('tv-wait-msg').style.color = "var(--muted)";
+        $s('tv-vote-count').textContent = `${currentVotesCount}/${totalVoters} ont voté`;
+    } else {
+        if (me.vote) {
+            $s('tv-options').style.display = 'none';
+            $s('tv-wait').style.display = 'block';
+            $s('tv-wait-msg').textContent = "Ton vote est enregistré !";
+            $s('tv-wait-msg').style.color = "rgb(var(--success-rgb))";
+            $s('tv-vote-count').textContent = `${currentVotesCount}/${totalVoters} ont voté`;
+        } else {
+            $s('tv-options').style.display = 'flex';
+            $s('tv-wait').style.display = 'none';
+            $s('tv-options').innerHTML = `
+                <button class="theme-card" onclick="submitThemeVote('theme1')" style="cursor:pointer; padding:1.5rem; text-align:center; transition:transform 0.2s;">
+                    <div class="theme-text">${escapeHtml(theme1)}</div>
+                </button>
+                <div style="text-align:center; font-family:'Space Grotesk',sans-serif; font-weight:900; color:var(--muted); font-size:1.5rem;">VS</div>
+                <button class="theme-card" onclick="submitThemeVote('theme2')" style="cursor:pointer; padding:1.5rem; text-align:center; transition:transform 0.2s;">
+                    <div class="theme-text">${escapeHtml(theme2)}</div>
+                </button>
+            `;
+        }
+    }
+
+    const allVoted = totalVoters > 0 && currentVotesCount >= totalVoters;
+
+    // ✅ CHRONO 3S "FIN DES VOTES DANS..."
+    if (allVoted) {
+        if ($s('tv-countdown')) $s('tv-countdown').style.display = 'block';
+        if ($s('tv-wait-dots')) $s('tv-wait-dots').style.display = 'none';
+        
+        if (!window._tvActive) {
+            window._tvActive = true;
+            let timeLeft = 3;
+            if ($s('tv-cd-val')) $s('tv-cd-val').textContent = timeLeft;
+            
+            if (window._tvInterval) clearInterval(window._tvInterval);
+            window._tvInterval = setInterval(() => {
+                timeLeft--;
+                if ($s('tv-cd-val')) $s('tv-cd-val').textContent = timeLeft;
+                if (timeLeft <= 0) clearInterval(window._tvInterval);
+            }, 1000);
+
+            if (d.host === pid) {
+                let winningTheme = theme1;
+                if (votes.theme2 > votes.theme1) winningTheme = theme2;
+                else if (votes.theme1 === votes.theme2) winningTheme = Math.random() > 0.5 ? theme1 : theme2;
+                
+                if (window._tvTimeout) clearTimeout(window._tvTimeout);
+                window._tvTimeout = setTimeout(() => {
+                    window._tvActive = false;
+                    if (room.data?.status === 'theme-vote') {
+                        update(ref(db, `rooms/${room.id}`), { 
+                            status: 'theme-vote-result',
+                            winningTheme: winningTheme
+                        });
+                    }
+                }, 3000);
+            }
+        }
+    } else {
+        window._tvActive = false;
+        if ($s('tv-countdown')) $s('tv-countdown').style.display = 'none';
+        if ($s('tv-wait-dots')) $s('tv-wait-dots').style.display = 'inline-flex';
+        if (window._tvInterval) clearInterval(window._tvInterval);
+        if (window._tvTimeout) clearTimeout(window._tvTimeout);
+    }
+}
+
+window.submitThemeVote = async (choice) => {
+    await update(ref(db, `rooms/${room.id}/players/${pid}`), { vote: choice });
+};
+
+// ═══════════════════════════════════════════════════════════
+//  13.6 THEME VOTE RESULT (Animation du gagnant)
+// ═══════════════════════════════════════════════════════════
+function renderThemeVoteResult(d) {
+    showScreen('theme-vote-result');
+    
+    if ($s('tvr-winner-text')) {
+        $s('tvr-winner-text').textContent = d.winningTheme || '...';
+    }
+    
+    if (d.host === pid) {
+        if (!window._tvrActive) {
+            window._tvrActive = true;
+            if (window._tvrTimeout) clearTimeout(window._tvrTimeout);
+            
+            // Laisse l'animation tourner 4.5 secondes puis passe à l'écriture des réponses
+            window._tvrTimeout = setTimeout(() => {
+                window._tvrActive = false;
+                if (room.data?.status === 'theme-vote-result') {
+                    const u = {};
+                    u[`rooms/${room.id}/theme`] = d.winningTheme;
+                    u[`rooms/${room.id}/status`] = 'answering';
+                    
+                    const timerVal = parseInt(d.timerSec) || 0;
+                    u[`rooms/${room.id}/timerEndsAt`] = timerVal > 0 ? Date.now() + (timerVal * 1000) : null;
+                    
+                    // Reset
+                    Object.keys(d.players).forEach(id => {
+                        u[`rooms/${room.id}/players/${id}/vote`] = null;
+                        u[`rooms/${room.id}/players/${id}/answer`] = null;
+                        u[`rooms/${room.id}/players/${id}/answered`] = false;
+                    });
+                    update(ref(db), u);
+                }
+            }, 4500);
+        }
+    } else {
+        window._tvrActive = false;
+    }
+}
 
 // ═══════════════════════════════════════════════════════════
 //  14. ANSWERING
 // ═══════════════════════════════════════════════════════════
 function renderAnswering(d) {
   showScreen('answering');
-  const isCap = d.captainId === pid;
+  
+  // ✅ CORRECTION 1 : On vérifie si on est le Cap'ten 1 OU le Cap'ten 2 (en mode Duel)
+  const isCap = (d.captainId === pid) || (d.mode === 'duel' && d.captainId2 === pid);
   const me = d.players?.[pid];
   const players = d.players || {};
-  const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
+  
+  // ✅ CORRECTION 2 : On exclut les DEUX Cap'tens de la liste des gens qui doivent répondre
+  const respondants = Object.entries(players).filter(([i]) => i !== d.captainId && i !== d.captainId2);
+  const N = respondants.length;
+  const answered = respondants.filter(([, p]) => p.answered);
+  const allAnswered = (N > 0 && answered.length === N);
   const m = modeInfo(d.mode);
 
-  $s('ans-round').textContent = d.round;
-  $s('ans-theme').textContent = d.theme || '…';
-  $s('ans-mode').textContent  = `${m.emoji} ${m.name}`;
+  const isTimeUp = d.timerEndsAt && (Date.now() >= d.timerEndsAt);
 
-  // Header center: lives (coop) or score (competitive)
-  const centerHdr = $s('ans-center-hdr');
-  centerHdr.innerHTML = '';
-  if (m.coop) {
-    centerHdr.className = 'lives-bar';
-    lives(centerHdr, d.lives);
+  if (window._ansTimerInt) clearInterval(window._ansTimerInt);
+  const timerWrap = $s('ans-timer-wrap');
+  
+  if (d.timerEndsAt && !allAnswered) {
+    if (timerWrap) timerWrap.style.display = 'block';
+    const tick = () => {
+      const remaining = Math.max(0, d.timerEndsAt - Date.now());
+      const secs = Math.ceil(remaining / 1000);
+      
+      const timerText = $s('ans-timer-text');
+      if (timerText) timerText.textContent = `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
+      
+      const pct = remaining / ((d.timerSec || 60) * 1000);
+      const fill = $s('ans-timer-fill');
+      if (fill) {
+          fill.style.transform = `scaleX(${pct})`;
+          const hue = Math.max(0, Math.floor(pct * 120));
+          fill.style.background = `hsl(${hue}, 90%, 55%)`;
+          fill.style.boxShadow = `0 0 12px hsla(${hue}, 90%, 55%, 0.6)`;
+          fill.classList.toggle('danger', pct <= .15);
+      }
+
+      if (remaining <= 0) {
+        clearInterval(window._ansTimerInt);
+        if (!isCap && !me?.answered) {
+           const txtArea = $s('ans-text');
+           if (txtArea) {
+               const currentText = txtArea.value.trim() || "(Pas de réponse)";
+               txtArea.value = currentText;
+               window.submitAnswer();
+               toast('Temps écoulé ! Validation automatique.', 'err');
+           }
+        }
+      }
+    };
+    tick();
+    window._ansTimerInt = setInterval(tick, 250);
   } else {
-    centerHdr.className = '';
-    centerHdr.innerHTML = `<span style="font-family:'Space Grotesk',sans-serif;font-size:.7rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;">Manche ${d.round} / ${d.maxRounds}</span>`;
+    if (timerWrap) timerWrap.style.display = 'none';
+  }
+
+  const maxStr = (d.mode === 'survival' || d.maxRounds > 9000) ? '∞' : (d.maxRounds || 5);
+  if ($s('ans-round')) $s('ans-round').textContent = d.round + ' / ' + maxStr;
+  const totalPlayers = Object.keys(d.players || {}).length;
+  const queueLen = (d.captainQueue || []).length;
+  if ($s('ans-prog')) {
+      if (d.mode === 'duel') {
+          $s('ans-prog').innerHTML = `<span style="margin-left:8px; opacity:0.7;">⚔️ Duel ${d.currentDuelNum || 1}/${d.totalDuels || 1}</span>`;
+      } else {
+          $s('ans-prog').textContent = `👑 ${totalPlayers - queueLen}/${totalPlayers}`;
+      }
+  }
+  if ($s('ans-theme')) $s('ans-theme').textContent = d.theme || '…';
+  if ($s('ans-mode')) $s('ans-mode').textContent  = `${m.emoji} ${m.name}`;
+  const centerHdr = $s('ans-center-hdr');
+  if (centerHdr) {
+    centerHdr.innerHTML = '';
+    if (m.coop) { centerHdr.className = 'lives-bar'; lives(centerHdr, d.lives, d.maxLives); }
   }
 
   if (isCap) {
-    $s('ans-form').style.display = 'none';
-    $s('ans-wait').style.display = 'none';
-    $s('ans-cap').style.display  = 'block';
+    if ($s('ans-form')) $s('ans-form').style.display = 'none';
+    if ($s('ans-cap')) $s('ans-cap').style.display  = 'block';
+    
+    const capAnsCount = document.getElementById('cap-ans-count');
+    if (capAnsCount) capAnsCount.innerHTML = `${answered.length}/${N}`;
 
     const prog = $s('ans-cap-prog');
-    prog.innerHTML = '';
-    respondants.forEach(([id, p]) => {
-      const it = document.createElement('div');
-      it.className = 'player-item';
-      it.innerHTML = `
-        <div class="player-avatar">${(p.name||'?').charAt(0).toUpperCase()}</div>
-        <div class="player-name">${escapeHtml(p.name)}</div>
-        <div class="player-dot ${p.answered ? 'ok' : ''}"></div>
-      `;
-      prog.appendChild(it);
-    });
-
-    // Host (who is the captain) transitions to 'resolving' when all answered
-    if (d.host === pid && respondants.length > 0 && respondants.every(([,p]) => p.answered)) {
-      setTimeout(() => {
-        if (room.data?.status === 'answering') {
-          update(ref(db, `rooms/${room.id}`), { status: 'resolving' });
+    if (prog) {
+        if (prog.children.length !== respondants.length) {
+          prog.innerHTML = '';
+          respondants.forEach(([id, p]) => {
+            prog.innerHTML += `
+              <div class="player-item">
+                <div class="player-avatar">${(p.name||'?').charAt(0).toUpperCase()}</div>
+                <div class="player-name">${escapeHtml(p.name)}</div>
+                <div class="player-dot ${p.answered ? 'ok' : ''}" id="cap-dot-${id}"></div>
+              </div>`;
+          });
+        } else {
+          respondants.forEach(([id, p]) => {
+            const dot = document.getElementById(`cap-dot-${id}`);
+            if (dot) dot.className = `player-dot ${p.answered ? 'ok' : ''}`;
+          });
         }
-      }, 400);
     }
-  } else if (me?.answered) {
-    $s('ans-form').style.display = 'none';
-    $s('ans-cap').style.display  = 'none';
-    $s('ans-wait').style.display = 'block';
+  } 
+  else {
+    if ($s('ans-cap')) $s('ans-cap').style.display  = 'none';
+    if ($s('ans-form')) $s('ans-form').style.display = 'block';
 
-    const prog = $s('ans-wait-prog');
-    prog.innerHTML = '';
-    respondants.forEach(([id, p]) => {
-      const it = document.createElement('div');
-      it.className = 'player-item';
-      it.innerHTML = `
-        <div class="player-avatar">${(p.name||'?').charAt(0).toUpperCase()}</div>
-        <div class="player-name">${escapeHtml(p.name)}</div>
-        <div class="player-dot ${p.answered ? 'ok' : ''}"></div>
-      `;
-      prog.appendChild(it);
-    });
-
-    // Host transition fallback
-    if (d.host === pid && respondants.length > 0 && respondants.every(([,p]) => p.answered)) {
-      setTimeout(() => {
-        if (room.data?.status === 'answering') {
-          update(ref(db, `rooms/${room.id}`), { status: 'resolving' });
-        }
-      }, 400);
-    }
-  } else {
-    $s('ans-cap').style.display  = 'none';
-    $s('ans-wait').style.display = 'none';
-    $s('ans-form').style.display = 'block';
-
+    const isDone = me?.answered;
+    if (isDone) clearInputDraft(); // Already submitted — discard any lingering draft
     const n = me?.number || 1;
+    const color = numColor(n);
+    
     const numEl = $s('ans-num');
-    numEl.textContent = n;
-    numEl.className = `number-display n${n}`;
-    numEl.style.textShadow = `0 0 40px ${numColor(n)},0 0 80px ${numColor(n)}44`;
+    if (numEl) { numEl.textContent = n; numEl.style.color = color; }
+    const backCard = document.getElementById('ans-flip-back');
+    if (backCard) { backCard.style.border = `2px solid ${color}`; backCard.style.boxShadow = `0 8px 24px ${color}33`; }
 
-    const g = $s('ans-gauge');
-    g.style.background = numGradient(n);
-    g.style.width = gaugeW(n);
-    g.style.setProperty('--glow-color', numColor(n));
+    const counterEl = document.getElementById('typing-counter');
+    if (counterEl) counterEl.innerHTML = `<span style="color:rgb(var(--success-rgb))">${answered.length}</span>/${N} ont répondu`;
 
-    $s('ans-btn').disabled = false;
-    // Only clear textarea when round actually changes (track via dataset)
-    const curRound = String(d.round);
-    if ($s('ans-text').dataset.round !== curRound) {
-      $s('ans-text').value = '';
-      $s('ans-text').dataset.round = curRound;
+    const txt = $s('ans-text');
+    const btnSubmit = document.getElementById('btn-submit-ans');
+    const btnEdit = document.getElementById('btn-edit-ans');
+
+    if (txt) {
+        txt.disabled = (isDone || allAnswered);
+        txt.style.opacity = (isDone || allAnswered) ? "0.5" : "1";
     }
-    $s('ans-text').disabled = false;
+
+    if (allAnswered) {
+      if (btnSubmit) btnSubmit.style.display = 'none';
+      if (btnEdit) btnEdit.style.display = isTimeUp ? 'none' : 'block'; 
+    } else if (isDone) {
+      if (btnSubmit) btnSubmit.style.display = 'none';
+      if (btnEdit) btnEdit.style.display = isTimeUp ? 'none' : 'block';
+    } else {
+      if (btnSubmit) { btnSubmit.style.display = 'block'; btnSubmit.disabled = false; }
+      if (btnEdit) btnEdit.style.display = 'none';
+
+      const turnKey = (d.startedAt || 0) + '_' + d.round + '_' + d.captainId;
+      if (txt && txt.dataset.turn !== turnKey) { 
+        // New turn — restore any saved draft (handles page-refresh mid-turn)
+        const draft = restoreInputDraft();
+        txt.value = draft;
+        txt.dataset.turn = turnKey; 
+        const flipCard = document.querySelector('.flip-card');
+        if (flipCard) flipCard.classList.remove('flipped');
+      }
+      // Attach draft-save listener once
+      if (txt && !txt._draftBound) {
+        txt._draftBound = true;
+        txt.addEventListener('input', () => saveInputDraft(txt.value));
+      }
+    }
+  }
+
+  const cdText = document.getElementById('ans-countdown-text');
+  if (cdText) {
+     cdText.style.display = allAnswered ? 'block' : 'none';
+  }
+
+  if (window._ansInterval) clearInterval(window._ansInterval);
+  if (window._ansTimeout) clearTimeout(window._ansTimeout);
+
+  if (allAnswered) {
+    let timeLeft = 3;
+    document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = '3');
+    
+    window._ansInterval = setInterval(() => {
+      timeLeft--;
+      document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = timeLeft);
+      if (timeLeft <= 0) clearInterval(window._ansInterval);
+    }, 1000);
+
+    if (d.host === pid) {
+      window._ansTimeout = setTimeout(() => {
+        if (room.data?.status === 'answering') {
+           // ✅ CORRECTION 3 : L'hôte vérifie l'avancée en excluant bien les deux Cap'tens !
+           const checkRes = Object.entries(room.data.players || {}).filter(([i]) => i !== room.data.captainId && i !== room.data.captainId2);
+           if (checkRes.every(([, p]) => p.answered)) {
+              update(ref(db, `rooms/${room.id}`), { status: 'resolving' });
+           }
+        }
+      }, 3500); 
+    }
   }
 }
-
+// Fonction de validation CORRIGÉE
 window.submitAnswer = async () => {
   const val = $s('ans-text').value.trim();
   if (!val) { toast('Écris une réponse !', 'err'); return; }
-  $s('ans-btn').disabled = true;
+  
+  const btn = $s('btn-submit-ans');
+  if (btn) btn.disabled = true;
   $s('ans-text').disabled = true;
+  
   await update(ref(db, `rooms/${room.id}/players/${pid}`), { answer: val, answered: true });
+  clearInputDraft(); // Clear persisted draft after successful submit
   toast('Réponse envoyée ✓', 'ok');
 };
 
@@ -3034,60 +3961,204 @@ function renderCaptain(d) {
   const players = d.players || {};
   const m = modeInfo(d.mode);
 
-  $s('cap-round').textContent = d.round;
-  $s('cap-theme').textContent = d.theme || '…';
+  const maxStr = (d.mode === 'survival' || d.maxRounds > 9000) ? '∞' : (d.maxRounds || 5);
+  if ($s('cap-round')) $s('cap-round').textContent = d.round + ' / ' + maxStr;
+  
+  const totalPlayers = Object.keys(players).length;
+  const queueLen = (d.captainQueue || []).length;
+  if ($s('cap-prog')) {
+      if (d.mode === 'duel') {
+          $s('cap-prog').innerHTML = `<span style="margin-left:8px; opacity:0.7;">⚔️ Duel ${d.currentDuelNum || 1}/${d.totalDuels || 1}</span>`;
+      } else {
+          $s('cap-prog').textContent = `👑 ${totalPlayers - queueLen}/${totalPlayers}`;
+      }
+  }
+  if ($s('cap-theme')) $s('cap-theme').textContent = d.theme || '…';
 
-  // Header right: lives (coop) or round progress (comp)
+  // ✅ Mise à jour du badge mode à droite
+  if ($s('cap-mode')) $s('cap-mode').textContent = `${m.emoji} ${m.name}`;
+
+  // ✅ Mise à jour des cœurs au centre (uniquement en mode coop)
+  const centerHdr = $s('cap-center-hdr');
+  if (centerHdr) {
+    centerHdr.innerHTML = '';
+    if (m.coop) {
+      centerHdr.className = 'lives-bar';
+      lives(centerHdr, d.lives, d.maxLives);
+    }
+  }
+
+  // ✅ Sécurité : On nettoie l'ancien "cap-right-hdr" au cas où il existerait encore dans ton HTML
   const rightHdr = $s('cap-right-hdr');
-  rightHdr.innerHTML = '';
-  if (m.coop) {
-    rightHdr.className = 'lives-bar';
-    lives(rightHdr, d.lives);
-  } else {
-    rightHdr.className = '';
-    rightHdr.innerHTML = `<span style="font-family:'Space Grotesk',sans-serif;font-size:.7rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;">${d.round}/${d.maxRounds}</span>`;
-  }
+  if (rightHdr) rightHdr.innerHTML = '';
 
-  // Hide all mode containers
-  ['cap-classic','cap-sniper','cap-duel','cap-wait'].forEach(id => $s(id).style.display = 'none');
-  $s('cap-timer-wrap').style.display = 'none';
-  if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+  ['cap-classic','cap-sniper','cap-extreme','cap-wait'].forEach(id => {
+      if ($s(id)) $s(id).style.display = 'none';
+  });
+  if ($s('cap-timer-wrap')) $s('cap-timer-wrap').style.display = 'none';
 
-  if (!isCap) {
-    $s('cap-wait').style.display = 'block';
-    return;
-  }
-
-  // Theme label per mode
+  // Les joueurs voient le plateau, mais avec un titre différent
   const themeLabel = $s('cap-theme-label');
-  if (d.mode === 'sniper') themeLabel.textContent = '🏹 Devine les numéros';
-  else if (d.mode === 'duel') themeLabel.textContent = '🎭 Trouve 1 et 10';
-  else themeLabel.textContent = '✦ Classe ces réponses';
+  if (themeLabel) {
+      if (isCap) {
+        if (d.mode === 'extreme') {
+           if (instText) instText.innerHTML = `Place la pire réponse sur le 1 et la meilleure sur le 10.`;
+        } else if (d.mode === 'sniper') {
+           if (instText) instText.innerHTML = `Assigne le <strong style="color:rgb(var(--primary-rgb));">numéro exact</strong> à chaque réponse. (+2pts par trouvaille !).`;
+        } else {
+           if (instText) instText.innerHTML = `Tape une carte puis un numéro, ou glisse-la sur la timeline. <span style="color:rgb(var(--primary-rgb));">1 pire</span> → <span style="color:rgb(var(--accent-rgb));">10 meilleur</span>.`;
+        }
+      } else {
+        themeLabel.textContent = "Le Cap'ten classe vos réponses...";
+      }
+  }
 
   const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
 
-  if (d.mode === 'classic' || d.mode === 'blitz') {
-    $s('cap-classic').style.display = 'block';
-    dragState = { selected: null, placed: {} };
-    buildClassicCards(respondants);
-    buildClassicTimeline();
-    updateValidateClassic(respondants.length);
+  // --- VUE CAPITAINE (MODE AVEUGLE) ---
+  if (d.mode === 'blind') {
+      if ($s('cap-blind')) $s('cap-blind').style.display = 'block';
+      if (isCap) {
+          if (!window._capBoardBuilt) {
+              dragState.placed = d.liveSort || {};
+              buildBlindBoard(respondants);
+              window._capBoardBuilt = true;
+          }
+      }
+  } 
+  // --- VUE CAPITAINE (MODE SNIPER) ---
+  else if (d.mode === 'sniper') {
+      if ($s('cap-sniper')) $s('cap-sniper').style.display = 'block';
+      if ($s('btn-validate-sniper')) $s('btn-validate-sniper').style.display = isCap ? 'block' : 'none';
+      if ($s('cap-sniper')) $s('cap-sniper').style.pointerEvents = isCap ? 'auto' : 'none';
 
-    // Start blitz timer
-    if (d.mode === 'blitz') {
-      startBlitzTimer(d);
-    }
-  } else if (d.mode === 'sniper') {
-    $s('cap-sniper').style.display = 'block';
-    sniperGuesses = {};
-    buildSniperBoard(respondants);
-    updateValidateSniper(respondants.length);
-  } else if (d.mode === 'duel') {
-    $s('cap-duel').style.display = 'block';
-    duelGuess = { low: null, high: null };
-    buildDuelBoard(respondants);
-    updateValidateDuel();
+      if (isCap) {
+          if (!window._capBoardBuilt) { buildSniperBoard(respondants); window._capBoardBuilt = true; }
+          updateValidateSniper(respondants.length);
+      } else {
+          sniperGuesses = d.liveSort || {};
+          buildSniperBoard(respondants);
+          Object.entries(sniperGuesses).forEach(([id, n]) => pickSniperNumber(id, n, true));
+      }
   }
+  // --- VUE CAPITAINE (MODE DUEL) ---
+  // --- VUE CAPITAINE (MODE DUEL) ---
+  else if (d.mode === 'duel') {
+      if ($s('cap-duel')) $s('cap-duel').style.display = 'block';
+      
+      const liveSortDuel = d.liveSortDuel || {};
+      const c1Ready = d.players[d.captainId]?.duelReady;
+      const c2Ready = d.players[d.captainId2]?.duelReady;
+
+      if (isCap) {
+          const isMeReady = d.players[pid]?.duelReady;
+          
+          if (isMeReady) {
+              $s('duel-cap-view').style.display = 'none';
+              $s('duel-spec-view').style.display = 'none';
+              $s('duel-cap-wait').style.display = 'flex';
+          } else {
+              $s('duel-cap-view').style.display = 'block';
+              $s('duel-spec-view').style.display = 'none';
+              $s('duel-cap-wait').style.display = 'none';
+
+              if (!window._capBoardBuilt) {
+                  dragState.placed = liveSortDuel[pid] || {};
+                  buildDuelCards(respondants);
+                  buildDuelTimeline();
+                  window._capBoardBuilt = true;
+              }
+              
+              // Rafraîchissement visuel de la timeline du Cap'ten
+              document.querySelectorAll('#duel-cards .card-slot-tag').forEach(t => { t.textContent = '—'; t.className = 'card-slot-tag'; t.style.color = ''; });
+              for (let s = 1; s <= 10; s++) refreshDuelSlot(s, dragState.placed[s] || null);
+              
+              Object.entries(dragState.placed).forEach(([slot, pId]) => {
+                  const tag = document.getElementById(`duel-tag-${pId}`);
+                  if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
+              });
+
+              document.querySelectorAll('#duel-cards .answer-card').forEach(c => {
+                  if (Object.values(dragState.placed).includes(c.dataset.pid)) {
+                      c.style.display = 'flex'; c.style.opacity = '0.3'; c.style.filter = 'grayscale(1)';
+                  } else {
+                      c.style.display = 'flex'; c.style.opacity = '1'; c.style.filter = 'none';
+                  }
+              });
+
+              $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
+          }
+      } else {
+          // VUE SPECTATEURS
+          $s('duel-cap-view').style.display = 'none';
+          $s('duel-cap-wait').style.display = 'none';
+          $s('duel-spec-view').style.display = 'block';
+
+          $s('duel-spec-name1').textContent = `${d.players[d.captainId]?.name || 'Cap\'ten 1'} ${c1Ready ? '✅' : '⏳'}`;
+          $s('duel-spec-name2').textContent = `${d.players[d.captainId2]?.name || 'Cap\'ten 2'} ${c2Ready ? '✅' : '⏳'}`;
+
+          buildStaticTimeline($s('duel-timeline-spec1'), liveSortDuel[d.captainId] || {}, players);
+          buildStaticTimeline($s('duel-timeline-spec2'), liveSortDuel[d.captainId2] || {}, players);
+      }
+  }
+  // --- VUE GLOBALE (TIMELINE CLASSIQUE/EXTREME + SPECTATEURS AVEUGLE) ---
+  else {
+      if ($s('cap-classic')) $s('cap-classic').style.display = 'block';
+      if ($s('btn-validate-classic')) $s('btn-validate-classic').style.display = isCap ? 'block' : 'none';
+      if ($s('cap-classic')) $s('cap-classic').style.pointerEvents = isCap ? 'auto' : 'none';
+      
+      const instText = $s('cap-classic-inst');
+      const poolTitle = $s('cap-classic-pool-title');
+      const cardsStack = $s('cap-cards');
+
+      if (isCap) {
+        if (d.mode === 'extreme') {
+           if (instText) instText.innerHTML = `Place la pire réponse sur le 1 et la meilleure sur le 10 (laisse les autres dans la boîte).`;
+        } else {
+           if (instText) instText.innerHTML = `Tape une carte puis un numéro, ou glisse-la sur la timeline. <span style="color:rgb(var(--primary-rgb));">1 pire</span> → <span style="color:rgb(var(--accent-rgb));">10 meilleur</span>.`;
+        }
+      } else {
+        if (instText) instText.innerHTML = `<span style="color:rgb(var(--success-rgb));font-weight:bold;font-size:1.05rem;display:block;text-align:center;padding:.5rem 0;">Le Cap'ten classe vos réponses...</span>`;
+      }
+
+      if (poolTitle) poolTitle.style.display = 'block'; 
+      if (cardsStack) cardsStack.style.display = 'flex';
+
+      if (!window._capBoardBuilt) { 
+          dragState.placed = d.liveSort || {};
+          buildClassicCards(respondants); 
+          buildClassicTimeline(); 
+          window._capBoardBuilt = true; 
+      }
+
+      dragState.placed = d.liveSort || {};
+      document.querySelectorAll('.card-slot-tag').forEach(t => { t.textContent = '—'; t.className = 'card-slot-tag'; t.style.color = ''; });
+      
+      for (let s = 1; s <= 10; s++) {
+          refreshClassicSlot(s, dragState.placed[s] || null);
+      }
+      Object.entries(dragState.placed).forEach(([slot, pId]) => {
+         const tag = document.getElementById(`tag-${pId}`);
+         if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
+      });
+
+      document.querySelectorAll('.answer-card').forEach(c => {
+         if (Object.values(dragState.placed).includes(c.dataset.pid)) {
+             c.style.display = 'flex';
+             c.style.opacity = '0.3';
+             c.style.filter = 'grayscale(1)';
+         } else {
+             c.style.display = 'flex';
+             c.style.opacity = '1';
+             c.style.filter = 'none';
+         }
+      });
+
+      const requiredPlacements = (d.mode === 'extreme') ? 2 : respondants.length;
+      updateValidateClassic(requiredPlacements);
+  }
+
+  if (d.mode === 'blitz') startBlitzTimer(d);
 }
 
 // ─── CLASSIC / BLITZ ─────────────────────────────
@@ -3132,6 +4203,8 @@ function buildClassicCards(respondants) {
 function buildClassicTimeline() {
   const tl = $s('cap-timeline');
   tl.innerHTML = '';
+  const currentMode = room.data?.mode; // On récupère le mode actuel
+
   for (let slot = 1; slot <= 10; slot++) {
     const slotEl = document.createElement('div');
     slotEl.className = 'tl-slot';
@@ -3146,25 +4219,250 @@ function buildClassicTimeline() {
     drop.className = 'tl-drop';
     drop.dataset.slot = slot;
     drop.textContent = '+';
-    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-    drop.addEventListener('drop', e => {
-      e.preventDefault();
-      drop.classList.remove('over');
-      const droppedPid = e.dataTransfer.getData('text/plain') || dragState.selected;
-      if (droppedPid) placeClassicCard(slot, droppedPid);
-    });
-    drop.addEventListener('click', () => {
-      if (dragState.selected) {
-        placeClassicCard(slot, dragState.selected);
-        dragState.selected = null;
-        document.querySelectorAll('.answer-card').forEach(c => c.classList.remove('selected'));
-      }
-    });
+
+    // ✅ NOUVEAU : Si mode Extrême, on verrouille les cases de 2 à 9 !
+    if (currentMode === 'extreme' && slot !== 1 && slot !== 10) {
+        drop.style.pointerEvents = 'none';
+        drop.style.opacity = '0.1';
+        drop.textContent = '🔒';
+    } else {
+        drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+        drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+        drop.addEventListener('drop', e => {
+          e.preventDefault();
+          drop.classList.remove('over');
+          const droppedPid = e.dataTransfer.getData('text/plain') || dragState.selected;
+          if (droppedPid) placeClassicCard(slot, droppedPid);
+        });
+        drop.addEventListener('click', () => {
+          if (dragState.selected) {
+            placeClassicCard(slot, dragState.selected);
+            dragState.selected = null;
+            document.querySelectorAll('.answer-card').forEach(c => c.classList.remove('selected'));
+          }
+        });
+    }
+
     slotEl.appendChild(drop);
     tl.appendChild(slotEl);
   }
 }
+
+// ═══════════════════════════════════════════════════════════
+//  FONCTIONS DU MODE DUEL (TIMELINE ET VALIDATION)
+// ═══════════════════════════════════════════════════════════
+function buildDuelCards(respondants) {
+  const el = $s('duel-cards');
+  el.innerHTML = '';
+  respondants.forEach(([id, p]) => {
+    const card = document.createElement('div');
+    card.className = 'answer-card';
+    card.dataset.pid = id;
+    card.draggable = true;
+    card.innerHTML = `
+      <span class="card-handle">⠿</span>
+      <div style="flex:1;min-width:0;">
+        <div class="card-player">${escapeHtml(p.name)}</div>
+        <div class="card-answer">${escapeHtml(p.answer || '–')}</div>
+      </div>
+      <div class="card-slot-tag" id="duel-tag-${id}">—</div>
+    `;
+    card.addEventListener('dragstart', e => {
+      dragState.selected = id; card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', () => {
+      if (dragState.selected === id) {
+        dragState.selected = null; card.classList.remove('selected');
+      } else {
+        document.querySelectorAll('#duel-cards .answer-card').forEach(c => c.classList.remove('selected'));
+        dragState.selected = id; card.classList.add('selected');
+        toast('Tape un numéro sur la timeline', 'info');
+      }
+    });
+    el.appendChild(card);
+  });
+}
+
+function buildDuelTimeline() {
+  const tl = $s('duel-timeline');
+  tl.innerHTML = '';
+  for (let slot = 1; slot <= 10; slot++) {
+    const slotEl = document.createElement('div');
+    slotEl.className = 'tl-slot';
+    slotEl.innerHTML = `<div class="tl-num n${slot}" style="color:${numColor(slot)}">${slot}</div>`;
+
+    const drop = document.createElement('div');
+    drop.className = 'tl-drop';
+    drop.dataset.slot = slot;
+    drop.textContent = '+';
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+    drop.addEventListener('drop', e => {
+      e.preventDefault(); drop.classList.remove('over');
+      const droppedPid = e.dataTransfer.getData('text/plain') || dragState.selected;
+      if (droppedPid) placeDuelCard(slot, droppedPid);
+    });
+    drop.addEventListener('click', () => {
+      if (dragState.selected) {
+        placeDuelCard(slot, dragState.selected);
+        dragState.selected = null;
+        document.querySelectorAll('#duel-cards .answer-card').forEach(c => c.classList.remove('selected'));
+      }
+    });
+    slotEl.appendChild(drop); tl.appendChild(slotEl);
+  }
+}
+
+function placeDuelCard(slot, placedPid) {
+  Object.entries(dragState.placed).forEach(([s, p]) => {
+    if (p === placedPid) { delete dragState.placed[s]; refreshDuelSlot(parseInt(s), null); }
+  });
+  if (dragState.placed[slot]) {
+    const evicted = dragState.placed[slot];
+    delete dragState.placed[slot];
+    refreshDuelSlot(slot, null);
+    const tag = document.getElementById(`duel-tag-${evicted}`);
+    if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
+  }
+  dragState.placed[slot] = placedPid;
+  refreshDuelSlot(slot, placedPid);
+  
+  const d = room.data;
+  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId && i !== d.captainId2);
+  $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
+  
+  // 🔥 MISE À JOUR EN DIRECT VERS FIREBASE POUR LES SPECTATEURS !
+  update(ref(db, `rooms/${room.id}/liveSortDuel/${pid}`), dragState.placed);
+}
+
+function refreshDuelSlot(slot, placedPid) {
+  const tl = $s('duel-timeline');
+  const slotEl = tl.children[slot - 1];
+  if (!slotEl) return;
+  const drop = slotEl.querySelector('.tl-drop');
+  if (!placedPid) { drop.className = 'tl-drop'; drop.innerHTML = '+'; return; }
+  
+  const p = room.data?.players?.[placedPid];
+  drop.classList.add('filled');
+  drop.innerHTML = `
+    <div class="mini-card" style="background:${numCardGradient(slot)};" onclick="window.removeDuelSlot(${slot})" title="Cliquer pour retirer">
+      <span style="display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;">${escapeHtml(p?.answer || '–')}</span>
+    </div>
+  `;
+}
+
+window.removeDuelSlot = slot => {
+  const evicted = dragState.placed[slot];
+  if (!evicted) return;
+  delete dragState.placed[slot];
+  refreshDuelSlot(slot, null);
+  const tag = document.getElementById(`duel-tag-${evicted}`);
+  if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
+  
+  const d = room.data;
+  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId && i !== d.captainId2);
+  $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
+  update(ref(db, `rooms/${room.id}/liveSortDuel/${pid}`), dragState.placed);
+};
+
+// Construit une timeline figée pour les spectateurs
+function buildStaticTimeline(container, sortData, playersData) {
+    container.innerHTML = '';
+    for (let slot = 1; slot <= 10; slot++) {
+        const slotEl = document.createElement('div');
+        slotEl.className = 'tl-slot';
+        slotEl.innerHTML = `<div class="tl-num n${slot}" style="color:${numColor(slot)}">${slot}</div>`;
+        const drop = document.createElement('div');
+        drop.className = 'tl-drop'; 
+        
+        const placedPid = sortData[slot];
+        if (placedPid) {
+            const ans = playersData[placedPid]?.answer || '...';
+            drop.classList.add('filled');
+            drop.innerHTML = `<div class="mini-card" style="background:${numCardGradient(slot)}; pointer-events:none;">
+              <span style="display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;">${escapeHtml(ans)}</span>
+            </div>`;
+        } else {
+            drop.textContent = '—';
+            drop.style.opacity = '0.3';
+        }
+        slotEl.appendChild(drop); container.appendChild(slotEl);
+    }
+}
+
+// 💥 VALIDATION DU DUEL ET CALCUL DES POINTS
+window.validateDuel = async () => {
+    const d = room.data; if (!d) return;
+    
+    // Le Cap'ten indique qu'il a fini
+    const updates = {};
+    updates[`rooms/${room.id}/players/${pid}/duelReady`] = true;
+    
+    // Vérifier si l'autre Cap'ten a déjà fini
+    const otherCapId = (d.captainId === pid) ? d.captainId2 : d.captainId;
+    const otherReady = d.players[otherCapId]?.duelReady;
+    
+    if (otherReady) {
+        // Les deux ont fini ! On calcule les scores
+        const liveSort = d.liveSortDuel || {};
+        const sort1 = liveSort[d.captainId] || {}; // Classement Cap 1 (si manquant, triche sécurité)
+        const sort2 = (pid === d.captainId2) ? dragState.placed : (liveSort[d.captainId2] || {});
+        
+        const respondants = Object.entries(d.players).filter(([i]) => i !== d.captainId && i !== d.captainId2);
+        
+        let error1 = 0, error2 = 0;
+        let playerPoints = {};
+        respondants.forEach(([id]) => playerPoints[id] = 0);
+
+        respondants.forEach(([id, p]) => {
+            const real = p.number;
+            
+            // Calcul Cap'ten 1
+            const slot1 = Object.keys(sort1).find(k => sort1[k] === id);
+            const guess1 = slot1 ? parseInt(slot1) : 0;
+            if (guess1) {
+                error1 += Math.abs(guess1 - real);
+                if (guess1 === real) playerPoints[id] += 2; // +2 si exact
+                else if (Math.abs(guess1 - real) === 1) playerPoints[id] += 1; // +1 si à côté
+            } else error1 += 10; // Pénalité si carte non placée
+            
+            // Calcul Cap'ten 2
+            const slot2 = Object.keys(sort2).find(k => sort2[k] === id);
+            const guess2 = slot2 ? parseInt(slot2) : 0;
+            if (guess2) {
+                error2 += Math.abs(guess2 - real);
+                if (guess2 === real) playerPoints[id] += 2;
+                else if (Math.abs(guess2 - real) === 1) playerPoints[id] += 1;
+            } else error2 += 10;
+        });
+
+        let cap1Pts = 0, cap2Pts = 0;
+        if (error1 < error2) cap1Pts = 3;
+        else if (error2 < error1) cap2Pts = 3;
+        else { cap1Pts = 1; cap2Pts = 1; } // Égalité
+
+        updates[`rooms/${room.id}/duelResult`] = { error1, error2, cap1Pts, cap2Pts };
+        
+        // Distribution des points aux Capitaines
+        updates[`rooms/${room.id}/players/${d.captainId}/score`] = (d.players[d.captainId]?.score || 0) + cap1Pts;
+        updates[`rooms/${room.id}/players/${d.captainId2}/score`] = (d.players[d.captainId2]?.score || 0) + cap2Pts;
+        
+        // Distribution des points aux Répondants
+        respondants.forEach(([id]) => {
+            if (playerPoints[id] > 0) {
+                updates[`rooms/${room.id}/players/${id}/score`] = (d.players[id]?.score || 0) + playerPoints[id];
+            }
+        });
+        
+        // On passe à la révélation des résultats !
+        updates[`rooms/${room.id}/status`] = 'round-reveal';
+    }
+    
+    await update(ref(db), updates);
+};
 
 function placeClassicCard(slot, placedPid) {
   const d = room.data;
@@ -3189,6 +4487,9 @@ function placeClassicCard(slot, placedPid) {
   if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
 
   updateValidateClassic(respondants.length);
+  if (room.data.captainId === pid) {
+      set(ref(db, `rooms/${room.id}/liveSort`), dragState.placed);
+  }
 }
 
 function refreshClassicSlot(slot, placedPid) {
@@ -3196,15 +4497,22 @@ function refreshClassicSlot(slot, placedPid) {
   const slotEl = tl.children[slot - 1];
   if (!slotEl) return;
   const drop = slotEl.querySelector('.tl-drop');
+  
   if (!placedPid) {
-    drop.className = 'tl-drop'; drop.innerHTML = '+';
+    drop.className = 'tl-drop'; 
+    drop.innerHTML = '+';
     return;
   }
+  
   const p = room.data?.players?.[placedPid];
   drop.classList.add('filled');
+  
+  // ✅ CORRECTION : On a ajouté un "span" avec -webkit-line-clamp pour tronquer proprement les longs textes à 4 lignes max
   drop.innerHTML = `
-    <div class="mini-card" style="background:${numCardGradient(slot)};" onclick="removeClassicSlot(${slot})" title="Cliquer pour retirer">
-      ${escapeHtml(p?.answer || '–')}
+    <div class="mini-card" style="background:${numCardGradient(slot)};" onclick="window.removeClassicSlot(${slot})" title="Cliquer pour retirer">
+      <span style="display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; width:100%; word-break:break-word; overflow-wrap:anywhere;">
+        ${escapeHtml(p?.answer || '–')}
+      </span>
     </div>
   `;
 }
@@ -3219,6 +4527,9 @@ window.removeClassicSlot = slot => {
   const d = room.data;
   const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
   updateValidateClassic(respondants.length);
+  if (room.data.captainId === pid) {
+      set(ref(db, `rooms/${room.id}/liveSort`), dragState.placed);
+  }
 };
 
 function updateValidateClassic(total) {
@@ -3230,6 +4541,63 @@ window.validateClassic = async () => {
   const players = d.players || {};
   const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
 
+  // --- LOGIQUE MODE SNIPER ---
+  if (d.mode === 'sniper') {
+      let capPts = 0;
+      const updates = {};
+      Object.entries(dragState.placed).forEach(([slot, pId]) => {
+          const guessNum = parseInt(slot);
+          const real = players[pId]?.number;
+          if (guessNum === real) {
+              capPts += 2; // Le Cap'ten gagne 2 pts
+              updates[`rooms/${room.id}/players/${pId}/score`] = (players[pId]?.score || 0) + 1; // Le Joueur gagne 1 pt
+          }
+      });
+      
+      updates[`rooms/${room.id}/captainGuess`] = dragState.placed;
+      updates[`rooms/${room.id}/roundResult`]  = 'correct'; // Pour passer à l'écran de résultat
+      updates[`rooms/${room.id}/status`]       = 'round-reveal';
+      updates[`rooms/${room.id}/players/${d.captainId}/score`] = (players[d.captainId]?.score || 0) + capPts;
+      updates[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: capPts };
+      
+      if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+      await update(ref(db), updates);
+      return;
+  }
+
+  // --- LOGIQUE MODE EXTREME ---
+  if (d.mode === 'extreme') {
+      let real1 = null, real10 = null;
+      Object.entries(players).forEach(([id, p]) => {
+        if (p.number === 1) real1 = id;
+        if (p.number === 10) real10 = id;
+      });
+      
+      // Trouve quelle carte a été mise sur le plus petit chiffre, et le plus grand
+      const slots = Object.keys(dragState.placed).map(Number).sort((a,b)=>a-b);
+      const lowGuessId = dragState.placed[slots[0]];
+      const highGuessId = dragState.placed[slots[slots.length - 1]];
+      const extremeGuessObj = { low: lowGuessId, high: highGuessId };
+
+      let pts = 0;
+      if (lowGuessId === real1) pts++;
+      if (highGuessId === real10) pts++;
+
+      const isSuccess = (pts === 2);
+      const newLives = isSuccess ? d.lives : Math.max(0, d.lives - 1);
+      
+      if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+      await update(ref(db, `rooms/${room.id}`), {
+        captainGuess: extremeGuessObj,
+        roundResult: isSuccess ? 'correct' : 'wrong',
+        lives: newLives,
+        status: 'round-reveal',
+        lastRoundPts: { [d.captainId]: pts } 
+      });
+      return;
+  }
+
+  // --- LOGIQUE MODE CLASSIQUE / BLITZ / SURVIE ---
   const placed = Object.entries(dragState.placed)
     .map(([slot, id]) => ({ slot: parseInt(slot), id }))
     .sort((a, b) => a.slot - b.slot);
@@ -3328,7 +4696,7 @@ function buildSniperBoard(respondants) {
   });
 }
 
-function pickSniperNumber(pid, n) {
+function pickSniperNumber(pid, n, isSync = false) {
   sniperGuesses[pid] = n;
   const picker = document.querySelector(`.num-picker[data-pid="${pid}"]`);
   if (!picker) return;
@@ -3343,6 +4711,7 @@ function pickSniperNumber(pid, n) {
   const d = room.data;
   const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
   updateValidateSniper(respondants.length);
+  if (!isSync && room.data.captainId === pid) update(ref(db, `rooms/${room.id}/liveSort`), sniperGuesses);
 }
 
 function updateValidateSniper(total) {
@@ -3374,67 +4743,66 @@ window.validateSniper = async () => {
   await update(ref(db), updates);
 };
 
-// ─── DUEL ─────────────────────────────
-function buildDuelBoard(respondants) {
-  const low = $s('cap-duel-low');
-  const high = $s('cap-duel-high');
+// ─── EXTREME ─────────────────────────────
+function buildExtremeBoard(respondants) {
+  const low = $s('cap-extreme-low');
+  const high = $s('cap-extreme-high');
   low.innerHTML = ''; high.innerHTML = '';
   const shuffled = shuffle(respondants);
   shuffled.forEach(([id, p]) => {
     const lopt = document.createElement('div');
-    lopt.className = 'duel-opt';
+    lopt.className = 'extreme-opt';
     lopt.dataset.pid = id;
     lopt.textContent = p.answer || '–';
-    lopt.onclick = () => pickDuel('low', id);
+    lopt.onclick = () => pickExtreme('low', id);
     low.appendChild(lopt);
 
     const hopt = document.createElement('div');
-    hopt.className = 'duel-opt';
+    hopt.className = 'extreme-opt';
     hopt.dataset.pid = id;
     hopt.textContent = p.answer || '–';
-    hopt.onclick = () => pickDuel('high', id);
+    hopt.onclick = () => pickExtreme('high', id);
     high.appendChild(hopt);
   });
 }
 
-function pickDuel(which, id) {
-  duelGuess[which] = id;
-  const list = which === 'low' ? $s('cap-duel-low') : $s('cap-duel-high');
-  list.querySelectorAll('.duel-opt').forEach(o => {
+function pickExtreme(which, id, isSync = false) {
+  extremeGuess[which] = id;
+  const list = which === 'low' ? $s('cap-extreme-low') : $s('cap-extreme-high');
+  list.querySelectorAll('.extreme-opt').forEach(o => {
     o.classList.remove('picked--low', 'picked--high');
     if (o.dataset.pid === id) o.classList.add(which === 'low' ? 'picked--low' : 'picked--high');
   });
-  updateValidateDuel();
+  updateValidateExtreme();
+  if (!isSync && room.data.captainId === pid) update(ref(db, `rooms/${room.id}/liveSort`), extremeGuess);
 }
 
-function updateValidateDuel() {
-  $s('btn-validate-duel').disabled = !(duelGuess.low && duelGuess.high && duelGuess.low !== duelGuess.high);
+function updateValidateExtreme() {
+  $s('btn-validate-extreme').disabled = !(extremeGuess.low && extremeGuess.high && extremeGuess.low !== extremeGuess.high);
 }
 
-window.validateDuel = async () => {
+window.validateExtreme = async () => {
   const d = room.data; if (!d) return;
-  const players = d.players || {};
-
-  // Find real low and high
-  const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
-  let realLowId = null, realHighId = null, lowN = 11, highN = 0;
-  respondants.forEach(([id, p]) => {
-    if (p.number < lowN) { lowN = p.number; realLowId = id; }
-    if (p.number > highN) { highN = p.number; realHighId = id; }
+  const players = d.players;
+  
+  // Trouve les vrais IDs du 1 et du 10
+  let real1 = null, real10 = null;
+  Object.entries(players).forEach(([id, p]) => {
+    if (p.number === 1) real1 = id;
+    if (p.number === 10) real10 = id;
   });
 
-  let pts = 0;
-  if (duelGuess.low  === realLowId)  pts++;
-  if (duelGuess.high === realHighId) pts++;
+  // Vérifie si le Cap'ten a vu juste (extremeGuess.low est son choix pour le 1, high pour le 10)
+  const isSuccess = (extremeGuess.low === real1 && extremeGuess.high === real10);
+  
+  const newLives = isSuccess ? d.lives : Math.max(0, d.lives - 1);
 
-  const updates = {};
-  updates[`rooms/${room.id}/captainGuess`] = { low: duelGuess.low, high: duelGuess.high };
-  updates[`rooms/${room.id}/roundResult`]  = pts >= 2 ? 'correct' : (pts === 1 ? 'close' : 'wrong');
-  updates[`rooms/${room.id}/status`]       = 'round-reveal';
-  updates[`rooms/${room.id}/players/${d.captainId}/score`] = (players[d.captainId]?.score || 0) + pts;
-  updates[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: pts };
-
-  await update(ref(db), updates);
+  await update(ref(db, `rooms/${room.id}`), {
+    captainGuess: extremeGuess,
+    roundResult: isSuccess ? 'correct' : 'wrong',
+    lives: newLives,
+    status: 'round-reveal'
+  });
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -3466,7 +4834,7 @@ function renderRoundReveal(d) {
     }
 
     $s('rv-lives').style.display = 'flex';
-    lives($s('rv-lives'), d.lives);
+    lives($s('rv-lives'), d.lives, d.maxLives);
 
     // Reveal results ordered 1→10
     const captainOrder = d.captainGuess || {};
@@ -3484,8 +4852,11 @@ function renderRoundReveal(d) {
       const isThisRight = capIdx === idx;
       const it = document.createElement('div');
       it.className = `result-item ${correct ? 'correct' : (isThisRight ? 'correct' : 'wrong')}`;
-      it.style.animationDelay = `${idx * 0.15}s`;
-      it.style.animation = `floatIn .4s ease ${idx * 0.15}s both`;
+      // Révélation une par une toutes les 1.2 secondes
+      it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 1.2}s both`;
+      
+      // Petit effet haptique au moment où la carte s'affiche
+      setTimeout(() => { try { navigator.vibrate?.(40); } catch(e){} }, idx * 1200);
       it.innerHTML = `
         <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
         <div style="flex:1;min-width:0;">
@@ -3524,7 +4895,11 @@ function renderRoundReveal(d) {
       const pts   = exact ? 3 : (close ? 1 : 0);
       const it = document.createElement('div');
       it.className = `result-item ${cls}`;
-      it.style.animation = `floatIn .4s ease ${idx * 0.15}s both`;
+      // Révélation une par une toutes les 1.2 secondes
+      it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 1.2}s both`;
+      
+      // Petit effet haptique au moment où la carte s'affiche
+      setTimeout(() => { try { navigator.vibrate?.(40); } catch(e){} }, idx * 1200);
       it.innerHTML = `
         <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
         <div style="flex:1;min-width:0;">
@@ -3538,11 +4913,11 @@ function renderRoundReveal(d) {
 
     buildRevealActions(d, m);
 
-  } else if (d.mode === 'duel') {
-    // DUEL reveal
+  } else if (d.mode === 'extreme') {
+    // EXTREME reveal
     const pts = d.lastRoundPts?.[d.captainId] || 0;
     $s('rv-icon').textContent = pts === 2 ? '🎭' : pts === 1 ? '🎯' : '💥';
-    $s('rv-title').textContent = pts === 2 ? 'Duel Parfait !' : pts === 1 ? 'Mi-chemin' : 'Raté sur les deux';
+    $s('rv-title').textContent = pts === 2 ? 'Extrême Parfait !' : pts === 1 ? 'Mi-chemin' : 'Raté sur les deux';
     $s('rv-sub').textContent = `+${pts} point${pts > 1 ? 's' : ''}`;
     $s('rv-sub').style.color = pts > 0 ? 'rgb(var(--success-rgb))' : 'rgb(var(--accent-rgb))';
     $s('rv-sub').style.textShadow = pts > 0 ? '0 0 14px rgba(var(--success-rgb),.45)' : 'none';
@@ -3577,7 +4952,11 @@ function renderRoundReveal(d) {
 
       const it = document.createElement('div');
       it.className = `result-item ${cls}`;
-      it.style.animation = `floatIn .4s ease ${idx * 0.15}s both`;
+      // Révélation une par une toutes les 1.2 secondes
+      it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 1.2}s both`;
+      
+      // Petit effet haptique au moment où la carte s'affiche
+      setTimeout(() => { try { navigator.vibrate?.(40); } catch(e){} }, idx * 1200);
       it.innerHTML = `
         <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
         <div style="flex:1;min-width:0;">
@@ -3596,29 +4975,43 @@ function buildRevealActions(d, m) {
   const act = $s('rv-actions');
   act.innerHTML = '';
   const isHost = d.host === pid;
-  const isLastRound = !m.coop && d.round >= (d.maxRounds || 5);
-  const isDead      = m.coop && d.lives <= 0;
+  
+  // Calculer si c'est la fin de la manche (tout le monde est passé Cap'ten)
+  const queue = d.captainQueue || [];
+  const isEndOfRound = queue.length === 0;
+
+  // Calculer si c'est la DERNIÈRE manche de la partie
+  const targetRounds = d.mode === 'survival' ? 9999 : (d.maxRounds || 5);
+  const isFinalRound = isEndOfRound && (d.round >= targetRounds);
+
+  const isDead = m.coop && d.lives <= 0;
 
   if (isHost) {
-    if (isDead) {
+    if (isDead || isFinalRound) {
+      // Si on n'a plus de vies OU si c'est la fin de la dernière manche
       const btn = document.createElement('button');
       btn.className = 'btn btn-danger btn-full';
-      btn.textContent = '💀 Voir le bilan';
+      btn.textContent = isDead ? '💀 Voir le bilan' : '🏆 Voir le résultat final';
       btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'gameover' });
       act.appendChild(btn);
     } else if (!m.coop) {
-      // Competitive mode → go to leaderboard
+      // Mode compétitif (Sniper/Extrême) -> On va au classement
       const btn = document.createElement('button');
       btn.className = 'btn btn-primary btn-full';
-      btn.textContent = isLastRound ? '🏆 Voir le podium' : '🏆 Voir le classement';
-      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: isLastRound ? 'gameover' : 'leaderboard' });
+      btn.textContent = '🏆 Voir le classement';
+      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'leaderboard' });
       act.appendChild(btn);
     } else {
-      // Coop, still alive
+      // Mode Coop et on continue
       const btn = document.createElement('button');
       btn.className = 'btn btn-primary btn-full';
-      btn.textContent = 'Manche suivante ✦';
-      btn.onclick = nextRound;
+      if (isEndOfRound) {
+        btn.textContent = 'Manche suivante ✦';
+        btn.onclick = window.nextRound;
+      } else {
+        btn.textContent = 'Cap\'ten Suivant 👑';
+        btn.onclick = window.nextTurn;
+      }
       act.appendChild(btn);
     }
   } else {
@@ -3662,8 +5055,22 @@ function renderLeaderboard(d) {
   if (d.host === pid) {
     const btn = document.createElement('button');
     btn.className = 'btn btn-primary btn-full';
-    btn.textContent = 'Manche suivante ✦';
-    btn.onclick = nextRound;
+    
+    const queue = d.captainQueue || [];
+    const isEndOfRound = queue.length === 0;
+    const targetRounds = d.mode === 'survival' ? 9999 : (d.maxRounds || 5);
+    const isFinalRound = isEndOfRound && (d.round >= targetRounds);
+
+    if (isFinalRound) {
+      btn.textContent = '🏆 Résultat final';
+      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'gameover' });
+    } else if (isEndOfRound) {
+      btn.textContent = 'Manche suivante ✦';
+      btn.onclick = window.nextRound;
+    } else {
+      btn.textContent = 'Cap\'ten Suivant 👑';
+      btn.onclick = window.nextTurn;
+    }
     act.appendChild(btn);
   } else {
     const p2 = document.createElement('p');
@@ -3674,35 +5081,35 @@ function renderLeaderboard(d) {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  18. NEXT ROUND
+//  18. GESTION DES TOURS ET MANCHES
 // ═══════════════════════════════════════════════════════════
-async function nextRound() {
-  const d = room.data; if (!d) return;
-  if (d.host !== pid) return;
+window.startTurn = async (isNewRound) => {
+  const d = room.data; if (!d || d.host !== pid) return;
+  const ids = Object.keys(d.players);
+  let queue = d.captainQueue || [];
+  let round = d.round;
 
-  const players = d.players || {};
-  const ids = Object.keys(players);
+  // Si on change de manche (ou si la liste est vide par sécurité)
+  if (isNewRound || queue.length === 0) {
+    queue = shuffle([...ids]);
+    round += 1;
+  }
 
-  // Rotate captain
-  const prevCap = d.captainId;
-  const others = ids.filter(i => i !== prevCap);
-  const newCap = others.length > 0
-    ? others[Math.floor(Math.random() * others.length)]
-    : ids[Math.floor(Math.random() * ids.length)];
-
+  const newCap = queue.shift();
   const respondants = ids.filter(i => i !== newCap);
-  const numbers = shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0, respondants.length);
 
   const u = {};
-  u[`rooms/${room.id}/status`]       = 'reveal';
+  u[`rooms/${room.id}/status`]       = 'theme-choice';
   u[`rooms/${room.id}/captainId`]    = newCap;
+  u[`rooms/${room.id}/captainQueue`] = queue;
+  u[`rooms/${room.id}/round`]        = round;
   u[`rooms/${room.id}/theme`]        = null;
   u[`rooms/${room.id}/drawnTheme`]   = pickRandomTheme(d.level);
-  u[`rooms/${room.id}/round`]        = d.round + 1;
   u[`rooms/${room.id}/captainGuess`] = null;
   u[`rooms/${room.id}/roundResult`]  = null;
   u[`rooms/${room.id}/timerEndsAt`]  = null;
   u[`rooms/${room.id}/lastRoundPts`] = null;
+  u[`rooms/${room.id}/liveSort`]     = null;
 
   ids.forEach(i => {
     u[`rooms/${room.id}/players/${i}/number`]   = null;
@@ -3710,18 +5117,36 @@ async function nextRound() {
     u[`rooms/${room.id}/players/${i}/answered`] = false;
     u[`rooms/${room.id}/players/${i}/ready`]    = false;
   });
-  respondants.forEach((id, idx) => {
-    u[`rooms/${room.id}/players/${id}/number`] = numbers[idx];
-  });
+
+  // Distribution des numéros (Logique Mode Extrême incluse)
+  if (d.mode === 'extreme' && respondants.length >= 2) {
+    const shuff = shuffle([...respondants]);
+    respondants.forEach(id => {
+      if (id === shuff[0]) u[`rooms/${room.id}/players/${id}/number`] = 1;
+      else if (id === shuff[1]) u[`rooms/${room.id}/players/${id}/number`] = 10;
+      else u[`rooms/${room.id}/players/${id}/number`] = Math.floor(Math.random() * 8) + 2; 
+    });
+  } else {
+    const numbers = shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0, respondants.length);
+    respondants.forEach((id, idx) => {
+      u[`rooms/${room.id}/players/${id}/number`] = numbers[idx];
+    });
+  }
 
   await update(ref(db), u);
-}
+};
+
+window.nextRound = () => window.startTurn(true);
+window.nextTurn  = () => window.startTurn(false);
 
 // ═══════════════════════════════════════════════════════════
 //  19. GAMEOVER
 // ═══════════════════════════════════════════════════════════
 function renderGameover(d) {
   showScreen('gameover');
+  const isHost = d.host === pid;
+  $s('go-host-actions').style.display = isHost ? 'flex' : 'none';
+  $s('go-guest-wait').style.display = isHost ? 'none' : 'block';
   const m = modeInfo(d.mode);
   const players = d.players || {};
 
@@ -3795,12 +5220,15 @@ window.restartGame = async () => {
   u[`rooms/${room.id}/captainGuess`] = null;
   u[`rooms/${room.id}/timerEndsAt`]  = null;
   u[`rooms/${room.id}/lastRoundPts`] = null;
+  u[`rooms/${room.id}/liveSort`]     = null;
+
   ids.forEach(i => {
     u[`rooms/${room.id}/players/${i}/number`]   = null;
     u[`rooms/${room.id}/players/${i}/answer`]   = null;
     u[`rooms/${room.id}/players/${i}/answered`] = false;
     u[`rooms/${room.id}/players/${i}/ready`]    = false;
     u[`rooms/${room.id}/players/${i}/score`]    = 0;
+    // connectedAt is preserved intentionally (needed for host election)
   });
   await update(ref(db), u);
 };
@@ -3808,8 +5236,88 @@ window.restartGame = async () => {
 // ═══════════════════════════════════════════════════════════
 //  20. SETTINGS / THEMES / RULES
 // ═══════════════════════════════════════════════════════════
-window.openSettings  = () => $s('settings-overlay').classList.add('open');
+window.openSettings = () => {
+  const sessionBtns = document.getElementById('settings-session-btns');
+  const returnBtn = document.getElementById('btn-return-lobby');
+  
+  if (room && room.id) {
+    sessionBtns.style.display = 'block';
+    
+    // Le bouton n'est grisé QUE si on est à l'accueil du salon
+    // S'il est en 'config' ou en train de jouer, le bouton est actif !
+    if (room.data && room.data.status === 'lobby') {
+      returnBtn.style.opacity = '0.3';
+      returnBtn.style.pointerEvents = 'none';
+    } else {
+      returnBtn.style.opacity = '1';
+      returnBtn.style.pointerEvents = 'auto';
+    }
+  } else {
+    sessionBtns.style.display = 'none';
+  }
+  
+  $s('settings-overlay').classList.add('open');
+};
+
 window.closeSettings = () => $s('settings-overlay').classList.remove('open');
+
+// --- Fonctions d'action de session depuis les paramètres ---
+// Quitter la partie depuis les paramètres
+window.settingsLeaveGame = () => {
+  window.closeSettings(); // Ferme d'abord le menu paramètres
+  window.showConfirm("Veux-tu vraiment quitter la partie en cours ?", () => {
+    window.leaveRoomActual(); // On crée une petite fonction interne pour le départ sans re-demander
+  });
+};
+
+// Fonction technique pour quitter sans popup (appelée par showConfirm)
+window.leaveRoomActual = async () => {
+  const d = room.data;
+  const remaining = Object.entries((d?.players || {})).filter(([id]) => id !== pid);
+  const updates = {};
+
+  // Reassign host if we are the host
+  if (d && d.host === pid && remaining.length > 0) {
+    const newHost = remaining.sort((a, b) => (a[1].connectedAt || 0) - (b[1].connectedAt || 0))[0][0];
+    updates[`rooms/${room.id}/host`] = newHost;
+  }
+
+  try {
+    if (remaining.length === 0) {
+      await remove(ref(db, `rooms/${room.id}`));
+    } else {
+      updates[`rooms/${room.id}/players/${pid}`] = null;
+      await update(ref(db), updates);
+    }
+  } catch(e){}
+
+  localStorage.removeItem('tt-reconnect-state');
+  location.reload();
+};
+
+// Retourner au salon (Hôte uniquement)
+window.settingsReturnLobby = async () => {
+  if (!room.data || room.data.host !== pid) {
+    toast("Seul l'hôte peut annuler la manche.", "err");
+    return;
+  }
+  
+  window.closeSettings();
+  window.showConfirm("Annuler la manche et retourner au salon pour tous les joueurs ?", async () => {
+    const pids = Object.keys(room.data.players || {});
+    const updates = {};
+    updates[`rooms/${room.id}/status`] = 'lobby';
+    updates[`rooms/${room.id}/round`] = 0;
+    // On réinitialise les états de jeu...
+    pids.forEach(id => {
+      updates[`rooms/${room.id}/players/${id}/answered`] = false;
+      updates[`rooms/${room.id}/players/${id}/answer`] = null;
+    });
+    
+    await update(ref(db), updates);
+    toast("Retour au salon", "ok");
+  });
+};
 window.openRules     = () => { window.closeSettings(); setTimeout(() => $s('rules-overlay').classList.add('open'), 80); };
 window.closeRules    = () => $s('rules-overlay').classList.remove('open');
 window.closeWelcome  = () => {
@@ -3864,6 +5372,24 @@ document.addEventListener('keydown', e => {
 
 // Expose window methods (some already assigned above via window.*)
 // Clean exit
+window.cfgSetMode = async (mode) => {
+  if (!room.data || room.data.host !== pid) return;
+  await update(ref(db, `rooms/${room.id}`), { mode });
+  renderConfigParams(mode); // Rafraîchit les options
+};
+
+window.unsubmitAnswer = async () => {
+  if (!room.id || !room.data) return;
+  
+  // ✅ SÉCURITÉ : Empêche de repasser en mode écriture si le temps est fini
+  const isTimeUp = room.data.timerEndsAt && (Date.now() >= room.data.timerEndsAt);
+  if (isTimeUp) {
+    toast("Le temps est écoulé !", "err");
+    return;
+  }
+
+  await update(ref(db, `rooms/${room.id}/players/${pid}`), { answered: false });
+};
 </script>
 </body>
 </html>
