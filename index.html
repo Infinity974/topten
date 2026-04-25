@@ -1979,6 +1979,19 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
     <div id="tc-countdown" style="display:none; text-align:center; padding:1.2rem 0; font-weight:700; color:rgb(var(--success-rgb)); font-family:'Space Grotesk',sans-serif; text-transform:uppercase; font-size:0.9rem;">
         Vote des thèmes dans <span id="tc-cd-val">3</span>s...
     </div>
+
+    <div id="tc-wait" style="display:none;">
+      <div class="wait-center">
+        <div class="wait-icon">👑</div>
+        <h2 style="color:#fff;">Le Cap'ten réfléchit…</h2>
+        <p id="tc-wait-name">Il choisit le thème de la manche.</p>
+        <div class="dots" id="tc-wait-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div id="tc-countdown" style="display:none; text-align:center; padding:1.2rem 0; font-weight:700; color:rgb(var(--success-rgb)); font-family:'Space Grotesk',sans-serif; text-transform:uppercase; font-size:0.9rem;">
+        Vote des thèmes dans <span id="tc-cd-val" class="cd-timer-val">3</span>s...
+    </div>
   </div>
 </div>
 
@@ -2018,6 +2031,18 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
         <h2 style="color:#fff; margin-top:1rem; font-size:2.2rem; text-transform:uppercase; letter-spacing:0.1em; animation: floatIn 0.8s ease forwards;">Thème Gagnant !</h2>
         
         <div class="theme-card" style="margin-top:2rem; width:100%; max-width:400px; transform:scale(1.1); animation: popInWinner 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;">
+            <div class="theme-label" style="color:rgb(var(--gold-rgb)); text-shadow:0 0 10px rgba(var(--gold-rgb),0.5);">Le peuple a parlé</div>
+            <div class="theme-text" id="tvr-winner-text" style="font-size:1.3rem;">...</div>
+        </div>
+    </div>
+</div>
+
+<div id="screen-theme-vote-result" class="screen">
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+        <div style="font-size:5rem; animation: floatIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; filter:drop-shadow(0 0 30px rgba(var(--gold-rgb), 0.5));">🏆</div>
+        <h2 style="color:#fff; margin-top:1rem; font-size:2.2rem; text-transform:uppercase; letter-spacing:0.1em; animation: floatIn 0.8s ease forwards;">Thème Gagnant !</h2>
+        
+        <div class="theme-card" style="margin-top:2rem; width:100%; transform:scale(1.1); animation: popInWinner 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;">
             <div class="theme-label" style="color:rgb(var(--gold-rgb)); text-shadow:0 0 10px rgba(var(--gold-rgb),0.5);">Le peuple a parlé</div>
             <div class="theme-text" id="tvr-winner-text" style="font-size:1.3rem;">...</div>
         </div>
@@ -2215,9 +2240,14 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
       </div>
 
       <div id="duel-spec-view" style="display:none;">
-        <p style="font-size:.84rem;margin-bottom:1.5rem;text-align:center;color:rgb(var(--success-rgb));font-weight:bold;">
+        <p style="font-size:.84rem;margin-bottom:1rem;text-align:center;color:rgb(var(--success-rgb));font-weight:bold;">
           Les 2 Cap'tens classent en direct...
         </p>
+
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:15px; margin-bottom:1.5rem;">
+            <h3 style="margin-bottom:.8rem; color:var(--muted); text-align:center;">Réponses à classer</h3>
+            <div id="duel-spec-answers" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
+        </div>
         
         <h3 id="duel-spec-name1" style="margin-bottom:.55rem; color:rgb(var(--primary-rgb));">Timeline 1</h3>
         <div class="timeline-wrap" style="margin-bottom:1.5rem; border:1px solid rgba(var(--primary-rgb),0.3); border-radius:12px; background:rgba(var(--primary-rgb),0.05); padding:10px;">
@@ -2292,6 +2322,7 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
     <div id="go-coop-wrap" class="glass" style="display:none;padding:1.5rem;text-align:center;">
       <h3 style="margin-bottom:.45rem;">Manches réussies</h3>
       <div id="go-score" style="font-family:'Space Grotesk',sans-serif;font-size:3.5rem;font-weight:900;background:linear-gradient(120deg,rgb(var(--gold-rgb)) 0%,#ff8c00 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 18px rgba(var(--gold-rgb),.40));">0</div>
+      <div id="go-lives-bilan" class="lives-bar" style="justify-content:center; margin-top:1.5rem;"></div>
     </div>
 
     <div id="go-host-actions" style="display:none;flex-direction:column;gap:.55rem;margin-top:1rem;">
@@ -2472,67 +2503,68 @@ const firebaseConfig = {
 // ═══════════════════════════════════════════════════════════
 const QUESTIONS = {
   family: [
-    "Inventez un nom de chien, du moins original au plus original",
-    "Une excuse pour ne pas faire la vaisselle, de la plus classique à la plus créative",
-    "Un super-héros totalement inutile, du moins au plus inutile",
-    "Un plat inventé qui semble raté, du moins appétissant au plus appétissant",
-    "Un talent inutile à mettre sur un CV, du moins au plus impressionnant",
-    "Une chose à crier en entrant dans une pièce, du moins au plus dramatique",
-    "Un prénom pour un robot domestique, du moins stylé au plus stylé",
-    "Un animal de compagnie insolite, du moins au plus surprenant",
-    "Une raison d'appeler les pompiers, de la moins justifiée à la plus justifiée",
-    "Un mot inventé pour décrire une émotion, du moins au plus expressif",
-    "Une danse de victoire, du moins au plus ridicule",
-    "Un slogan pour une marque de chaussettes, du plus banal au plus génial",
-    "Une nouvelle utilité pour un crayon, du moins au plus utile",
-    "Un nom de groupe de musique imaginaire, du moins au plus impressionnant",
-    "Une façon de dire au revoir, de la moins au plus originale",
-    "Un pouvoir magique inutile, du moins au plus décevant",
-    "Un cri de guerre de chaton, du moins au plus terrifiant",
-    "Un parfum à la nourriture improbable, du moins au plus gourmand",
-    "Un nom pour une nouvelle couleur, du plus fade au plus éclatant",
-    "Une raison bidon d'être en retard, de la moins à la plus crédible",
-    "Un cadeau pourri pour ton meilleur ami, du moins au plus nul",
-    "Un sport totalement inventé, du moins au plus dangereux",
-    "Une émission TV improbable, de la moins à la plus regardable",
-    "Un bruit étrange dans la nuit, du moins au plus flippant",
-    "Un goût de glace absurde, du moins au plus bon"
+    "Ton ami te présente son nouveau bébé, mais il est vraiment très laid. Du compliment le plus hypocrite au compliment le plus sincère.",
+    "Tu es aux toilettes chez tes beaux-parents et tu as bouché les WC. De la pire à la meilleure phrase pour annoncer la nouvelle.",
+    "Le Père Noël te demande ce que tu veux cette année. De la demande la plus modeste à la plus irréalisable.",
+    "Tu te fais arrêter pour excès de vitesse. De la pire à la meilleure excuse à donner au policier.",
+    "Tu dois convaincre tes amis d'aller voir un film au cinéma. Du pire argument au meilleur argument.",
+    "Un voyant lit ton avenir dans une boule de cristal. De la prédiction la plus banale à la plus terrifiante.",
+    "Le médecin t'annonce les résultats de tes analyses. De la maladie la moins grave (et inventée) à la maladie la plus foudroyante.",
+    "Tu dois vendre un objet cassé sur Le Bon Coin. Du pire argument de vente au meilleur mensonge pour conclure l'affaire.",
+    "Tu essaies de t'incruster dans une soirée privée. De l'excuse la plus pathétique à la couverture la plus solide face au videur.",
+    "Tu viens d'envoyer un message très insultant à ton patron au lieu de l'envoyer à ton collègue. De la pire à la meilleure phrase à lui envoyer dans la seconde pour rattraper le coup.",
+    "Choisissez un objet pour remplacer le papier toilette manquant. Du pire au meilleur objet à portée de main.",
+    "Ton patron te réveille alors que tu dormais profondément. De la pire à la meilleure phrase à dire en ouvrant les yeux.",
+    "Tu es à un date et la personne en face de toi est absolument insupportable. De la pire à la meilleure excuse à inventer pour fuir immédiatement.",
+    "On t'offre un cadeau d'anniversaire absolument hideux devant tous tes amis. Du compliment le moins crédible au mensonge le plus parfait pour faire croire que tu l'adores.",
+    "Tu discutes depuis 10 minutes avec quelqu'un dont tu as totalement oublié le prénom. Du pire au meilleur stratagème pour découvrir son prénom sans qu'il s'en rende compte.",
+    "Le chien de ton ami vient de vomir sur tes chaussures neuves. De la pire à la meilleure remarque à faire à ton ami.",
+    "Le recruteur lors d'un entretien d'embauche te demande : \"Quel est votre plus grand défaut ?\" Du pire défaut (qui te fait recaler direct) au meilleur défaut (qui te donne le job).",
+    "Tu te fais choper par la sécurité du supermarché avec un article non payé dans ta poche. De la pire à la meilleure justification à donner au vigile.",
+    "Tu veux absolument passer devant tout le monde dans une file d'attente. Du pire prétexte à la meilleure excuse pour que les gens te laissent passer.",
+    "Tu trouves un portefeuille avec 500 euros par terre, juste devant son propriétaire qui le cherche. De la pire à la meilleure phrase pour essayer de garder l'argent pour toi en toute impunité.",
+    "Un braqueur de banque te prend en otage pendant un braquage. De la pire à la meilleure phrase pour essayer de sympathiser avec lui et devenir son complice.",
+    "Tu te réveilles après une soirée beaucoup trop arrosée, sans aucun souvenir. Du pire au meilleur endroit où te retrouver en ouvrant les yeux.",
+    "Tu es coincé(e) dans un ascenseur en panne avec un inconnu et tu as une terrible envie de lâcher un pet. De la pire à la meilleure stratégie pour gérer la situation (ou la détourner).",
+    "Tu dois absolument te défendre contre un zombie, mais tu es dans une cuisine. Du pire au meilleur ustensile de cuisine à utiliser comme arme mortelle.",
+    "Tu félicites une femme pour sa grossesse, mais elle te répond sèchement qu'elle n'est pas du tout enceinte. De la pire à la meilleure phrase pour essayer de rattraper ton énorme gaffe.",
+    "Tu découvres que tu as un super-pouvoir. Du pouvoir le plus inutile au pouvoir le plus révolutionnaire.",
+    "La science te permet de fusionner deux animaux pour en créer un nouveau. Du croisement le plus raté et inoffensif au prédateur ultime.",
+    "Tu peux désormais contrôler un élément du quotidien par la pensée (comme Magnéto avec le métal). Du contrôle le plus ridicule au pouvoir le plus impressionnant.",
+    "Tu te réincarnes en objet inanimé après ta mort. De l'objet qui va te faire vivre un enfer à celui qui te garantit la meilleure vie possible.",
+    "Une start-up invente une pilule qui remplace le sommeil, mais elle a un effet secondaire. De l'effet secondaire le plus handicapant à celui qui est presque un avantage.",
+    "Les extraterrestres t'enlèvent et te demandent une bonne raison de ne pas détruire la Terre. Du pire argument au meilleur discours pour sauver l'humanité.",
+    "Au moment de payer l'addition au restaurant, tu te rends compte que tu as oublié ton portefeuille. De la pire à la meilleure proposition à faire au serveur en échange du repas.",
+    "Ton médecin t'annonce qu'il te reste 24 heures à vivre. De la pire à la meilleure façon de dépenser toutes tes économies en une journée.",
+    "Tu dois organiser l'enterrement de vie de célibataire de ton/ta meilleur(e) ami(e) avec un budget de 10 euros. De la pire à la meilleure activité proposée.",
+    "Tu adoptes un perroquet, mais il ne répète qu'une seule phrase très gênante. De la pire à la meilleure phrase qu'il pourrait hurler.",
+    "Tu te réveilles avec un tatouage géant sur le torse dont tu n'as aucun souvenir. Du motif le plus honteux (et difficile à assumer) au tatouage le plus incroyable.",
+    "Tu cherches un cadeau pour l'enfant de 5 ans de quelqu'un que tu détestes. Du cadeau le moins dérangeant au cadeau le plus insupportable pour les parents."
   ],
   adult: [
-    "Un surnom romantique catastrophique, du moins au plus cringe",
-    "Une phrase de rupture à éviter, de la moins maladroite à la plus maladroite",
-    "Un endroit improbable pour un rendez-vous galant, du moins au plus audacieux",
-    "Une chose à ne JAMAIS dire à la belle-mère, de la moins grave à la plus grave",
-    "Un euphémisme pour parler d'une nuit très arrosée, du moins au plus suggestif",
-    "Une excuse pour rentrer tôt d'une soirée, de la moins convaincante à la plus créative",
-    "Un poème d'amour horrible, du moins au plus catastrophique",
-    "Une façon ratée de se déclarer, de la moins gênante à la plus gênante",
-    "Un conseil de séduction désastreux, du moins au plus dévastateur",
-    "Une phrase pour draguer dans un musée, du moins au plus ridicule",
-    "Un sujet tabou au repas de famille, du moins au plus explosif",
-    "Un mensonge à son/sa partenaire, du plus bénin au plus grave",
-    "Une mauvaise idée de tatouage, du moins au plus regrettable",
-    "Un fantasme absurde, du moins au plus improbable",
-    "Une catastrophe de première fois, de la moins à la plus gênante",
-    "Un cadeau de Saint-Valentin raté, du moins au plus décevant",
-    "Une excuse pour fuir un plan cul, de la moins à la plus créative",
-    "Un message ivre envoyé à 3h, du moins au plus embarrassant",
-    "Une réaction face à un·e ex inattendu·e, de la moins à la plus gênée",
-    "Un secret honteux, du moins au plus incroyable"
-  ]
+    "Tu envoies par erreur une photo très \"personnelle\" à ton groupe familial sur WhatsApp. De la pire à la meilleure phrase pour tenter de justifier cet envoi.",
+    "Ton partenaire te regarde droit dans les yeux et demande : \"Avec combien de personnes as-tu couché avant moi ?\". De la pire à la meilleure réponse.",
+    "Tu es en plein moment intime avec ton date et ton chat s'assoit sur le lit pour vous fixer intensément. De la pire à la meilleure réaction à avoir.",
+    "Tu arrives aux urgences avec un objet coincé dans un endroit... très gênant. De l'excuse la plus pathétique à la meilleure histoire inventée pour le médecin.",
+    "Ton ex t'envoie un message à 3h du matin qui dit juste : \"Tu dors ?\". De la réponse la plus pitoyable à la meilleure punchline pour le recadrer.",
+    "Tu essaies de draguer quelqu'un de très séduisant lors d'un enterrement. De l'approche la plus glauque à la meilleure technique de séduction.",
+    "Tu te réveilles après une soirée beaucoup trop arrosée et tu découvres un objet insolite dans ton lit. De l'objet le plus drôle à l'objet le plus terrifiant.",
+    "Lors d'un jeu d'Action ou Vérité sans aucune limite, on te donne un défi. Du défi le plus sage au défi le plus illégal/honteux.",
+    "Tu te rends compte au milieu de l'action que tu as oublié de fermer les rideaux et que les voisins d'en face regardent. De la pire à la meilleure façon de réagir.",
+    "La douane fouille ta valise à l'aéroport et sort devant tout le monde ton jouet intime le plus extravagant. De l'excuse la plus pathétique à la meilleure justification assumée.",
+    "Tes parents (ou tes beaux-parents) rentrent sans prévenir alors que tu es en pleine action dans le salon. De la pire à la meilleure phrase à lâcher pour tenter de sauver la situation."
+  ],
 };
 
 // ═══════════════════════════════════════════════════════════
 //  3. LOCAL STATE
 // ═══════════════════════════════════════════════════════════
-let pid = sessionStorage.getItem('pid') || localStorage.getItem('tt-pid');
+let pid = sessionStorage.getItem('pid');
 if (!pid) {
   pid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  sessionStorage.setItem('pid', pid);
 }
-sessionStorage.setItem('pid', pid);
-localStorage.setItem('tt-pid', pid);
-
-let pname = sessionStorage.getItem('pname') || localStorage.getItem('tt-pname') || '';
+let pname = sessionStorage.getItem('pname') || '';
 
 let room = { id: null, data: null, unsub: null };
 let db = null, fbReady = false;
@@ -2558,9 +2590,10 @@ try {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  5. SPLASH CONTROL + RECONNECTION CHECK
+//  5. SPLASH CONTROL (Réparé)
 // ═══════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
+  // Pré-remplit le pseudo
   const inpName = document.getElementById('inp-name');
   if (inpName && pname) inpName.value = pname;
 
@@ -2568,102 +2601,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (sp) {
     setTimeout(() => {
       sp.classList.add('hide');
-      setTimeout(async () => {
+      setTimeout(() => {
         sp.remove();
-        const reconnected = await checkReconnection();
-        if (!reconnected && !localStorage.getItem('tt-welcomed') && document.getElementById('welcome-rules')) {
+        // Affiche les règles si c'est la première fois
+        if (!localStorage.getItem('tt-welcomed') && document.getElementById('welcome-rules')) {
           document.getElementById('welcome-rules').classList.add('open');
         }
       }, 1000);
-    }, 2500);
+    }, 2500); // Temps d'affichage du logo
   }
 });
-
-// ═══════════════════════════════════════════════════════════
-//  5b. RECONNECTION SYSTEM
-// ═══════════════════════════════════════════════════════════
-async function checkReconnection() {
-  if (!fbReady) return false;
-  let saved;
-  try { saved = JSON.parse(localStorage.getItem('tt-reconnect-state') || 'null'); } catch(e) { return false; }
-  if (!saved || !saved.disconnectedAt || !saved.roomId) return false;
-
-  const elapsed = Date.now() - saved.disconnectedAt;
-  if (elapsed > 60000) {
-    localStorage.removeItem('tt-reconnect-state');
-    return false;
-  }
-
-  // Restore identity in case sessionStorage was cleared (tab reopen)
-  if (saved.pid) { pid = saved.pid; sessionStorage.setItem('pid', pid); localStorage.setItem('tt-pid', pid); }
-  if (saved.pname) { pname = saved.pname; sessionStorage.setItem('pname', pname); localStorage.setItem('tt-pname', pname); }
-
-  if (elapsed < 5000) {
-    return await attemptReconnect(saved.roomId, true);
-  }
-
-  // 5–60 s → show modal
-  return new Promise(resolve => {
-    const secs = Math.floor((60000 - elapsed) / 1000);
-    openModal(`
-      <div style="text-align:center;padding:.5rem;">
-        <div style="font-size:3rem;margin-bottom:1rem;">🔄</div>
-        <h2 style="color:#fff;margin-bottom:.75rem;">Reprendre la partie ?</h2>
-        <p style="margin-bottom:1.5rem;line-height:1.5;color:rgba(255,255,255,.75);">
-          Tu étais connecté au salon <strong style="color:rgb(var(--gold-rgb));">${escapeHtml(saved.roomId)}</strong>.<br>
-          <span style="font-size:.82rem;color:var(--muted);">Session expire dans ${secs}s</span>
-        </p>
-        <div style="display:flex;gap:.75rem;">
-          <button class="btn btn-secondary" style="flex:1;" id="rc-no">Nouvelle partie</button>
-          <button class="btn btn-primary" style="flex:1;" id="rc-yes">Reprendre ✦</button>
-        </div>
-      </div>
-    `);
-    document.getElementById('rc-yes').onclick = async () => {
-      closeModal();
-      const ok = await attemptReconnect(saved.roomId, false);
-      resolve(ok);
-    };
-    document.getElementById('rc-no').onclick = () => {
-      closeModal();
-      localStorage.removeItem('tt-reconnect-state');
-      resolve(false);
-    };
-  });
-}
-
-async function attemptReconnect(roomId, silent) {
-  try {
-    const snap = await get(ref(db, `rooms/${roomId}`));
-    if (!snap.exists()) {
-      localStorage.removeItem('tt-reconnect-state');
-      if (!silent) toast('Ce salon n\'existe plus.', 'err');
-      return false;
-    }
-    const d = snap.val();
-    if (!d.players?.[pid]) {
-      // Re-add player if they were removed while disconnected
-      await set(ref(db, `rooms/${roomId}/players/${pid}`), {
-        name: pname, number: null, answer: null, answered: false,
-        score: 0, ready: false, connectedAt: Date.now()
-      });
-    }
-    // Clear disconnectedAt but keep state alive
-    const state = JSON.parse(localStorage.getItem('tt-reconnect-state') || '{}');
-    delete state.disconnectedAt;
-    localStorage.setItem('tt-reconnect-state', JSON.stringify(state));
-
-    const inpName = document.getElementById('inp-name');
-    if (inpName && pname) inpName.value = pname;
-
-    enterRoom(roomId);
-    if (!silent) toast('Session restaurée ✓', 'ok');
-    return true;
-  } catch(e) {
-    if (!silent) toast('Impossible de se reconnecter.', 'err');
-    return false;
-  }
-}
 
 // ═══════════════════════════════════════════════════════════
 //  6. UTILITIES
@@ -2741,13 +2688,11 @@ function gaugeW(n) { return ((n - 1) / 9 * 100).toFixed(1) + '%'; }
 
 function lives(el, n, max) {
   el.innerHTML = '';
-  const totalHearts = max || 3; // Utilise le max défini, sinon 3 par défaut
+  const totalHearts = max || 3; // Respecte toujours ton réglage "Vies Max"
   for (let i = 0; i < totalHearts; i++) {
     const h = document.createElement('span');
     const isLost = i >= n;
-    // C'est la dernière vie SI : il reste 1 vie en tout ET que ce cœur n'est pas perdu
-    const isLastLife = (n === 1 && !isLost);
-
+    const isLastLife = (n === 1 && !isLost); 
     h.className = 'life-heart' + (isLost ? ' lost' : '') + (isLastLife ? ' critical' : '');
     h.textContent = isLastLife ? '💔' : '❤️';
     el.appendChild(h);
@@ -2758,16 +2703,6 @@ function checkFB() {
   if (!fbReady) { toast('⚠️ Configure Firebase dans le JS !', 'err'); return false; }
   return true;
 }
-
-// ─── INPUT DRAFT PERSISTENCE ───────────────────────────────
-function _inputKey() {
-  const d = room.data;
-  if (!d || !room.id) return null;
-  return `tt-ans-${room.id}-${pid}-${d.round || 0}-${d.captainId || ''}`;
-}
-function saveInputDraft(v) { const k = _inputKey(); if (k) localStorage.setItem(k, v); }
-function restoreInputDraft() { const k = _inputKey(); return k ? (localStorage.getItem(k) || '') : ''; }
-function clearInputDraft() { const k = _inputKey(); if (k) localStorage.removeItem(k); }
 
 function modeInfo(mode) {
   const m = {
@@ -2816,7 +2751,6 @@ window.createRoom = async () => {
   // Sauvegarde le pseudo
   pname = name; 
   sessionStorage.setItem('pname', name);
-  localStorage.setItem('tt-pname', name);
 
   const btn = $s('btn-create');
   if (btn) { btn.disabled = true; btn.innerHTML = 'Création…'; }
@@ -2837,7 +2771,7 @@ window.createRoom = async () => {
     drawnTheme: null,
     roundResult: null,
     createdAt: Date.now(),
-    players: { [pid]: { name, number: null, answer: null, answered: false, score: 0, ready: false, connectedAt: Date.now() } }
+    players: { [pid]: { name, number: null, answer: null, answered: false, score: 0, ready: false } }
   };
   
   try {
@@ -2860,7 +2794,6 @@ window.joinRoom = async () => {
   
   pname = name; 
   sessionStorage.setItem('pname', name);
-  localStorage.setItem('tt-pname', name);
 
   const btn = $s('btn-join');
   if (btn) { btn.disabled = true; btn.innerHTML = 'Connexion…'; }
@@ -2875,7 +2808,7 @@ window.joinRoom = async () => {
     }
 
     await set(ref(db, `rooms/${code}/players/${pid}`), {
-      name, number: null, answer: null, answered: false, score: 0, ready: false, connectedAt: Date.now()
+      name, number: null, answer: null, answered: false, score: 0, ready: false
     });
     
     enterRoom(code);
@@ -2901,76 +2834,36 @@ function enterRoom(id) {
   $s('lby-code').textContent = id;
   showScreen('lobby');
 
-  // Persist connection state for reconnection
-  localStorage.setItem('tt-reconnect-state', JSON.stringify({ roomId: id, pid, pname }));
-
   const roomRef = ref(db, `rooms/${id}`);
   room.unsub = onValue(roomRef, snap => {
     if (!snap.exists()) {
       toast('Le salon a été fermé.', 'err');
       if (room.unsub) { try { room.unsub(); } catch(e){} }
       room.id = null; room.data = null;
-      localStorage.removeItem('tt-reconnect-state');
       showScreen('home');
       return;
     }
-    const d = snap.val();
-    // Auto-cleanup empty rooms (all players disconnected via onDisconnect)
-    if (!d.players || Object.keys(d.players).length === 0) {
-      remove(ref(db, `rooms/${id}`)).catch(() => {});
-      if (room.unsub) { try { room.unsub(); } catch(e){} }
-      room.id = null; room.data = null;
-      localStorage.removeItem('tt-reconnect-state');
-      showScreen('home');
-      return;
-    }
-    room.data = d;
-    dispatch(d);
+    room.data = snap.val();
+    dispatch(room.data);
   });
 
-  // Remove player entry on connection drop
+  // Clean up on page close
   onDisconnect(ref(db, `rooms/${id}/players/${pid}`)).remove();
+  window.addEventListener('beforeunload', () => {
+    try { remove(ref(db, `rooms/${id}/players/${pid}`)); } catch(e){}
+  });
 }
-
-// One-time beforeunload — save disconnect timestamp for reconnection logic
-window.addEventListener('beforeunload', () => {
-  if (room.id) {
-    try {
-      const state = JSON.parse(localStorage.getItem('tt-reconnect-state') || '{}');
-      state.disconnectedAt = Date.now();
-      localStorage.setItem('tt-reconnect-state', JSON.stringify(state));
-    } catch(e) {}
-  }
-});
 
 window.leaveRoom = async () => {
   if (!room.id) return;
   
   window.showConfirm("Es-tu sûr de vouloir quitter ce salon ?", async () => {
-    const d = room.data;
-    const updates = {};
-    const remaining = Object.entries((d?.players || {})).filter(([id]) => id !== pid);
-
-    // If we're the host and others remain, reassign host to longest-connected player
-    if (d && d.host === pid && remaining.length > 0) {
-      const newHost = remaining.sort((a, b) => (a[1].connectedAt || 0) - (b[1].connectedAt || 0))[0][0];
-      updates[`rooms/${room.id}/host`] = newHost;
-    }
-
-    try {
-      if (remaining.length === 0) {
-        // Last player — delete the whole room
-        await remove(ref(db, `rooms/${room.id}`));
-      } else {
-        updates[`rooms/${room.id}/players/${pid}`] = null;
-        await update(ref(db), updates);
-      }
+    try { 
+      await remove(ref(db, `rooms/${room.id}/players/${pid}`)); 
     } catch(e){}
-
     if (room.unsub) { try { room.unsub(); } catch(e){} }
     room.id = null; room.data = null; room.unsub = null;
     revealAnimDone = false; lastStatus = null;
-    localStorage.removeItem('tt-reconnect-state');
     showScreen('home');
     toast("Tu as quitté le salon", "info");
   });
@@ -2986,19 +2879,6 @@ window.goHome = () => {
 // ═══════════════════════════════════════════════════════════
 function dispatch(d) {
   if (!d) return;
-
-  // ── HOST REASSIGNMENT ──────────────────────────────────────
-  // If the current host has left, deterministically elect the longest-connected player.
-  // All clients compute the same result; only the elected player writes to avoid conflicts.
-  if (d.players && d.host && !d.players[d.host] && Object.keys(d.players).length > 0) {
-    const newHostId = Object.entries(d.players)
-      .sort((a, b) => (a[1].connectedAt || 0) - (b[1].connectedAt || 0))[0][0];
-    if (newHostId === pid) {
-      update(ref(db, `rooms/${room.id}`), { host: newHostId });
-    }
-    return; // Wait for Firebase to re-trigger with updated host
-  }
-  // ──────────────────────────────────────────────────────────
   // Detect status change → reset volatile local state
   if (d.status !== lastStatus) {
     if (d.status === 'reveal') revealAnimDone = false;
@@ -3032,32 +2912,31 @@ function renderLobby(d) {
   const players = d.players || {};
   const ids = Object.keys(players);
 
+  // Met à jour le compteur
   $s('lby-count').textContent = ids.length;
 
+  // Affiche ou cache l'avertissement
   const warnEl = $s('lby-warn');
-  if (warnEl) warnEl.style.display = ids.length < 3 ? 'block' : 'none';
-
-  // ── Incremental player list — only rebuild when data actually changes ──
-  const el = $s('lby-players');
-  const snapshot = JSON.stringify(
-    Object.entries(players).map(([id, p]) => ({ id, name: p.name, host: id === d.host }))
-  );
-  if (el.dataset.snapshot !== snapshot) {
-    el.dataset.snapshot = snapshot;
-    el.innerHTML = '';
-    Object.entries(players).forEach(([id, p]) => {
-      const item = document.createElement('div');
-      item.className = 'player-item';
-      item.style.animation = 'none';
-      item.innerHTML = `
-        <div class="player-avatar">${(p.name || '?').charAt(0).toUpperCase()}</div>
-        <div class="player-name">${escapeHtml(p.name || '???')}</div>
-        ${id === d.host ? '<div class="player-host">Hôte</div>' : ''}
-      `;
-      el.appendChild(item);
-    });
+  if (warnEl) {
+    warnEl.style.display = ids.length < 3 ? 'block' : 'none';
   }
 
+  // Liste des joueurs
+  const el = $s('lby-players');
+  el.innerHTML = '';
+  Object.entries(players).forEach(([id, p]) => {
+    const item = document.createElement('div');
+    item.className = 'player-item';
+    item.style.animation = 'none'; // ✅ Empêche le clignotement
+    item.innerHTML = `
+      <div class="player-avatar">${(p.name || '?').charAt(0).toUpperCase()}</div>
+      <div class="player-name">${escapeHtml(p.name || '???')}</div>
+      ${id === d.host ? '<div class="player-host">Hôte</div>' : ''}
+    `;
+    el.appendChild(item);
+  });
+
+  // Affiche les contrôles selon le rôle (Hôte ou Invité)
   $s('lby-host-ctrl').style.display  = isHost ? 'block' : 'none';
   $s('lby-guest-ctrl').style.display = isHost ? 'none'  : 'block';
 }
@@ -3151,9 +3030,9 @@ function renderConfigParams(mode, d, isHost) {
       <div style="display:flex; flex-direction:column; gap:.5rem;">
         <label style="font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em;">Vies d'équipe</label>
         <select class="input" style="padding:.6rem;" onchange="if(${isHost}) window.updateDbLives(this.value)" ${!isHost ? 'disabled' : ''}>
-          <option value="1" ${d.lives===1?'selected':''}>1 vie (Hard)</option>
-          <option value="3" ${d.lives===3||!d.lives?'selected':''}>3 vies (Normal)</option>
-          <option value="5" ${d.lives===5?'selected':''}>5 vies (Easy)</option>
+          <option value="1" ${d.maxLives===1?'selected':''}>1 vie (Hard)</option>
+          <option value="3" ${d.maxLives===3||!d.maxLives?'selected':''}>3 vies (Normal)</option>
+          <option value="5" ${d.maxLives===5?'selected':''}>5 vies (Easy)</option>
         </select>
       </div>`;
   }
@@ -3175,7 +3054,9 @@ function renderConfigParams(mode, d, isHost) {
 
 // --- Sauvegarde des paramètres dans Firebase (déclenché par les sliders/selects) ---
 window.updateDbRounds = async (val) => { await update(ref(db, `rooms/${room.id}`), { maxRounds: parseInt(val) }); };
-window.updateDbLives  = async (val) => { await update(ref(db, `rooms/${room.id}`), { lives: parseInt(val) }); };
+window.updateDbLives = async (val) => { 
+    await update(ref(db, `rooms/${room.id}`), { lives: parseInt(val), maxLives: parseInt(val) }); 
+};
 window.updateDbTimer  = async (val) => { await update(ref(db, `rooms/${room.id}`), { timerSec: parseInt(val) }); };
 
 window.cfgSetLevel = async (lv) => {
@@ -3467,7 +3348,7 @@ function renderThemeChoice(d) {
     if ($s('tc-wait')) $s('tc-wait').style.display = 'none';
 
     const tcCustom = $s('tc-custom');
-    const turnKey = d.round + '_' + d.captainId + '_' + d.captainId2;
+    const turnKey = d.round + '_' + (d.currentDuelNum || 1) + '_' + d.captainId + '_' + (d.captainId2 || '');
     if (tcCustom && tcCustom.dataset.turn !== turnKey) {
         tcCustom.value = '';
         tcCustom.dataset.turn = turnKey;
@@ -3732,11 +3613,19 @@ function renderThemeVoteResult(d) {
                     const timerVal = parseInt(d.timerSec) || 0;
                     u[`rooms/${room.id}/timerEndsAt`] = timerVal > 0 ? Date.now() + (timerVal * 1000) : null;
                     
-                    // Reset
+                    // ✅ DISTRIBUTION DES NUMEROS SECRETS POUR LE DUEL
+                    const respondants = Object.keys(d.players).filter(i => i !== d.captainId && i !== d.captainId2);
+                    const numbers = shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0, respondants.length);
+                    
                     Object.keys(d.players).forEach(id => {
                         u[`rooms/${room.id}/players/${id}/vote`] = null;
                         u[`rooms/${room.id}/players/${id}/answer`] = null;
                         u[`rooms/${room.id}/players/${id}/answered`] = false;
+                        
+                        // Si c'est un répondant, on lui donne le numéro secret pour qu'il puisse jouer !
+                        if (respondants.includes(id)) {
+                            u[`rooms/${room.id}/players/${id}/number`] = numbers[respondants.indexOf(id)];
+                        }
                     });
                     update(ref(db), u);
                 }
@@ -3859,7 +3748,6 @@ function renderAnswering(d) {
     if ($s('ans-form')) $s('ans-form').style.display = 'block';
 
     const isDone = me?.answered;
-    if (isDone) clearInputDraft(); // Already submitted — discard any lingering draft
     const n = me?.number || 1;
     const color = numColor(n);
     
@@ -3892,17 +3780,10 @@ function renderAnswering(d) {
 
       const turnKey = (d.startedAt || 0) + '_' + d.round + '_' + d.captainId;
       if (txt && txt.dataset.turn !== turnKey) { 
-        // New turn — restore any saved draft (handles page-refresh mid-turn)
-        const draft = restoreInputDraft();
-        txt.value = draft;
+        txt.value = ''; 
         txt.dataset.turn = turnKey; 
         const flipCard = document.querySelector('.flip-card');
         if (flipCard) flipCard.classList.remove('flipped');
-      }
-      // Attach draft-save listener once
-      if (txt && !txt._draftBound) {
-        txt._draftBound = true;
-        txt.addEventListener('input', () => saveInputDraft(txt.value));
       }
     }
   }
@@ -3943,12 +3824,13 @@ window.submitAnswer = async () => {
   const val = $s('ans-text').value.trim();
   if (!val) { toast('Écris une réponse !', 'err'); return; }
   
+  // On bloque le bon bouton pour éviter les double-clics
   const btn = $s('btn-submit-ans');
   if (btn) btn.disabled = true;
+  
   $s('ans-text').disabled = true;
   
   await update(ref(db, `rooms/${room.id}/players/${pid}`), { answer: val, answered: true });
-  clearInputDraft(); // Clear persisted draft after successful submit
   toast('Réponse envoyée ✓', 'ok');
 };
 
@@ -3957,7 +3839,8 @@ window.submitAnswer = async () => {
 // ═══════════════════════════════════════════════════════════
 function renderCaptain(d) {
   showScreen('captain');
-  const isCap = d.captainId === pid;
+  
+  const isCap = (d.captainId === pid) || (d.mode === 'duel' && d.captainId2 === pid);
   const players = d.players || {};
   const m = modeInfo(d.mode);
 
@@ -3966,6 +3849,7 @@ function renderCaptain(d) {
   
   const totalPlayers = Object.keys(players).length;
   const queueLen = (d.captainQueue || []).length;
+  
   if ($s('cap-prog')) {
       if (d.mode === 'duel') {
           $s('cap-prog').innerHTML = `<span style="margin-left:8px; opacity:0.7;">⚔️ Duel ${d.currentDuelNum || 1}/${d.totalDuels || 1}</span>`;
@@ -3973,77 +3857,37 @@ function renderCaptain(d) {
           $s('cap-prog').textContent = `👑 ${totalPlayers - queueLen}/${totalPlayers}`;
       }
   }
+  
   if ($s('cap-theme')) $s('cap-theme').textContent = d.theme || '…';
-
-  // ✅ Mise à jour du badge mode à droite
   if ($s('cap-mode')) $s('cap-mode').textContent = `${m.emoji} ${m.name}`;
 
-  // ✅ Mise à jour des cœurs au centre (uniquement en mode coop)
   const centerHdr = $s('cap-center-hdr');
   if (centerHdr) {
     centerHdr.innerHTML = '';
-    if (m.coop) {
-      centerHdr.className = 'lives-bar';
-      lives(centerHdr, d.lives, d.maxLives);
-    }
+    if (m.coop) { centerHdr.className = 'lives-bar'; lives(centerHdr, d.lives, d.maxLives); } 
+    else { centerHdr.className = ''; }
   }
 
-  // ✅ Sécurité : On nettoie l'ancien "cap-right-hdr" au cas où il existerait encore dans ton HTML
-  const rightHdr = $s('cap-right-hdr');
-  if (rightHdr) rightHdr.innerHTML = '';
-
-  ['cap-classic','cap-sniper','cap-extreme','cap-wait'].forEach(id => {
+  ['cap-classic','cap-sniper','cap-extreme','cap-wait','cap-blind','cap-duel'].forEach(id => {
       if ($s(id)) $s(id).style.display = 'none';
   });
   if ($s('cap-timer-wrap')) $s('cap-timer-wrap').style.display = 'none';
 
-  // Les joueurs voient le plateau, mais avec un titre différent
   const themeLabel = $s('cap-theme-label');
   if (themeLabel) {
       if (isCap) {
-        if (d.mode === 'extreme') {
-           if (instText) instText.innerHTML = `Place la pire réponse sur le 1 et la meilleure sur le 10.`;
-        } else if (d.mode === 'sniper') {
-           if (instText) instText.innerHTML = `Assigne le <strong style="color:rgb(var(--primary-rgb));">numéro exact</strong> à chaque réponse. (+2pts par trouvaille !).`;
-        } else {
-           if (instText) instText.innerHTML = `Tape une carte puis un numéro, ou glisse-la sur la timeline. <span style="color:rgb(var(--primary-rgb));">1 pire</span> → <span style="color:rgb(var(--accent-rgb));">10 meilleur</span>.`;
-        }
+        if (d.mode === 'extreme') themeLabel.innerHTML = `Place la pire réponse sur le 1 et la meilleure sur le 10.`;
+        else if (d.mode === 'sniper') themeLabel.innerHTML = `Assigne le numéro exact à chaque réponse.`;
+        else themeLabel.innerHTML = `✦ Classe ces réponses`;
       } else {
-        themeLabel.textContent = "Le Cap'ten classe vos réponses...";
+        themeLabel.textContent = d.mode === 'duel' ? "Les Cap'tens classent vos réponses..." : "Le Cap'ten classe vos réponses...";
       }
   }
 
-  const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
+  const respondants = Object.entries(players).filter(([i]) => i !== d.captainId && i !== d.captainId2);
 
-  // --- VUE CAPITAINE (MODE AVEUGLE) ---
-  if (d.mode === 'blind') {
-      if ($s('cap-blind')) $s('cap-blind').style.display = 'block';
-      if (isCap) {
-          if (!window._capBoardBuilt) {
-              dragState.placed = d.liveSort || {};
-              buildBlindBoard(respondants);
-              window._capBoardBuilt = true;
-          }
-      }
-  } 
-  // --- VUE CAPITAINE (MODE SNIPER) ---
-  else if (d.mode === 'sniper') {
-      if ($s('cap-sniper')) $s('cap-sniper').style.display = 'block';
-      if ($s('btn-validate-sniper')) $s('btn-validate-sniper').style.display = isCap ? 'block' : 'none';
-      if ($s('cap-sniper')) $s('cap-sniper').style.pointerEvents = isCap ? 'auto' : 'none';
-
-      if (isCap) {
-          if (!window._capBoardBuilt) { buildSniperBoard(respondants); window._capBoardBuilt = true; }
-          updateValidateSniper(respondants.length);
-      } else {
-          sniperGuesses = d.liveSort || {};
-          buildSniperBoard(respondants);
-          Object.entries(sniperGuesses).forEach(([id, n]) => pickSniperNumber(id, n, true));
-      }
-  }
   // --- VUE CAPITAINE (MODE DUEL) ---
-  // --- VUE CAPITAINE (MODE DUEL) ---
-  else if (d.mode === 'duel') {
+  if (d.mode === 'duel') {
       if ($s('cap-duel')) $s('cap-duel').style.display = 'block';
       
       const liveSortDuel = d.liveSortDuel || {};
@@ -4052,7 +3896,6 @@ function renderCaptain(d) {
 
       if (isCap) {
           const isMeReady = d.players[pid]?.duelReady;
-          
           if (isMeReady) {
               $s('duel-cap-view').style.display = 'none';
               $s('duel-spec-view').style.display = 'none';
@@ -4062,20 +3905,20 @@ function renderCaptain(d) {
               $s('duel-spec-view').style.display = 'none';
               $s('duel-cap-wait').style.display = 'none';
 
+              const safeSort = liveSortDuel[pid] ? { ...liveSortDuel[pid] } : {};
               if (!window._capBoardBuilt) {
-                  dragState.placed = liveSortDuel[pid] || {};
+                  dragState.placed = safeSort;
                   buildDuelCards(respondants);
                   buildDuelTimeline();
                   window._capBoardBuilt = true;
               }
               
-              // Rafraîchissement visuel de la timeline du Cap'ten
+              dragState.placed = safeSort; 
               document.querySelectorAll('#duel-cards .card-slot-tag').forEach(t => { t.textContent = '—'; t.className = 'card-slot-tag'; t.style.color = ''; });
               for (let s = 1; s <= 10; s++) refreshDuelSlot(s, dragState.placed[s] || null);
-              
               Object.entries(dragState.placed).forEach(([slot, pId]) => {
                   const tag = document.getElementById(`duel-tag-${pId}`);
-                  if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
+                  if (tag && pId !== "_empty") { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
               });
 
               document.querySelectorAll('#duel-cards .answer-card').forEach(c => {
@@ -4086,76 +3929,85 @@ function renderCaptain(d) {
                   }
               });
 
-              $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
+              if ($s('btn-validate-duel')) $s('btn-validate-duel').disabled = Object.keys(dragState.placed).filter(k => dragState.placed[k] !== '_empty').length < respondants.length;
           }
       } else {
-          // VUE SPECTATEURS
+          // SPECTATEURS DUEL
           $s('duel-cap-view').style.display = 'none';
           $s('duel-cap-wait').style.display = 'none';
           $s('duel-spec-view').style.display = 'block';
 
-          $s('duel-spec-name1').textContent = `${d.players[d.captainId]?.name || 'Cap\'ten 1'} ${c1Ready ? '✅' : '⏳'}`;
-          $s('duel-spec-name2').textContent = `${d.players[d.captainId2]?.name || 'Cap\'ten 2'} ${c2Ready ? '✅' : '⏳'}`;
+          const specAns = $s('duel-spec-answers');
+          if (specAns && !window._specAnsBuilt) {
+              specAns.innerHTML = '';
+              respondants.forEach(([id, p]) => {
+                  specAns.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); font-size:0.95rem; font-weight:600;"><span style="color:var(--muted); font-size:0.75rem; text-transform:uppercase;">${escapeHtml(p.name)}</span><br>${escapeHtml(p.answer || '–')}</div>`;
+              });
+              window._specAnsBuilt = true;
+          }
+
+          if ($s('duel-spec-name1')) $s('duel-spec-name1').textContent = `${d.players[d.captainId]?.name || 'Cap\'ten 1'} ${c1Ready ? '✅' : '⏳'}`;
+          if ($s('duel-spec-name2')) $s('duel-spec-name2').textContent = `${d.players[d.captainId2]?.name || 'Cap\'ten 2'} ${c2Ready ? '✅' : '⏳'}`;
 
           buildStaticTimeline($s('duel-timeline-spec1'), liveSortDuel[d.captainId] || {}, players);
           buildStaticTimeline($s('duel-timeline-spec2'), liveSortDuel[d.captainId2] || {}, players);
       }
   }
-  // --- VUE GLOBALE (TIMELINE CLASSIQUE/EXTREME + SPECTATEURS AVEUGLE) ---
+  // --- VUE GLOBALE (CLASSIQUE, AVEUGLE, SNIPER, EXTREME) ---
   else {
       if ($s('cap-classic')) $s('cap-classic').style.display = 'block';
       if ($s('btn-validate-classic')) $s('btn-validate-classic').style.display = isCap ? 'block' : 'none';
       if ($s('cap-classic')) $s('cap-classic').style.pointerEvents = isCap ? 'auto' : 'none';
       
-      const instText = $s('cap-classic-inst');
-      const poolTitle = $s('cap-classic-pool-title');
-      const cardsStack = $s('cap-cards');
-
       if (isCap) {
-        if (d.mode === 'extreme') {
-           if (instText) instText.innerHTML = `Place la pire réponse sur le 1 et la meilleure sur le 10 (laisse les autres dans la boîte).`;
-        } else {
-           if (instText) instText.innerHTML = `Tape une carte puis un numéro, ou glisse-la sur la timeline. <span style="color:rgb(var(--primary-rgb));">1 pire</span> → <span style="color:rgb(var(--accent-rgb));">10 meilleur</span>.`;
-        }
+          const safeSort = d.liveSort ? { ...d.liveSort } : {};
+          if (!window._capBoardBuilt) { 
+              dragState.placed = safeSort;
+              buildClassicCards(respondants); 
+              buildClassicTimeline(); 
+              window._capBoardBuilt = true; 
+          }
+
+          dragState.placed = safeSort;
+          document.querySelectorAll('#cap-cards .card-slot-tag').forEach(t => { t.textContent = '—'; t.className = 'card-slot-tag'; t.style.color = ''; });
+          for (let s = 1; s <= 10; s++) refreshClassicSlot(s, dragState.placed[s] || null);
+          Object.entries(dragState.placed).forEach(([slot, pId]) => {
+             const tag = document.getElementById(`tag-${pId}`);
+             if (tag && pId !== "_empty") { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
+          });
+          document.querySelectorAll('#cap-cards .answer-card').forEach(c => {
+             if (Object.values(dragState.placed).includes(c.dataset.pid)) {
+                 c.style.display = 'flex'; c.style.opacity = '0.3'; c.style.filter = 'grayscale(1)';
+             } else {
+                 c.style.display = 'flex'; c.style.opacity = '1'; c.style.filter = 'none';
+             }
+          });
+          
+          const reqCount = (d.mode === 'extreme') ? 2 : respondants.length;
+          const placedCount = Object.keys(dragState.placed).filter(k => dragState.placed[k] !== '_empty').length;
+          
+          if ($s('btn-validate-classic')) {
+              // Si mode aveugle et que tout est placé, on auto-valide !
+              if (d.mode === 'blind') {
+                  $s('btn-validate-classic').style.display = 'none';
+                  if (placedCount === reqCount && !window._blindValidating) {
+                      window._blindValidating = true;
+                      setTimeout(() => validateClassic(), 1000); // Valide tout seul après 1 seconde
+                  }
+              } else {
+                  $s('btn-validate-classic').disabled = placedCount < reqCount;
+                  $s('btn-validate-classic').textContent = "Valider le classement ✓";
+              }
+          }
       } else {
-        if (instText) instText.innerHTML = `<span style="color:rgb(var(--success-rgb));font-weight:bold;font-size:1.05rem;display:block;text-align:center;padding:.5rem 0;">Le Cap'ten classe vos réponses...</span>`;
+          // SPECTATEUR NON-DUEL
+          if (!window._capBoardBuilt) { 
+              buildClassicCards(respondants); 
+              buildClassicTimeline(); 
+              window._capBoardBuilt = true; 
+          }
+          for (let s = 1; s <= 10; s++) refreshClassicSlot(s, d.liveSort?.[s] || null);
       }
-
-      if (poolTitle) poolTitle.style.display = 'block'; 
-      if (cardsStack) cardsStack.style.display = 'flex';
-
-      if (!window._capBoardBuilt) { 
-          dragState.placed = d.liveSort || {};
-          buildClassicCards(respondants); 
-          buildClassicTimeline(); 
-          window._capBoardBuilt = true; 
-      }
-
-      dragState.placed = d.liveSort || {};
-      document.querySelectorAll('.card-slot-tag').forEach(t => { t.textContent = '—'; t.className = 'card-slot-tag'; t.style.color = ''; });
-      
-      for (let s = 1; s <= 10; s++) {
-          refreshClassicSlot(s, dragState.placed[s] || null);
-      }
-      Object.entries(dragState.placed).forEach(([slot, pId]) => {
-         const tag = document.getElementById(`tag-${pId}`);
-         if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
-      });
-
-      document.querySelectorAll('.answer-card').forEach(c => {
-         if (Object.values(dragState.placed).includes(c.dataset.pid)) {
-             c.style.display = 'flex';
-             c.style.opacity = '0.3';
-             c.style.filter = 'grayscale(1)';
-         } else {
-             c.style.display = 'flex';
-             c.style.opacity = '1';
-             c.style.filter = 'none';
-         }
-      });
-
-      const requiredPlacements = (d.mode === 'extreme') ? 2 : respondants.length;
-      updateValidateClassic(requiredPlacements);
   }
 
   if (d.mode === 'blitz') startBlitzTimer(d);
@@ -4164,8 +4016,23 @@ function renderCaptain(d) {
 // ─── CLASSIC / BLITZ ─────────────────────────────
 function buildClassicCards(respondants) {
   const el = $s('cap-cards');
+  if (!el) return;
   el.innerHTML = '';
-  respondants.forEach(([id, p]) => {
+  
+  let toRender = respondants;
+  
+  // ✅ LOGIQUE AVEUGLE : On n'affiche QUE la 1ère carte qui n'est pas encore placée !
+  if (room.data?.mode === 'blind') {
+      const placedPids = Object.values(dragState.placed || {});
+      toRender = respondants.filter(([id]) => !placedPids.includes(id));
+      toRender = toRender.slice(0, 1); 
+      
+      if (toRender.length === 0) {
+          el.innerHTML = `<p style="color:rgb(var(--success-rgb)); font-weight:bold; text-align:center; padding:1rem;">Toutes les cartes sont placées ! ✅</p>`;
+      }
+  }
+
+  toRender.forEach(([id, p]) => {
     const card = document.createElement('div');
     card.className = 'answer-card';
     card.dataset.pid = id;
@@ -4179,26 +4046,73 @@ function buildClassicCards(respondants) {
       <div class="card-slot-tag" id="tag-${id}">—</div>
     `;
     card.addEventListener('dragstart', e => {
-      dragState.selected = id;
-      card.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', id);
+      dragState.selected = id; card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id);
     });
     card.addEventListener('dragend', () => card.classList.remove('dragging'));
     card.addEventListener('click', () => {
       if (dragState.selected === id) {
-        dragState.selected = null;
-        card.classList.remove('selected');
+        dragState.selected = null; card.classList.remove('selected');
       } else {
         document.querySelectorAll('.answer-card').forEach(c => c.classList.remove('selected'));
-        dragState.selected = id;
-        card.classList.add('selected');
-        toast('Tape un numéro sur la timeline', 'info');
+        dragState.selected = id; card.classList.add('selected');
       }
     });
     el.appendChild(card);
   });
 }
+// ─── MODE AVEUGLE (BLIND) ─────────────────────────────
+function buildBlindBoard(respondants) {
+    const container = $s('blind-container');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    // Trouve la première carte qui n'est pas encore placée sur la timeline
+    const placedPids = Object.values(dragState.placed || {});
+    const unplaced = respondants.filter(([id]) => !placedPids.includes(id));
+    
+    if (unplaced.length === 0) {
+        container.innerHTML = `<p style="color:rgb(var(--success-rgb)); font-weight:bold; font-size:1.1rem;">Toutes les cartes sont placées !</p>`;
+        updateValidateClassic(respondants.length); 
+        return;
+    }
+    
+    const [currentId, currentP] = unplaced[0];
+    
+    let html = `
+        <div class="answer-card" style="margin-bottom:1.5rem; transform:scale(1.1); width:100%; max-width:300px; justify-content:center;">
+            <div style="flex:1;text-align:center;">
+                <div class="card-player" style="margin-bottom:0.3rem;">${escapeHtml(currentP.name)}</div>
+                <div class="card-answer" style="font-size:1.2rem;">${escapeHtml(currentP.answer)}</div>
+            </div>
+        </div>
+        <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">Choisis son emplacement définitif</div>
+        <div class="num-picker" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; width:100%; max-width:300px;">
+    `;
+    
+    for(let i=1; i<=10; i++) {
+        const isTaken = Object.keys(dragState.placed || {}).includes(i.toString());
+        if (isTaken) {
+            html += `<button class="num-btn" disabled style="opacity:0.2; pointer-events:none;">${i}</button>`;
+        } else {
+            html += `<button class="num-btn" onclick="placeBlindCard(${i}, '${currentId}')">${i}</button>`;
+        }
+    }
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+window.placeBlindCard = (slot, pid) => {
+    if (!dragState.placed) dragState.placed = {};
+    dragState.placed[slot] = pid;
+    
+    const d = room.data;
+    const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
+    
+    set(ref(db, `rooms/${room.id}/liveSort`), dragState.placed);
+    buildBlindBoard(respondants);
+    updateValidateClassic(respondants.length);
+};
 
 function buildClassicTimeline() {
   const tl = $s('cap-timeline');
@@ -4316,7 +4230,66 @@ function buildDuelTimeline() {
   }
 }
 
-function placeDuelCard(slot, placedPid) {
+window.placeClassicCard = (slot, placedPid) => {
+  const d = room.data; if (!d) return;
+  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
+
+  // Sécurité Mode Aveugle (pas le droit d'écraser)
+  if (d.mode === 'blind' && dragState.placed[slot]) {
+      toast("Emplacement déjà pris !", "err"); return;
+  }
+
+  Object.entries(dragState.placed).forEach(([s, p]) => {
+    if (p === placedPid) { delete dragState.placed[s]; refreshClassicSlot(parseInt(s), null); }
+  });
+  if (dragState.placed[slot]) {
+    const evicted = dragState.placed[slot];
+    delete dragState.placed[slot];
+    refreshClassicSlot(slot, null);
+    const tag = document.getElementById(`tag-${evicted}`);
+    if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
+  }
+  
+  dragState.placed[slot] = placedPid;
+  refreshClassicSlot(slot, placedPid);
+
+  const tag = document.getElementById(`tag-${placedPid}`);
+  if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
+
+  updateValidateClassic(respondants.length);
+  
+  // ✅ FIX DUEL/SPECTATEUR : { _empty: true } empêche Firebase de bugger quand c'est vide
+  if (d.captainId === pid) {
+      const payload = Object.keys(dragState.placed).length > 0 ? dragState.placed : { _empty: true };
+      set(ref(db, `rooms/${room.id}/liveSort`), payload);
+  }
+  
+  // En mode Aveugle, on reconstruit les cartes pour afficher la suivante !
+  if (d.mode === 'blind') buildClassicCards(respondants);
+};
+window.removeClassicSlot = slot => {
+  if (room.data?.mode === 'blind') {
+      toast("En mode aveugle, le placement est définitif !", "err"); return;
+  }
+  
+  const evicted = dragState.placed[slot];
+  if (!evicted) return;
+  
+  delete dragState.placed[slot];
+  refreshClassicSlot(slot, null);
+  const tag = document.getElementById(`tag-${evicted}`);
+  if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
+  
+  const d = room.data;
+  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
+  updateValidateClassic(respondants.length);
+  
+  if (d.captainId === pid) {
+      const payload = Object.keys(dragState.placed).length > 0 ? dragState.placed : { _empty: true };
+      set(ref(db, `rooms/${room.id}/liveSort`), payload);
+  }
+};
+window.placeDuelCard = (slot, placedPid) => {
   Object.entries(dragState.placed).forEach(([s, p]) => {
     if (p === placedPid) { delete dragState.placed[s]; refreshDuelSlot(parseInt(s), null); }
   });
@@ -4332,11 +4305,49 @@ function placeDuelCard(slot, placedPid) {
   
   const d = room.data;
   const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId && i !== d.captainId2);
-  $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
+  if ($s('btn-validate-duel')) $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
   
-  // 🔥 MISE À JOUR EN DIRECT VERS FIREBASE POUR LES SPECTATEURS !
-  update(ref(db, `rooms/${room.id}/liveSortDuel/${pid}`), dragState.placed);
-}
+  // ✅ Met à jour le "grisé" de TOUTES les cartes
+  document.querySelectorAll('#duel-cards .answer-card').forEach(c => {
+      if (Object.values(dragState.placed).includes(c.dataset.pid)) {
+          c.style.opacity = '0.3'; c.style.filter = 'grayscale(1)';
+      } else {
+          c.style.opacity = '1'; c.style.filter = 'none';
+      }
+  });
+
+  const payload = Object.keys(dragState.placed).length > 0 ? dragState.placed : null;
+  set(ref(db, `rooms/${room.id}/liveSortDuel/${pid}`), payload);
+};
+
+window.removeDuelSlot = slot => {
+  const evicted = dragState.placed[slot];
+  if (!evicted) return;
+  
+  delete dragState.placed[slot];
+  refreshDuelSlot(slot, null);
+  const tag = document.getElementById(`duel-tag-${evicted}`);
+  if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
+  
+  const d = room.data;
+  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId && i !== d.captainId2);
+  if ($s('btn-validate-duel')) $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
+  
+  // ✅ Enlève le "grisé" de la carte retirée
+  document.querySelectorAll('#duel-cards .answer-card').forEach(c => {
+      if (Object.values(dragState.placed).includes(c.dataset.pid)) {
+          c.style.opacity = '0.3'; c.style.filter = 'grayscale(1)';
+      } else {
+          c.style.opacity = '1'; c.style.filter = 'none';
+      }
+  });
+
+  const payload = Object.keys(dragState.placed).length > 0 ? dragState.placed : { _empty: true };
+  const updates = {};
+  updates[`rooms/${room.id}/liveSortDuel/${pid}`] = payload;
+  update(ref(db), updates);
+};
+
 
 function refreshDuelSlot(slot, placedPid) {
   const tl = $s('duel-timeline');
@@ -4379,7 +4390,8 @@ function buildStaticTimeline(container, sortData, playersData) {
         drop.className = 'tl-drop'; 
         
         const placedPid = sortData[slot];
-        if (placedPid) {
+        // ✅ CORRECTION : on vérifie bien que ce n'est pas _empty
+        if (placedPid && placedPid !== '_empty') {
             const ans = playersData[placedPid]?.answer || '...';
             drop.classList.add('filled');
             drop.innerHTML = `<div class="mini-card" style="background:${numCardGradient(slot)}; pointer-events:none;">
@@ -4445,7 +4457,9 @@ window.validateDuel = async () => {
         else { cap1Pts = 1; cap2Pts = 1; } // Égalité
 
         updates[`rooms/${room.id}/duelResult`] = { error1, error2, cap1Pts, cap2Pts };
-        
+        let allRoundPts = { [d.captainId]: cap1Pts, [d.captainId2]: cap2Pts };
+        respondants.forEach(([id]) => { if (playerPoints[id] > 0) allRoundPts[id] = playerPoints[id]; });
+        updates[`rooms/${room.id}/lastRoundPts`] = allRoundPts;
         // Distribution des points aux Capitaines
         updates[`rooms/${room.id}/players/${d.captainId}/score`] = (d.players[d.captainId]?.score || 0) + cap1Pts;
         updates[`rooms/${room.id}/players/${d.captainId2}/score`] = (d.players[d.captainId2]?.score || 0) + cap2Pts;
@@ -4463,34 +4477,6 @@ window.validateDuel = async () => {
     
     await update(ref(db), updates);
 };
-
-function placeClassicCard(slot, placedPid) {
-  const d = room.data;
-  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
-
-  // Remove from previous slot if already placed
-  Object.entries(dragState.placed).forEach(([s, p]) => {
-    if (p === placedPid) { delete dragState.placed[s]; refreshClassicSlot(parseInt(s), null); }
-  });
-  // Evict current occupant
-  if (dragState.placed[slot]) {
-    const evicted = dragState.placed[slot];
-    delete dragState.placed[slot];
-    refreshClassicSlot(slot, null);
-    const tag = document.getElementById(`tag-${evicted}`);
-    if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
-  }
-  dragState.placed[slot] = placedPid;
-  refreshClassicSlot(slot, placedPid);
-
-  const tag = document.getElementById(`tag-${placedPid}`);
-  if (tag) { tag.textContent = slot; tag.className = `card-slot-tag n${slot}`; tag.style.color = numColor(slot); }
-
-  updateValidateClassic(respondants.length);
-  if (room.data.captainId === pid) {
-      set(ref(db, `rooms/${room.id}/liveSort`), dragState.placed);
-  }
-}
 
 function refreshClassicSlot(slot, placedPid) {
   const tl = $s('cap-timeline');
@@ -4540,85 +4526,63 @@ window.validateClassic = async () => {
   const d = room.data; if (!d) return;
   const players = d.players || {};
   const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
+  const updates = {};
+  let allRoundPts = {};
+  let isSuccess = false;
 
-  // --- LOGIQUE MODE SNIPER ---
-  if (d.mode === 'sniper') {
+  // --- EXTRÊME ---
+  if (d.mode === 'extreme') {
+      const lowGuessId = dragState.placed["1"] || dragState.placed[1];
+      const highGuessId = dragState.placed["10"] || dragState.placed[10];
+      let pts = 0;
+      if (lowGuessId && players[lowGuessId]?.number === 1) pts++;
+      if (highGuessId && players[highGuessId]?.number === 10) pts++;
+
+      isSuccess = (pts === 2);
+      updates[`rooms/${room.id}/captainGuess`] = { low: lowGuessId, high: highGuessId };
+      updates[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: pts };
+  } 
+  // --- SNIPER ---
+  else if (d.mode === 'sniper') {
       let capPts = 0;
-      const updates = {};
-      Object.entries(dragState.placed).forEach(([slot, pId]) => {
-          const guessNum = parseInt(slot);
-          const real = players[pId]?.number;
-          if (guessNum === real) {
-              capPts += 2; // Le Cap'ten gagne 2 pts
-              updates[`rooms/${room.id}/players/${pId}/score`] = (players[pId]?.score || 0) + 1; // Le Joueur gagne 1 pt
+      respondants.forEach(([id, p]) => {
+          const slotStr = Object.keys(dragState.placed).find(k => dragState.placed[k] === id);
+          const guess = slotStr ? parseInt(slotStr) : 0;
+          allRoundPts[id] = 0;
+          if (guess === p.number) {
+              capPts += 2;          // ✅ +2 pour le Cap'ten
+              allRoundPts[id] = 1;  // ✅ +1 pour le joueur
           }
       });
+      allRoundPts[d.captainId] = capPts; // On stocke les points du Cap'ten pour l'écran Bilan
       
       updates[`rooms/${room.id}/captainGuess`] = dragState.placed;
-      updates[`rooms/${room.id}/roundResult`]  = 'correct'; // Pour passer à l'écran de résultat
-      updates[`rooms/${room.id}/status`]       = 'round-reveal';
+      updates[`rooms/${room.id}/lastRoundPts`] = allRoundPts; 
       updates[`rooms/${room.id}/players/${d.captainId}/score`] = (players[d.captainId]?.score || 0) + capPts;
-      updates[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: capPts };
       
-      if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
-      await update(ref(db), updates);
-      return;
-  }
-
-  // --- LOGIQUE MODE EXTREME ---
-  if (d.mode === 'extreme') {
-      let real1 = null, real10 = null;
-      Object.entries(players).forEach(([id, p]) => {
-        if (p.number === 1) real1 = id;
-        if (p.number === 10) real10 = id;
+      respondants.forEach(([id]) => {
+          if (allRoundPts[id] > 0) updates[`rooms/${room.id}/players/${id}/score`] = (players[id]?.score || 0) + allRoundPts[id];
       });
-      
-      // Trouve quelle carte a été mise sur le plus petit chiffre, et le plus grand
-      const slots = Object.keys(dragState.placed).map(Number).sort((a,b)=>a-b);
-      const lowGuessId = dragState.placed[slots[0]];
-      const highGuessId = dragState.placed[slots[slots.length - 1]];
-      const extremeGuessObj = { low: lowGuessId, high: highGuessId };
-
-      let pts = 0;
-      if (lowGuessId === real1) pts++;
-      if (highGuessId === real10) pts++;
-
-      const isSuccess = (pts === 2);
-      const newLives = isSuccess ? d.lives : Math.max(0, d.lives - 1);
-      
-      if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
-      await update(ref(db, `rooms/${room.id}`), {
-        captainGuess: extremeGuessObj,
-        roundResult: isSuccess ? 'correct' : 'wrong',
-        lives: newLives,
-        status: 'round-reveal',
-        lastRoundPts: { [d.captainId]: pts } 
-      });
-      return;
+      isSuccess = true; 
+  }
+  // --- CLASSIQUE / AVEUGLE / SURVIE ---
+  else {
+      const placed = Object.entries(dragState.placed).filter(([s, id]) => id !== '_empty').map(([slot, id]) => ({ slot: parseInt(slot), id })).sort((a, b) => a.slot - b.slot);
+      isSuccess = true;
+      for (let i = 0; i < placed.length - 1; i++) {
+        if (players[placed[i].id]?.number >= players[placed[i+1].id]?.number) { isSuccess = false; break; }
+      }
+      updates[`rooms/${room.id}/captainGuess`] = dragState.placed;
   }
 
-  // --- LOGIQUE MODE CLASSIQUE / BLITZ / SURVIE ---
-  const placed = Object.entries(dragState.placed)
-    .map(([slot, id]) => ({ slot: parseInt(slot), id }))
-    .sort((a, b) => a.slot - b.slot);
+  const newLives = (d.mode === 'sniper') ? d.lives : (isSuccess ? d.lives : Math.max(0, d.lives - 1));
+  updates[`rooms/${room.id}/roundResult`] = isSuccess ? 'correct' : 'wrong';
+  updates[`rooms/${room.id}/lives`] = newLives;
+  updates[`rooms/${room.id}/status`] = 'round-reveal';
+  updates[`rooms/${room.id}/timerEndsAt`] = null;
 
-  let correct = true;
-  for (let i = 0; i < placed.length - 1; i++) {
-    const na = players[placed[i].id]?.number;
-    const nb = players[placed[i+1].id]?.number;
-    if (na >= nb) { correct = false; break; }
-  }
-
-  const newLives = correct ? d.lives : Math.max(0, d.lives - 1);
   if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
-
-  await update(ref(db, `rooms/${room.id}`), {
-    captainGuess: dragState.placed,
-    roundResult: correct ? 'correct' : 'wrong',
-    lives: newLives,
-    status: 'round-reveal',
-    timerEndsAt: null
-  });
+  await update(ref(db), updates);
 };
 
 // ─── BLITZ TIMER ─────────────────────────────
@@ -4723,22 +4687,31 @@ window.validateSniper = async () => {
   const players = d.players || {};
   const respondants = Object.entries(players).filter(([i]) => i !== d.captainId);
 
-  // Compute captain's points
   let capPts = 0;
+  let playerPts = {};
+
   respondants.forEach(([id, p]) => {
     const guess = sniperGuesses[id];
     const real  = p.number;
-    if (guess === real) capPts += 3;
-    else if (Math.abs(guess - real) === 1) capPts += 1;
+    playerPts[id] = 0;
+    if (guess === real) {
+        capPts += 2;      // ✅ +2 pour le Cap'ten
+        playerPts[id] = 1; // ✅ +1 pour le joueur trouvé
+    }
   });
 
   const updates = {};
   updates[`rooms/${room.id}/captainGuess`] = sniperGuesses;
-  updates[`rooms/${room.id}/roundResult`]  = null;
+  updates[`rooms/${room.id}/roundResult`]  = 'correct';
   updates[`rooms/${room.id}/status`]       = 'round-reveal';
-  // Captain earns points
   updates[`rooms/${room.id}/players/${d.captainId}/score`] = (players[d.captainId]?.score || 0) + capPts;
   updates[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: capPts };
+
+  respondants.forEach(([id]) => {
+      if (playerPts[id] > 0) {
+          updates[`rooms/${room.id}/players/${id}/score`] = (players[id]?.score || 0) + playerPts[id];
+      }
+  });
 
   await update(ref(db), updates);
 };
@@ -4812,197 +4785,106 @@ function renderRoundReveal(d) {
   showScreen('reveal');
   const m = modeInfo(d.mode);
   const players = d.players || {};
-
+  
+  // ✅ ON CHERCHE LES POINTS PERSONNELS DU JOUEUR QUI REGARDE L'ÉCRAN
+  const myPts = d.lastRoundPts?.[pid] || 0; 
+  
+  const resultsEl = $s('rv-results');
+  resultsEl.innerHTML = '';
+  
+  // --- HEADER PERSONNALISÉ ---
   if (m.coop) {
-    // CLASSIC / BLITZ — coop reveal
-    const correct = d.roundResult === 'correct';
-    $s('rv-icon').textContent = correct ? '🎉' : '💥';
-    $s('rv-title').textContent = correct ? 'Parfait !' : 'Raté !';
-    $s('rv-sub').textContent = correct
-      ? 'Le Cap\'ten a trouvé le bon ordre !'
-      : `Une vie perdue… (${d.lives} restante${d.lives !== 1 ? 's' : ''})`;
-    $s('rv-sub').style.color = correct ? 'rgb(var(--success-rgb))' : 'rgb(var(--accent-rgb))';
-    $s('rv-sub').style.textShadow = correct
-      ? '0 0 14px rgba(var(--success-rgb),.45)'
-      : '0 0 14px rgba(var(--accent-rgb),.45)';
+      const correct = d.roundResult === 'correct';
+      $s('rv-icon').textContent = correct ? '🎉' : '💥';
+      $s('rv-title').textContent = correct ? 'Parfait !' : 'Aïe... Raté !';
+      $s('rv-sub').textContent = correct ? "Le Cap'ten a trouvé le bon ordre !" : `L'équipe perd une vie...`;
+      $s('rv-sub').style.color = correct ? 'rgb(var(--success-rgb))' : 'rgb(var(--accent-rgb))';
+      $s('rv-lives').style.display = 'flex';
+      lives($s('rv-lives'), d.lives, d.maxLives);
+  } else {
+      // Modes compéttifs : Score individuel
+      $s('rv-icon').textContent = myPts > 0 ? '🏆' : '😅';
+      $s('rv-title').textContent = myPts > 0 ? `+${myPts} point${myPts > 1 ? 's' : ''} !` : `0 point`;
+      
+      if (d.mode === 'duel') {
+         const isCap = pid === d.captainId || pid === d.captainId2;
+         if (isCap) $s('rv-sub').textContent = myPts > 0 ? 'Ton cerveau a écrasé ton adversaire !' : 'Ta timeline était trop chaotique...';
+         else $s('rv-sub').textContent = myPts > 0 ? 'Ta carte a rapporté des points !' : 'Les Cap\'tens n\'ont rien compris à ta carte...';
+      } else {
+         const isCap = pid === d.captainId;
+         if (isCap) $s('rv-sub').textContent = myPts >= 4 ? 'C\'est un tir de génie ! 🎯' : 'Il va falloir changer de lunettes...';
+         else $s('rv-sub').textContent = myPts > 0 ? 'Ton numéro a été trouvé pile-poil !' : 'Le Cap\'ten a tiré à côté...';
+      }
+      $s('rv-sub').style.color = myPts > 0 ? 'rgb(var(--success-rgb))' : 'var(--muted)';
+      $s('rv-lives').style.display = 'none';
+  }
 
-    if (!correct) {
-      setTimeout(() => {
-        $s('screen-reveal').classList.add('shake');
-        setTimeout(() => $s('screen-reveal').classList.remove('shake'), 600);
-      }, 400);
+  const respondants = Object.entries(players).filter(([i]) => i !== d.captainId && i !== d.captainId2).sort((a, b) => a[1].number - b[1].number);
+
+  respondants.forEach(([id, p], idx) => {
+    const it = document.createElement('div');
+    let isCorrect = false;
+    let badgeHtml = '';
+    
+    if (m.coop) {
+        isCorrect = d.roundResult === 'correct';
+        if (d.mode === 'extreme') {
+            const pickedLow = d.captainGuess?.low === id;
+            const pickedHigh = d.captainGuess?.high === id;
+            if ((pickedLow && p.number === 1) || (pickedHigh && p.number === 10)) isCorrect = true;
+            else if (pickedLow || pickedHigh) isCorrect = false;
+            else isCorrect = true; 
+        }
+    } else {
+        const pEarned = d.lastRoundPts?.[id] || 0;
+        isCorrect = pEarned > 0;
+        if (pEarned > 0) badgeHtml = `<div class="result-pts pos">+${pEarned}</div>`;
+        else badgeHtml = `<div class="result-pts zero">0</div>`;
     }
 
-    $s('rv-lives').style.display = 'flex';
-    lives($s('rv-lives'), d.lives, d.maxLives);
+    it.className = `result-item ${isCorrect ? 'correct' : 'wrong'}`;
+    it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 0.8}s both`;
+    it.innerHTML = `
+      <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.65rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(p.name)}</div>
+        <div style="font-weight:600;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.answer)}</div>
+      </div>
+      ${badgeHtml}
+    `;
+    resultsEl.appendChild(it);
+  });
 
-    // Reveal results ordered 1→10
-    const captainOrder = d.captainGuess || {};
-    const placed = Object.entries(captainOrder)
-      .map(([slot, id]) => ({ slot: parseInt(slot), id }))
-      .sort((a, b) => a.slot - b.slot);
-    const respondants = Object.entries(players)
-      .filter(([i]) => i !== d.captainId)
-      .sort((a, b) => a[1].number - b[1].number);
-
-    const resultsEl = $s('rv-results');
-    resultsEl.innerHTML = '';
-    respondants.forEach(([id, p], idx) => {
-      const capIdx = placed.findIndex(e => e.id === id);
-      const isThisRight = capIdx === idx;
-      const it = document.createElement('div');
-      it.className = `result-item ${correct ? 'correct' : (isThisRight ? 'correct' : 'wrong')}`;
-      // Révélation une par une toutes les 1.2 secondes
-      it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 1.2}s both`;
-      
-      // Petit effet haptique au moment où la carte s'affiche
-      setTimeout(() => { try { navigator.vibrate?.(40); } catch(e){} }, idx * 1200);
-      it.innerHTML = `
-        <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:.65rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(p.name)}</div>
-          <div style="font-weight:600;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.answer)}</div>
-        </div>
-        <div style="font-size:1.2rem;">${(correct || isThisRight) ? '✅' : '❌'}</div>
-      `;
-      resultsEl.appendChild(it);
-    });
-
-    buildRevealActions(d, m);
-
-  } else if (d.mode === 'sniper') {
-    // SNIPER reveal
-    const capPts = d.lastRoundPts?.[d.captainId] || 0;
-    $s('rv-icon').textContent = capPts >= 6 ? '🎯' : capPts >= 3 ? '🏹' : '😅';
-    $s('rv-title').textContent = `+${capPts} point${capPts > 1 ? 's' : ''} !`;
-    $s('rv-sub').textContent = capPts >= 6 ? 'Quelle précision !' : (capPts >= 3 ? 'Bien joué !' : 'Dur dur le sniper…');
-    $s('rv-sub').style.color = capPts >= 3 ? 'rgb(var(--success-rgb))' : 'rgb(var(--accent-rgb))';
-    $s('rv-sub').style.textShadow = capPts >= 3 ? '0 0 14px rgba(var(--success-rgb),.45)' : 'none';
-    $s('rv-lives').style.display = 'none';
-
-    const guess = d.captainGuess || {};
-    const respondants = Object.entries(players)
-      .filter(([i]) => i !== d.captainId)
-      .sort((a, b) => a[1].number - b[1].number);
-
-    const resultsEl = $s('rv-results');
-    resultsEl.innerHTML = '';
-    respondants.forEach(([id, p], idx) => {
-      const g = guess[id];
-      const exact = g === p.number;
-      const close = !exact && Math.abs(g - p.number) === 1;
-      const cls   = exact ? 'correct' : (close ? 'close' : 'wrong');
-      const pts   = exact ? 3 : (close ? 1 : 0);
-      const it = document.createElement('div');
-      it.className = `result-item ${cls}`;
-      // Révélation une par une toutes les 1.2 secondes
-      it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 1.2}s both`;
-      
-      // Petit effet haptique au moment où la carte s'affiche
-      setTimeout(() => { try { navigator.vibrate?.(40); } catch(e){} }, idx * 1200);
-      it.innerHTML = `
-        <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:.65rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(p.name)} · deviné: <strong style="color:#fff">${g || '?'}</strong></div>
-          <div style="font-weight:600;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.answer)}</div>
-        </div>
-        <div class="result-pts ${pts > 0 ? 'pos' : 'zero'}">+${pts}</div>
-      `;
-      resultsEl.appendChild(it);
-    });
-
-    buildRevealActions(d, m);
-
-  } else if (d.mode === 'extreme') {
-    // EXTREME reveal
-    const pts = d.lastRoundPts?.[d.captainId] || 0;
-    $s('rv-icon').textContent = pts === 2 ? '🎭' : pts === 1 ? '🎯' : '💥';
-    $s('rv-title').textContent = pts === 2 ? 'Extrême Parfait !' : pts === 1 ? 'Mi-chemin' : 'Raté sur les deux';
-    $s('rv-sub').textContent = `+${pts} point${pts > 1 ? 's' : ''}`;
-    $s('rv-sub').style.color = pts > 0 ? 'rgb(var(--success-rgb))' : 'rgb(var(--accent-rgb))';
-    $s('rv-sub').style.textShadow = pts > 0 ? '0 0 14px rgba(var(--success-rgb),.45)' : 'none';
-    $s('rv-lives').style.display = 'none';
-
-    const guess = d.captainGuess || {};
-    const respondants = Object.entries(players)
-      .filter(([i]) => i !== d.captainId)
-      .sort((a, b) => a[1].number - b[1].number);
-
-    let realLowId = null, realHighId = null, lowN = 11, highN = 0;
-    respondants.forEach(([id, p]) => {
-      if (p.number < lowN) { lowN = p.number; realLowId = id; }
-      if (p.number > highN) { highN = p.number; realHighId = id; }
-    });
-
-    const resultsEl = $s('rv-results');
-    resultsEl.innerHTML = '';
-    respondants.forEach(([id, p], idx) => {
-      const isLow  = id === realLowId;
-      const isHigh = id === realHighId;
-      const pickedLow  = guess.low  === id;
-      const pickedHigh = guess.high === id;
-      let cls = 'wrong', tag = '';
-      if ((isLow && pickedLow) || (isHigh && pickedHigh)) { cls = 'correct'; }
-      else if (pickedLow || pickedHigh) { cls = 'wrong'; }
-      if (isLow) tag = '⬇️ Pire';
-      if (isHigh) tag = '⬆️ Meilleur';
-      let pickTag = '';
-      if (pickedLow)  pickTag = ' · <span style="color:#0099ff;-webkit-text-fill-color:#0099ff;">Choisi pire</span>';
-      if (pickedHigh) pickTag = ' · <span style="color:#ff003c;-webkit-text-fill-color:#ff003c;">Choisi meilleur</span>';
-
-      const it = document.createElement('div');
-      it.className = `result-item ${cls}`;
-      // Révélation une par une toutes les 1.2 secondes
-      it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 1.2}s both`;
-      
-      // Petit effet haptique au moment où la carte s'affiche
-      setTimeout(() => { try { navigator.vibrate?.(40); } catch(e){} }, idx * 1200);
-      it.innerHTML = `
-        <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:.65rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(p.name)} ${tag}${pickTag}</div>
-          <div style="font-weight:600;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.answer)}</div>
-        </div>
-      `;
-      resultsEl.appendChild(it);
-    });
-
-    buildRevealActions(d, m);
-  }
+  buildRevealActions(d, m);
 }
-
 function buildRevealActions(d, m) {
   const act = $s('rv-actions');
   act.innerHTML = '';
   const isHost = d.host === pid;
   
-  // Calculer si c'est la fin de la manche (tout le monde est passé Cap'ten)
-  const queue = d.captainQueue || [];
+  const isDuel = d.mode === 'duel';
+  const queue = isDuel ? (d.duelQueue || []) : (d.captainQueue || []);
   const isEndOfRound = queue.length === 0;
 
-  // Calculer si c'est la DERNIÈRE manche de la partie
   const targetRounds = d.mode === 'survival' ? 9999 : (d.maxRounds || 5);
   const isFinalRound = isEndOfRound && (d.round >= targetRounds);
-
   const isDead = m.coop && d.lives <= 0;
 
   if (isHost) {
     if (isDead || isFinalRound) {
-      // Si on n'a plus de vies OU si c'est la fin de la dernière manche
       const btn = document.createElement('button');
       btn.className = 'btn btn-danger btn-full';
       btn.textContent = isDead ? '💀 Voir le bilan' : '🏆 Voir le résultat final';
       btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'gameover' });
       act.appendChild(btn);
     } else if (!m.coop) {
-      // Mode compétitif (Sniper/Extrême) -> On va au classement
+      // Sniper / Duel : on montre le classement avant de passer au suivant !
       const btn = document.createElement('button');
       btn.className = 'btn btn-primary btn-full';
       btn.textContent = '🏆 Voir le classement';
       btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'leaderboard' });
       act.appendChild(btn);
     } else {
-      // Mode Coop et on continue
       const btn = document.createElement('button');
       btn.className = 'btn btn-primary btn-full';
       if (isEndOfRound) {
@@ -5056,7 +4938,8 @@ function renderLeaderboard(d) {
     const btn = document.createElement('button');
     btn.className = 'btn btn-primary btn-full';
     
-    const queue = d.captainQueue || [];
+    const isDuel = d.mode === 'duel';
+    const queue = isDuel ? (d.duelQueue || []) : (d.captainQueue || []);
     const isEndOfRound = queue.length === 0;
     const targetRounds = d.mode === 'survival' ? 9999 : (d.maxRounds || 5);
     const isFinalRound = isEndOfRound && (d.round >= targetRounds);
@@ -5068,7 +4951,7 @@ function renderLeaderboard(d) {
       btn.textContent = 'Manche suivante ✦';
       btn.onclick = window.nextRound;
     } else {
-      btn.textContent = 'Cap\'ten Suivant 👑';
+      btn.textContent = isDuel ? 'Duel Suivant ⚔️' : 'Cap\'ten Suivant 👑';
       btn.onclick = window.nextTurn;
     }
     act.appendChild(btn);
@@ -5079,26 +4962,87 @@ function renderLeaderboard(d) {
     act.appendChild(p2);
   }
 }
-
 // ═══════════════════════════════════════════════════════════
 //  18. GESTION DES TOURS ET MANCHES
 // ═══════════════════════════════════════════════════════════
 window.startTurn = async (isNewRound) => {
   const d = room.data; if (!d || d.host !== pid) return;
   const ids = Object.keys(d.players);
-  let queue = d.captainQueue || [];
-  let round = d.round;
+  const u = {};
 
-  // Si on change de manche (ou si la liste est vide par sécurité)
+  // --- LOGIQUE DU NOUVEAU MODE DUEL ---
+  if (d.mode === 'duel') {
+      let queue = d.duelQueue || [];
+      let round = d.round || 1;
+
+      if (isNewRound || queue.length === 0) {
+          // Nouvelle manche : on recrée la file de duels
+          const shuffled = shuffle([...ids]);
+          const newQueue = [];
+          while (shuffled.length >= 2) newQueue.push([shuffled.shift(), shuffled.shift()]);
+          if (shuffled.length === 1) newQueue.push({ challenger: shuffled[0] });
+          
+          queue = shuffle(newQueue);
+          if (isNewRound) round += 1;
+          u[`rooms/${room.id}/totalDuels`] = queue.length;
+          u[`rooms/${room.id}/currentDuelNum`] = 1;
+      } else {
+          u[`rooms/${room.id}/currentDuelNum`] = (d.currentDuelNum || 1) + 1;
+      }
+
+      const nextMatch = queue.shift();
+      u[`rooms/${room.id}/duelQueue`] = queue;
+      u[`rooms/${room.id}/round`] = round;
+      
+      // ✅ LA PURGE DE TOUTES LES ANCIENNES DONNÉES
+      u[`rooms/${room.id}/theme`] = null;
+      u[`rooms/${room.id}/drawnTheme`] = [pickRandomTheme(d.level), pickRandomTheme(d.level), pickRandomTheme(d.level)];
+      u[`rooms/${room.id}/liveSort`] = null;
+      u[`rooms/${room.id}/liveSortDuel`] = null;
+      u[`rooms/${room.id}/duelResult`] = null;
+      u[`rooms/${room.id}/roundResult`] = null;
+      u[`rooms/${room.id}/timerEndsAt`] = null;
+      u[`rooms/${room.id}/winningTheme`] = null;
+
+      if (nextMatch.challenger) {
+          u[`rooms/${room.id}/status`] = 'duel-challenge';
+          u[`rooms/${room.id}/challengerId`] = nextMatch.challenger;
+          u[`rooms/${room.id}/captainId`] = null;
+          u[`rooms/${room.id}/captainId2`] = null;
+      } else {
+          u[`rooms/${room.id}/status`] = 'theme-choice';
+          u[`rooms/${room.id}/challengerId`] = null;
+          u[`rooms/${room.id}/captainId`] = nextMatch[0];
+          u[`rooms/${room.id}/captainId2`] = nextMatch[1];
+      }
+
+      // ✅ LA PURGE DE TOUS LES JOUEURS
+      ids.forEach(i => {
+          u[`rooms/${room.id}/players/${i}/number`] = null;
+          u[`rooms/${room.id}/players/${i}/answer`] = null;
+          u[`rooms/${room.id}/players/${i}/answered`] = false;
+          u[`rooms/${room.id}/players/${i}/ready`] = false;
+          u[`rooms/${room.id}/players/${i}/themeProposal`] = null;
+          u[`rooms/${room.id}/players/${i}/vote`] = null;
+          u[`rooms/${room.id}/players/${i}/duelReady`] = null;
+      });
+
+      await update(ref(db), u);
+      return;
+  }
+
+  // --- LOGIQUE CLASSIQUE / AUTRES MODES ---
+  let queue = d.captainQueue || [];
+  let round = d.round || 1;
+
   if (isNewRound || queue.length === 0) {
     queue = shuffle([...ids]);
-    round += 1;
+    if (isNewRound) round += 1;
   }
 
   const newCap = queue.shift();
   const respondants = ids.filter(i => i !== newCap);
 
-  const u = {};
   u[`rooms/${room.id}/status`]       = 'theme-choice';
   u[`rooms/${room.id}/captainId`]    = newCap;
   u[`rooms/${room.id}/captainQueue`] = queue;
@@ -5118,7 +5062,6 @@ window.startTurn = async (isNewRound) => {
     u[`rooms/${room.id}/players/${i}/ready`]    = false;
   });
 
-  // Distribution des numéros (Logique Mode Extrême incluse)
   if (d.mode === 'extreme' && respondants.length >= 2) {
     const shuff = shuffle([...respondants]);
     respondants.forEach(id => {
@@ -5132,9 +5075,9 @@ window.startTurn = async (isNewRound) => {
       u[`rooms/${room.id}/players/${id}/number`] = numbers[idx];
     });
   }
-
   await update(ref(db), u);
 };
+
 
 window.nextRound = () => window.startTurn(true);
 window.nextTurn  = () => window.startTurn(false);
@@ -5158,6 +5101,7 @@ function renderGameover(d) {
     $s('go-coop-wrap').style.display = 'block';
     $s('go-podium-wrap').style.display = 'none';
     $s('go-score').textContent = Math.max(0, d.round - (d.lives > 0 ? 0 : 1));
+    lives($s('go-lives-bilan'), d.lives, d.maxLives);
   } else {
     // Competitive: show podium
     $s('go-icon').textContent = '🏆';
@@ -5206,29 +5150,22 @@ function renderGameover(d) {
 
 window.restartGame = async () => {
   const d = room.data; if (!d) return;
-  if (d.host !== pid) { toast('Seul l\'hôte peut relancer !', 'err'); return; }
-
+  if (d.host !== pid) return;
   const ids = Object.keys(d.players || {});
   const u = {};
   u[`rooms/${room.id}/status`]       = 'config';
-  u[`rooms/${room.id}/lives`]        = 3;
+  u[`rooms/${room.id}/lives`]        = d.maxLives || 3; // ✅ Remet les vies MAX
   u[`rooms/${room.id}/round`]        = 0;
   u[`rooms/${room.id}/captainId`]    = null;
   u[`rooms/${room.id}/theme`]        = null;
-  u[`rooms/${room.id}/drawnTheme`]   = null;
   u[`rooms/${room.id}/roundResult`]  = null;
-  u[`rooms/${room.id}/captainGuess`] = null;
-  u[`rooms/${room.id}/timerEndsAt`]  = null;
-  u[`rooms/${room.id}/lastRoundPts`] = null;
   u[`rooms/${room.id}/liveSort`]     = null;
-
+  
   ids.forEach(i => {
     u[`rooms/${room.id}/players/${i}/number`]   = null;
     u[`rooms/${room.id}/players/${i}/answer`]   = null;
     u[`rooms/${room.id}/players/${i}/answered`] = false;
-    u[`rooms/${room.id}/players/${i}/ready`]    = false;
     u[`rooms/${room.id}/players/${i}/score`]    = 0;
-    // connectedAt is preserved intentionally (needed for host election)
   });
   await update(ref(db), u);
 };
@@ -5272,27 +5209,8 @@ window.settingsLeaveGame = () => {
 
 // Fonction technique pour quitter sans popup (appelée par showConfirm)
 window.leaveRoomActual = async () => {
-  const d = room.data;
-  const remaining = Object.entries((d?.players || {})).filter(([id]) => id !== pid);
-  const updates = {};
-
-  // Reassign host if we are the host
-  if (d && d.host === pid && remaining.length > 0) {
-    const newHost = remaining.sort((a, b) => (a[1].connectedAt || 0) - (b[1].connectedAt || 0))[0][0];
-    updates[`rooms/${room.id}/host`] = newHost;
-  }
-
-  try {
-    if (remaining.length === 0) {
-      await remove(ref(db, `rooms/${room.id}`));
-    } else {
-      updates[`rooms/${room.id}/players/${pid}`] = null;
-      await update(ref(db), updates);
-    }
-  } catch(e){}
-
-  localStorage.removeItem('tt-reconnect-state');
-  location.reload();
+  try { await remove(ref(db, `rooms/${room.id}/players/${pid}`)); } catch(e){}
+  location.reload(); // Un reload est plus propre pour réinitialiser tout l'état
 };
 
 // Retourner au salon (Hôte uniquement)
