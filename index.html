@@ -1656,11 +1656,707 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
   .podium-block.p3 { font-size: 1.6rem; height: 85px; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   34. DUEL ARENA (face-à-face Cap'tens) + amélioration visuelle
+═══════════════════════════════════════════════════════════ */
+.duel-arena {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.1rem;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,.012) 100%),
+    rgba(0,0,0,.35);
+  backdrop-filter: blur(var(--blur-sm)) saturate(170%);
+  -webkit-backdrop-filter: blur(var(--blur-sm)) saturate(170%);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.20);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 36px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.10);
+  overflow: hidden;
+}
+.duel-arena::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 50%; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+  pointer-events: none;
+}
+.duel-arena::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 0% 50%, rgba(var(--primary-rgb), .12) 0%, transparent 45%),
+    radial-gradient(circle at 100% 50%, rgba(var(--accent-rgb), .12) 0%, transparent 45%);
+  pointer-events: none;
+}
+.duel-fighter {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  flex: 1;
+  min-width: 0;
+}
+.duel-fighter-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900; font-size: 1.5rem;
+  color: #fff;
+  position: relative;
+  border: 2px solid;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.30);
+}
+.duel-fighter.f1 .duel-fighter-avatar {
+  background: linear-gradient(135deg, rgba(var(--primary-rgb),.92), rgba(var(--secondary-rgb),.92));
+  border-color: rgba(var(--primary-rgb), .65);
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb),.32), inset 0 1px 0 rgba(255,255,255,.30);
+}
+.duel-fighter.f2 .duel-fighter-avatar {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb),.92), #ff6b35);
+  border-color: rgba(var(--accent-rgb), .65);
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb),.32), inset 0 1px 0 rgba(255,255,255,.30);
+}
+.duel-fighter-avatar .crown-pin {
+  position: absolute;
+  top: -10px; right: -8px;
+  font-size: 1rem;
+  filter: drop-shadow(0 0 6px rgba(var(--gold-rgb), .8));
+}
+.duel-fighter-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: .85rem;
+  text-align: center;
+  max-width: 110px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.duel-fighter.f1 .duel-fighter-name { color: rgb(var(--primary-rgb)); }
+.duel-fighter.f2 .duel-fighter-name { color: rgb(var(--accent-rgb)); }
+.duel-fighter-status {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .58rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.duel-fighter-status.ready {
+  color: rgb(var(--success-rgb));
+  background: rgba(var(--success-rgb), .12);
+}
+.duel-fighter-status.thinking {
+  color: var(--muted);
+  background: rgba(255,255,255, .04);
+}
+.duel-vs {
+  position: relative;
+  z-index: 1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: .04em;
+  color: #fff;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.6));
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(var(--gold-rgb),1), #ff8c00);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: vsBounce 1.6s ease-in-out infinite;
+}
+@keyframes vsBounce {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+
+/* Conteneur d'une timeline coté Cap'ten 1 ou 2 */
+.duel-tl-card {
+  position: relative;
+  margin-bottom: 1.2rem;
+  border-radius: var(--radius-md);
+  padding: .85rem .85rem 1rem;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.01) 100%),
+    rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 8px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.duel-tl-card.cap1 { border-color: rgba(var(--primary-rgb),.30); border-top-color: rgba(var(--primary-rgb),.55); }
+.duel-tl-card.cap2 { border-color: rgba(var(--accent-rgb), .30); border-top-color: rgba(var(--accent-rgb), .55); }
+.duel-tl-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: .65rem;
+  padding-bottom: .55rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.duel-tl-header .name {
+  display: flex; align-items: center; gap: .45rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800; font-size: .95rem;
+}
+.duel-tl-card.cap1 .name { color: rgb(var(--primary-rgb)); }
+.duel-tl-card.cap2 .name { color: rgb(var(--accent-rgb));  }
+.duel-tl-header .status-pill {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .58rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  padding: .2rem .55rem; border-radius: 999px;
+  border: 1px solid;
+}
+.duel-tl-header .status-pill.ready {
+  color: rgb(var(--success-rgb));
+  border-color: rgba(var(--success-rgb), .3);
+  background: rgba(var(--success-rgb), .10);
+}
+.duel-tl-header .status-pill.thinking {
+  color: var(--muted);
+  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+}
+
+/* Bloc "réponses à classer" pour spectateurs duel */
+.duel-spec-pool {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.01) 100%),
+    rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top: 1px solid rgba(255,255,255,.18);
+  border-radius: var(--radius-md);
+  padding: .85rem 1rem;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.duel-spec-pool .pool-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--muted);
+  margin-bottom: .55rem;
+}
+.duel-spec-card {
+  display: flex; flex-direction: column;
+  padding: .55rem .75rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  border-top: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  margin-bottom: .35rem;
+}
+.duel-spec-card .from {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .58rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--muted);
+  margin-bottom: .15rem;
+}
+.duel-spec-card .ans {
+  font-weight: 600; font-size: .92rem;
+  word-break: break-word;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   35. VÉRIFICATION DU CLASSEMENT (round-reveal amélioré)
+═══════════════════════════════════════════════════════════ */
+/* Carte d'un résultat avec comparaison Cap'ten vs Réalité */
+.verify-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .8rem;
+  padding: .7rem .85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.15);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.012) 100%),
+    rgba(0,0,0,.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 22px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.08);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: verifyIn .55s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes verifyIn {
+  from { opacity: 0; transform: translateY(14px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.verify-row.exact {
+  border-color: rgba(var(--success-rgb), .35);
+  border-top: 1px solid rgba(var(--success-rgb), .55);
+  box-shadow: 0 0 22px rgba(var(--success-rgb), .14), 0 6px 22px rgba(0,0,0,.4), inset 0 1px 0 rgba(var(--success-rgb), .25);
+}
+.verify-row.close {
+  border-color: rgba(var(--gold-rgb), .35);
+  border-top: 1px solid rgba(var(--gold-rgb), .55);
+}
+.verify-row.miss {
+  border-color: rgba(var(--accent-rgb), .30);
+  border-top: 1px solid rgba(var(--accent-rgb), .50);
+}
+.verify-row.exact::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgb(var(--success-rgb)), rgba(var(--success-rgb), .5));
+  box-shadow: 0 0 16px rgba(var(--success-rgb), .55);
+}
+.verify-row.close::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgb(var(--gold-rgb)), rgba(var(--gold-rgb), .5));
+  box-shadow: 0 0 16px rgba(var(--gold-rgb), .45);
+}
+.verify-row.miss::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgb(var(--accent-rgb)), rgba(var(--accent-rgb), .5));
+  box-shadow: 0 0 14px rgba(var(--accent-rgb), .40);
+}
+.verify-numbers {
+  display: flex; align-items: center; gap: .45rem;
+  flex-shrink: 0;
+}
+.verify-num-cell {
+  display: flex; flex-direction: column;
+  align-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+  min-width: 2.1rem;
+}
+.verify-num-cell .label {
+  font-size: .55rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: .15rem;
+}
+.verify-num-cell .num {
+  font-weight: 900; font-size: 1.4rem;
+  line-height: 1;
+  text-shadow: 0 0 14px currentColor;
+}
+.verify-num-cell.guess .num {
+  filter: opacity(.7);
+}
+.verify-arrow {
+  color: rgba(255,255,255,.35);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  margin-top: 12px;
+}
+.verify-content {
+  min-width: 0;
+}
+.verify-content .who {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .62rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: .15rem;
+}
+.verify-content .ans {
+  font-weight: 600; font-size: .96rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.verify-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800; font-size: .72rem;
+  padding: .3rem .55rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  letter-spacing: .04em;
+  display: flex; align-items: center; gap: .25rem;
+}
+.verify-badge.exact {
+  color: rgb(var(--success-rgb));
+  background: rgba(var(--success-rgb), .14);
+  border: 1px solid rgba(var(--success-rgb), .35);
+  text-shadow: 0 0 8px rgba(var(--success-rgb), .55);
+}
+.verify-badge.close {
+  color: rgb(var(--gold-rgb));
+  background: rgba(var(--gold-rgb), .14);
+  border: 1px solid rgba(var(--gold-rgb), .35);
+}
+.verify-badge.miss {
+  color: var(--muted);
+  background: rgba(255,255,255, .04);
+  border: 1px solid rgba(255,255,255, .08);
+}
+
+/* Récap "Ton classement" en haut du reveal */
+.verify-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: .25rem 0 .85rem;
+  padding: .65rem 1rem;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.008) 100%),
+    rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.16);
+}
+.verify-summary .stat {
+  display: flex; flex-direction: column; align-items: center;
+}
+.verify-summary .stat .num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900; font-size: 1.3rem;
+  line-height: 1;
+}
+.verify-summary .stat .lbl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .55rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--muted);
+  margin-top: .25rem;
+}
+.verify-summary .stat.ok   .num { color: rgb(var(--success-rgb)); text-shadow: 0 0 10px rgba(var(--success-rgb),.5); }
+.verify-summary .stat.near .num { color: rgb(var(--gold-rgb));    text-shadow: 0 0 10px rgba(var(--gold-rgb),.5); }
+.verify-summary .stat.bad  .num { color: rgb(var(--accent-rgb));  text-shadow: 0 0 10px rgba(var(--accent-rgb),.4); }
+.verify-summary .sep {
+  width: 1px; height: 30px; background: rgba(255,255,255,.10);
+}
+
+/* Mode Fluide - simplifie ces effets */
+body.low-end-mode .duel-arena::before,
+body.low-end-mode .duel-arena::after { display: none !important; }
+body.low-end-mode .duel-vs { animation: none !important; }
+body.low-end-mode .verify-row::before { display: none !important; }
+body.low-end-mode .verify-num-cell .num { text-shadow: none !important; }
+
 /* Animation de vote de theme */
 @keyframes popInWinner {
     0% { opacity:0; transform: scale(0.5); }
     70% { opacity:1; transform: scale(1.15); }
     100% { opacity:1; transform: scale(1.05); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   30. CLASSEMENT AMÉLIORÉ (avec barres de progression)
+═══════════════════════════════════════════════════════════ */
+.lb-row {
+  position: relative;
+  overflow: hidden;
+}
+.lb-row::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: var(--lb-pct, 0%);
+  background: linear-gradient(90deg, rgba(var(--gold-rgb), 0.18) 0%, rgba(var(--gold-rgb), 0.04) 100%);
+  z-index: 0;
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.lb-row.top1::before { background: linear-gradient(90deg, rgba(var(--gold-rgb), 0.28) 0%, rgba(var(--gold-rgb), 0.05) 100%); }
+.lb-row.top2::before { background: linear-gradient(90deg, rgba(203,213,225, 0.22) 0%, rgba(203,213,225, 0.03) 100%); }
+.lb-row.top3::before { background: linear-gradient(90deg, rgba(217,119,6, 0.22) 0%, rgba(217,119,6, 0.03) 100%); }
+.lb-row > * { position: relative; z-index: 1; }
+.lb-trend {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .65rem; font-weight: 800;
+  padding: .2rem .5rem; border-radius: 999px;
+  letter-spacing: .03em;
+}
+.lb-trend.up   { color: rgb(var(--success-rgb)); background: rgba(var(--success-rgb), .12); }
+.lb-trend.down { color: rgb(var(--accent-rgb));  background: rgba(var(--accent-rgb), .12); }
+.lb-trend.same { color: var(--muted);             background: rgba(255,255,255,.06); }
+
+/* Captain name display in score breakdown */
+.captain-score-card {
+  background:
+    linear-gradient(145deg, rgba(var(--gold-rgb),.10) 0%, rgba(var(--gold-rgb),.02) 100%),
+    rgba(var(--gold-rgb),.04);
+  border: 1px solid rgba(var(--gold-rgb),.30);
+  border-top: 1px solid rgba(var(--gold-rgb),.55);
+  border-radius: var(--radius-md);
+  padding: .85rem 1rem;
+  display: flex; align-items: center; gap: .8rem;
+  margin-bottom: .6rem;
+  box-shadow: 0 0 18px rgba(var(--gold-rgb),.10), inset 0 1px 0 rgba(var(--gold-rgb),.20);
+}
+.captain-score-card .crown { font-size: 1.5rem; filter: drop-shadow(0 0 8px rgba(var(--gold-rgb),.6)); }
+
+/* ═══════════════════════════════════════════════════════════
+   31. RECONNECTION MODAL & CONNECTION INDICATOR
+═══════════════════════════════════════════════════════════ */
+.connection-indicator {
+  position: fixed;
+  top: 1rem; right: 1rem;
+  padding: .35rem .75rem;
+  border-radius: 999px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .65rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.1);
+  color: var(--muted);
+  z-index: 500;
+  display: flex; align-items: center; gap: .4rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.connection-indicator.show { opacity: 1; pointer-events: auto; }
+.connection-indicator .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--muted);
+}
+.connection-indicator.online .dot {
+  background: rgb(var(--success-rgb));
+  box-shadow: 0 0 8px rgba(var(--success-rgb), .7);
+}
+.connection-indicator.offline .dot {
+  background: rgb(var(--accent-rgb));
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), .7);
+  animation: pulseOffline 1s ease-in-out infinite;
+}
+.connection-indicator.reconnecting .dot {
+  background: rgb(var(--gold-rgb));
+  box-shadow: 0 0 8px rgba(var(--gold-rgb), .7);
+  animation: pulseOffline 1s ease-in-out infinite;
+}
+@keyframes pulseOffline {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(.8); }
+}
+
+/* Reconnect prompt modal-specific styling */
+.reconnect-card {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 1rem;
+}
+.reconnect-icon {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 22px rgba(var(--primary-rgb), .55));
+  animation: floatIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Player tile in host-transfer modal */
+.host-transfer-tile {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .7rem .85rem; margin-bottom: .4rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top: 1px solid rgba(255,255,255,.18);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.host-transfer-tile:hover {
+  background: rgba(var(--primary-rgb), .08);
+  border-color: rgba(var(--primary-rgb), .3);
+  transform: translateX(3px);
+}
+.host-transfer-tile.oldest {
+  border-color: rgba(var(--gold-rgb), .35);
+  background: rgba(var(--gold-rgb), .06);
+}
+.host-transfer-tile .since {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .62rem; font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase; letter-spacing: .08em;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   32. PREMIUM SWITCH (Mode Fluide toggle)
+═══════════════════════════════════════════════════════════ */
+.premium-switch {
+  position: relative;
+  display: inline-block;
+  width: 54px; height: 30px;
+  flex-shrink: 0;
+}
+.premium-switch input { opacity: 0; width: 0; height: 0; }
+.premium-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 34px;
+  transition: .35s cubic-bezier(.4,0,.2,1);
+}
+.premium-switch .slider:before {
+  position: absolute; content: "";
+  height: 22px; width: 22px;
+  left: 3px; bottom: 3px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,.35);
+  transition: .35s cubic-bezier(.4,0,.2,1);
+}
+.premium-switch input:checked + .slider {
+  background: linear-gradient(135deg, rgb(var(--primary-rgb)), rgb(var(--secondary-rgb)));
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(var(--secondary-rgb), .42);
+}
+.premium-switch input:checked + .slider:before { transform: translateX(24px); }
+
+/* ═══════════════════════════════════════════════════════════
+   33. MODE FLUIDE (Hautes performances) — désactive les effets lourds
+═══════════════════════════════════════════════════════════ */
+body.low-end-mode {
+  background: var(--bg-dark) !important;
+}
+body.low-end-mode::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(var(--primary-rgb), 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+/* Cache les orbes floutées (gros consommateurs CPU/GPU) */
+body.low-end-mode .bg-orb { display: none !important; }
+
+/* Coupe le flou (backdrop-filter) sur tous les éléments verre */
+body.low-end-mode .glass,
+body.low-end-mode .glass2,
+body.low-end-mode .answer-card,
+body.low-end-mode .theme-card,
+body.low-end-mode .timeline-wrap,
+body.low-end-mode .mode-card,
+body.low-end-mode .config-card,
+body.low-end-mode .game-hdr,
+body.low-end-mode .player-item,
+body.low-end-mode .lb-row,
+body.low-end-mode .result-item,
+body.low-end-mode .sniper-answer,
+body.low-end-mode .input,
+body.low-end-mode textarea.input,
+body.low-end-mode select.input,
+body.low-end-mode #settings-notch,
+body.low-end-mode #modal,
+body.low-end-mode #welcome-panel,
+body.low-end-mode #settings-panel,
+body.low-end-mode #rules-panel,
+body.low-end-mode #adult-panel,
+body.low-end-mode #reconnect-panel,
+body.low-end-mode #host-transfer-panel,
+body.low-end-mode .toast,
+body.low-end-mode .slot-machine,
+body.low-end-mode .tl-drop,
+body.low-end-mode .mini-card,
+body.low-end-mode .num-btn,
+body.low-end-mode .level-opt,
+body.low-end-mode .duel-arena,
+body.low-end-mode .duel-tl-card,
+body.low-end-mode .duel-spec-pool,
+body.low-end-mode .verify-row,
+body.low-end-mode .verify-summary,
+body.low-end-mode .captain-score-card,
+body.low-end-mode .connection-indicator {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Fond plus opaque pour la lisibilité */
+body.low-end-mode .glass,
+body.low-end-mode .glass2,
+body.low-end-mode .game-hdr,
+body.low-end-mode .answer-card,
+body.low-end-mode .timeline-wrap,
+body.low-end-mode .sniper-answer,
+body.low-end-mode .lb-row,
+body.low-end-mode .duel-arena,
+body.low-end-mode .duel-tl-card,
+body.low-end-mode .duel-spec-pool,
+body.low-end-mode .verify-row,
+body.low-end-mode .verify-summary,
+body.low-end-mode .captain-score-card,
+body.low-end-mode #settings-notch {
+  background: rgba(8, 8, 18, 0.92) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.13) !important;
+  border-top: 1px solid rgba(var(--primary-rgb), 0.30) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.55) !important;
+}
+body.low-end-mode .input,
+body.low-end-mode textarea.input,
+body.low-end-mode select.input {
+  background: rgba(0,0,0,.55) !important;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.45) !important;
+}
+body.low-end-mode .input:focus,
+body.low-end-mode textarea.input:focus,
+body.low-end-mode select.input:focus {
+  background: rgba(0,0,0,.65) !important;
+  border-color: rgba(var(--primary-rgb),.5) !important;
+  box-shadow: 0 0 14px rgba(var(--primary-rgb),.18), inset 0 2px 8px rgba(0,0,0,.55) !important;
+}
+body.low-end-mode #modal,
+body.low-end-mode #welcome-panel,
+body.low-end-mode #settings-panel,
+body.low-end-mode #rules-panel,
+body.low-end-mode #adult-panel,
+body.low-end-mode #reconnect-panel,
+body.low-end-mode #host-transfer-panel {
+  background: rgba(8, 8, 22, 0.98) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.13) !important;
+  border-top: 1px solid rgba(var(--primary-rgb), 0.30) !important;
+}
+
+/* Coupe les animations continues (consommatrices de CPU) */
+body.low-end-mode .game-title { filter: none !important; }
+body.low-end-mode .room-code  { filter: none !important; }
+body.low-end-mode .theme-card::before { animation: none !important; }
+body.low-end-mode .splash-digit { filter: none !important; }
+body.low-end-mode .slot-machine.done .slot-digit { animation: none !important; }
+body.low-end-mode .slot-machine.done .slot-highlight { animation: none !important; }
+body.low-end-mode .life-heart.critical { animation: none !important; transform: scale(1.1) !important; }
+body.low-end-mode .timer-fill.danger { animation: none !important; }
+body.low-end-mode .splash-scanline { display: none !important; }
+body.low-end-mode #splash-screen::after { animation: none !important; opacity: .6; }
+body.low-end-mode .dots span { animation: none !important; opacity: .8 !important; }
+body.low-end-mode .connection-indicator.offline .dot { animation: none !important; }
+body.low-end-mode .connection-indicator.reconnecting .dot { animation: none !important; }
+body.low-end-mode .reconnect-icon { animation: none !important; filter: none !important; }
+body.low-end-mode .verify-row { animation: none !important; opacity: 1 !important; }
+body.low-end-mode .verify-badge.exact { text-shadow: none !important; }
+
+/* Compatibilité Mode Fluide + Mode Clair */
+html.light-mode body.low-end-mode {
+  background: #f2f0f8 !important;
+}
+html.light-mode body.low-end-mode::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%) !important;
+}
+html.light-mode body.low-end-mode .glass,
+html.light-mode body.low-end-mode .glass2,
+html.light-mode body.low-end-mode .game-hdr,
+html.light-mode body.low-end-mode .answer-card,
+html.light-mode body.low-end-mode .timeline-wrap,
+html.light-mode body.low-end-mode .sniper-answer,
+html.light-mode body.low-end-mode .lb-row,
+html.light-mode body.low-end-mode #settings-notch {
+  background: rgba(255,255,255,.95) !important;
+  border: 1px solid rgba(0,0,0,.07) !important;
+  border-top: 1px solid #fff !important;
+  box-shadow: 0 8px 22px rgba(100,100,140,.13) !important;
+}
+html.light-mode body.low-end-mode .input,
+html.light-mode body.low-end-mode textarea.input,
+html.light-mode body.low-end-mode select.input {
+  background: rgba(255,255,255,.85) !important;
 }
 </style>
 </head>
@@ -1705,11 +2401,13 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
     </div>
 
     <div class="rule-block">
-      <div class="rule-block-title">🏹 4 modes de jeu</div>
+      <div class="rule-block-title">🏹 6 modes de jeu</div>
       <div class="rule-line"><span>🎯</span><span><strong>Classique</strong> · Coop · Range 1→10</span></div>
-      <div class="rule-line"><span>🏹</span><span><strong>Sniper</strong> · Compétitif · Précision</span></div>
-      <div class="rule-line"><span>⚡</span><span><strong>Éclair</strong> · Coop · Sous chrono</span></div>
-      <div class="rule-line"><span>🎭</span><span><strong>Extrême</strong> · Compétitif · Trouve 1 &amp; 10</span></div>
+      <div class="rule-line"><span>💀</span><span><strong>Survie</strong> · Coop · Tiens le plus longtemps</span></div>
+      <div class="rule-line"><span>🏹</span><span><strong>Sniper</strong> · PvP · Précision</span></div>
+      <div class="rule-line"><span>🎭</span><span><strong>Extrême</strong> · Coop · Trouve 1 &amp; 10</span></div>
+      <div class="rule-line"><span>🙈</span><span><strong>Aveugle</strong> · Coop · 1 carte à la fois</span></div>
+      <div class="rule-line"><span>⚔️</span><span><strong>Duel</strong> · PvP · 2 Cap'tens s'affrontent</span></div>
     </div>
 
     <button class="btn btn-primary btn-full" onclick="closeWelcome()" style="margin-top:.5rem;">J'ai compris ✦</button>
@@ -1955,7 +2653,8 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
       </div>
 
       <div class="glass2" style="padding:1.3rem;margin-bottom:1rem;">
-        <textarea id="tc-custom" class="input" rows="4" placeholder="Écris ton propre sujet..." style="margin-bottom:.85rem; font-size:1rem; line-height:1.4; resize:none;"></textarea>
+        <textarea id="tc-custom" class="input" rows="4" maxlength="240" placeholder="Écris ton propre sujet... (240 car. max)" style="margin-bottom:.4rem; font-size:1rem; line-height:1.4; resize:none;"></textarea>
+        <div id="tc-custom-count" style="text-align:right;font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:.7rem;">0 / 240</div>
         <button id="btn-draw-theme" class="btn btn-secondary btn-full" onclick="drawThemeAndFill()" style="border-radius:12px; font-size:.82rem;">
           🎲 Piocher un sujet
         </button>
@@ -1965,19 +2664,6 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
       <button id="btn-tc-edit" class="btn btn-secondary btn-full" onclick="unsubmitCapTheme()" style="display:none; margin-top:0.5rem;">✏️ Modifier mon thème</button>
       
       <div id="tc-other-cap-status" style="display:none;"></div>
-    </div>
-
-    <div id="tc-wait" style="display:none;">
-      <div class="wait-center">
-        <div class="wait-icon">👑</div>
-        <h2 style="color:#fff;">Le Cap'ten réfléchit…</h2>
-        <p id="tc-wait-name">Il choisit le thème de la manche.</p>
-        <div class="dots" id="tc-wait-dots"><span></span><span></span><span></span></div>
-      </div>
-    </div>
-
-    <div id="tc-countdown" style="display:none; text-align:center; padding:1.2rem 0; font-weight:700; color:rgb(var(--success-rgb)); font-family:'Space Grotesk',sans-serif; text-transform:uppercase; font-size:0.9rem;">
-        Vote des thèmes dans <span id="tc-cd-val">3</span>s...
     </div>
 
     <div id="tc-wait" style="display:none;">
@@ -2031,18 +2717,6 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
         <h2 style="color:#fff; margin-top:1rem; font-size:2.2rem; text-transform:uppercase; letter-spacing:0.1em; animation: floatIn 0.8s ease forwards;">Thème Gagnant !</h2>
         
         <div class="theme-card" style="margin-top:2rem; width:100%; max-width:400px; transform:scale(1.1); animation: popInWinner 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;">
-            <div class="theme-label" style="color:rgb(var(--gold-rgb)); text-shadow:0 0 10px rgba(var(--gold-rgb),0.5);">Le peuple a parlé</div>
-            <div class="theme-text" id="tvr-winner-text" style="font-size:1.3rem;">...</div>
-        </div>
-    </div>
-</div>
-
-<div id="screen-theme-vote-result" class="screen">
-    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-        <div style="font-size:5rem; animation: floatIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; filter:drop-shadow(0 0 30px rgba(var(--gold-rgb), 0.5));">🏆</div>
-        <h2 style="color:#fff; margin-top:1rem; font-size:2.2rem; text-transform:uppercase; letter-spacing:0.1em; animation: floatIn 0.8s ease forwards;">Thème Gagnant !</h2>
-        
-        <div class="theme-card" style="margin-top:2rem; width:100%; transform:scale(1.1); animation: popInWinner 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;">
             <div class="theme-label" style="color:rgb(var(--gold-rgb)); text-shadow:0 0 10px rgba(var(--gold-rgb),0.5);">Le peuple a parlé</div>
             <div class="theme-text" id="tvr-winner-text" style="font-size:1.3rem;">...</div>
         </div>
@@ -2113,7 +2787,8 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
           <div id="typing-counter" style="font-size:0.65rem; color:rgba(255,255,255,0.4); font-family: 'Space Grotesk', sans-serif; font-weight: 700;"></div>
       </div>
       
-      <textarea id="ans-text" class="input mb-2" rows="3" placeholder="Écris ta réponse ici..."></textarea>
+      <textarea id="ans-text" class="input mb-2" rows="3" maxlength="200" placeholder="Écris ta réponse ici... (200 car. max)"></textarea>
+      <div id="ans-text-count" style="text-align:right;font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.05em;margin:-.5rem 0 .6rem;">0 / 200</div>
       
       <button id="btn-submit-ans" class="btn btn-primary btn-full" onclick="submitAnswer()">Valider ✓</button>
       <button id="btn-edit-ans" class="btn btn-secondary btn-full" onclick="unsubmitAnswer()" style="display:none;">✏️ Modifier ma réponse</button>
@@ -2218,6 +2893,25 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
 
     <div id="cap-duel" style="display:none;">
       
+      <!-- VS arena : visible pour tous (cap + spec) -->
+      <div class="duel-arena" id="duel-arena-hdr" style="display:none;">
+        <div class="duel-fighter f1">
+          <div class="duel-fighter-avatar" id="duel-arena-av1">
+            ?<span class="crown-pin">👑</span>
+          </div>
+          <div class="duel-fighter-name" id="duel-arena-name1">Cap'ten 1</div>
+          <div class="duel-fighter-status thinking" id="duel-arena-status1">⏳ Réfléchit</div>
+        </div>
+        <div class="duel-vs">VS</div>
+        <div class="duel-fighter f2">
+          <div class="duel-fighter-avatar" id="duel-arena-av2">
+            ?<span class="crown-pin">👑</span>
+          </div>
+          <div class="duel-fighter-name" id="duel-arena-name2">Cap'ten 2</div>
+          <div class="duel-fighter-status thinking" id="duel-arena-status2">⏳ Réfléchit</div>
+        </div>
+      </div>
+      
       <div id="duel-cap-view" style="display:none;">
         <p style="font-size:.84rem;margin-bottom:.8rem;text-align:center;">
           Classe ces réponses sur ta timeline. <strong style="color:rgb(var(--primary-rgb));">Ne te concerte pas avec l'autre !</strong>
@@ -2240,23 +2934,35 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
       </div>
 
       <div id="duel-spec-view" style="display:none;">
-        <p style="font-size:.84rem;margin-bottom:1rem;text-align:center;color:rgb(var(--success-rgb));font-weight:bold;">
-          Les 2 Cap'tens classent en direct...
-        </p>
+        <div class="duel-spec-pool">
+          <div class="pool-title">📋 Réponses à classer</div>
+          <div id="duel-spec-answers"></div>
+        </div>
 
-        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:15px; margin-bottom:1.5rem;">
-            <h3 style="margin-bottom:.8rem; color:var(--muted); text-align:center;">Réponses à classer</h3>
-            <div id="duel-spec-answers" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
-        </div>
-        
-        <h3 id="duel-spec-name1" style="margin-bottom:.55rem; color:rgb(var(--primary-rgb));">Timeline 1</h3>
-        <div class="timeline-wrap" style="margin-bottom:1.5rem; border:1px solid rgba(var(--primary-rgb),0.3); border-radius:12px; background:rgba(var(--primary-rgb),0.05); padding:10px;">
+        <div class="duel-tl-card cap1">
+          <div class="duel-tl-header">
+            <div class="name">
+              <span style="font-size:1.1rem;">👑</span>
+              <span id="duel-spec-name1">Cap'ten 1</span>
+            </div>
+            <div class="status-pill thinking" id="duel-spec-status1">⏳ Classe…</div>
+          </div>
+          <div class="timeline-wrap" style="padding:6px;background:transparent;border:none;">
             <div class="timeline" id="duel-timeline-spec1"></div>
+          </div>
         </div>
-        
-        <h3 id="duel-spec-name2" style="margin-bottom:.55rem; color:rgb(var(--accent-rgb));">Timeline 2</h3>
-        <div class="timeline-wrap" style="border:1px solid rgba(var(--accent-rgb),0.3); border-radius:12px; background:rgba(var(--accent-rgb),0.05); padding:10px;">
+
+        <div class="duel-tl-card cap2">
+          <div class="duel-tl-header">
+            <div class="name">
+              <span style="font-size:1.1rem;">👑</span>
+              <span id="duel-spec-name2">Cap'ten 2</span>
+            </div>
+            <div class="status-pill thinking" id="duel-spec-status2">⏳ Classe…</div>
+          </div>
+          <div class="timeline-wrap" style="padding:6px;background:transparent;border:none;">
             <div class="timeline" id="duel-timeline-spec2"></div>
+          </div>
         </div>
       </div>
 
@@ -2351,6 +3057,55 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
 <div id="toasts"></div>
 
 <!-- ══════════════════════════════════════════════════════════
+     CONNECTION STATUS INDICATOR
+══════════════════════════════════════════════════════════ -->
+<div id="connection-indicator" class="connection-indicator">
+  <div class="dot"></div>
+  <span id="connection-label">En ligne</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     RECONNECT PROMPT MODAL
+══════════════════════════════════════════════════════════ -->
+<div id="reconnect-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.78); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); z-index:1100; align-items:center; justify-content:center; padding:1.5rem;">
+  <div id="reconnect-panel" style="position:relative; overflow:hidden; width:100%; max-width:380px; padding:2rem; background:linear-gradient(145deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.02) 100%),rgba(8,8,22,.96); backdrop-filter:blur(55px) saturate(200%); -webkit-backdrop-filter:blur(55px) saturate(200%); border:1px solid rgba(255,255,255,.09); border-top:1px solid rgba(255,255,255,.28); border-radius:var(--radius-xl); box-shadow:0 32px 80px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.14);">
+    <div class="reconnect-card">
+      <div class="reconnect-icon">🔄</div>
+      <h2 style="color:#fff;">Reconnexion à la partie ?</h2>
+      <p style="margin-top:0;font-size:.88rem;color:var(--muted);line-height:1.45;">
+        Une partie est en cours dans le salon <strong id="reconnect-room" style="color:rgb(var(--gold-rgb));">XXXX</strong>.<br>
+        Veux-tu y revenir ?
+      </p>
+      <p id="reconnect-elapsed" style="font-size:.7rem;color:var(--dim);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.1em;"></p>
+      <div style="display:flex;gap:.7rem;width:100%;margin-top:.5rem;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="declineReconnect()">Non, abandonner</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="acceptReconnect()">Reprendre ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     HOST TRANSFER MODAL
+══════════════════════════════════════════════════════════ -->
+<div id="host-transfer-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.78); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); z-index:1100; align-items:center; justify-content:center; padding:1.5rem;">
+  <div id="host-transfer-panel" style="position:relative; overflow:hidden; width:100%; max-width:420px; max-height:88dvh; overflow-y:auto; padding:2rem; background:linear-gradient(145deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.02) 100%),rgba(8,8,22,.96); backdrop-filter:blur(55px) saturate(200%); -webkit-backdrop-filter:blur(55px) saturate(200%); border:1px solid rgba(255,255,255,.09); border-top:1px solid rgba(255,255,255,.28); border-radius:var(--radius-xl); box-shadow:0 32px 80px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.14);">
+    <button class="close-panel-btn" onclick="closeHostTransfer()" aria-label="Fermer">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <div style="font-size:3rem;margin-bottom:.4rem;">👑</div>
+      <h2 style="color:#fff;">Quitter la partie</h2>
+      <p style="margin-top:.35rem;font-size:.85rem;color:var(--muted);">À qui transmettre le rôle d'hôte ?</p>
+    </div>
+    <div id="host-transfer-list" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem;"></div>
+    <button class="btn btn-secondary btn-full" onclick="closeHostTransfer()">Annuler</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
      SETTINGS NOTCH
 ══════════════════════════════════════════════════════════ -->
 <div id="settings-notch" onclick="openSettings()">
@@ -2406,10 +3161,22 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
       </label>
     </div>
 
+    <div class="settings-section" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+        <span style="font-family:'Space Grotesk',sans-serif;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:#fff;">🚀 Mode Fluide</span>
+        <span style="font-size:.72rem;color:var(--muted);line-height:1.3;">Désactive les effets lourds (anti-lag)</span>
+      </div>
+      <label class="premium-switch">
+        <input type="checkbox" id="perf-mode-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
     <button class="btn btn-secondary btn-full" onclick="openRules()" style="margin-bottom:.5rem;">Comment jouer ? 📖</button>
 
     <div id="settings-session-btns" style="display:none; border-top:1px solid rgba(255,255,255,.07); padding-top:.85rem; margin-top:.35rem;">
       <button class="btn btn-secondary btn-full" id="btn-return-lobby" style="color:rgba(255,170,30,.8); margin-bottom:.5rem;" onclick="settingsReturnLobby()">↩ Retourner au salon</button>
+      <button class="btn btn-secondary btn-full" id="btn-host-leave" style="color:rgb(var(--gold-rgb)); margin-bottom:.5rem; display:none;" onclick="hostLeaveWithTransfer()">👑 Quitter et transférer l'hôte</button>
       <button class="btn btn-secondary btn-full" style="color:rgb(var(--accent-rgb));" onclick="settingsLeaveGame()">✕ Quitter la partie</button>
     </div>
 
@@ -2435,20 +3202,31 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
       <div class="rule-line"><span>🔢</span><span>Chaque répondant reçoit <strong>secrètement</strong> un numéro entre 1 (pire) et 10 (meilleur).</span></div>
       <div class="rule-line"><span>📋</span><span>Le Cap'ten donne un <strong>thème</strong> (qu'il invente ou qu'il pioche).</span></div>
       <div class="rule-line"><span>✍️</span><span>Chacun écrit une réponse d'intensité cohérente avec son numéro.</span></div>
+      <div class="rule-line"><span>🔍</span><span>Le Cap'ten doit alors retrouver l'ordre des réponses.</span></div>
     </div>
 
     <div class="rule-block">
-      <div class="rule-block-title">🎮 Les 4 modes</div>
-      <div class="rule-line"><span>🎯</span><span><strong>Classique</strong> · Range toutes les réponses 1→10. 3 vies en équipe.</span></div>
-      <div class="rule-line"><span>🏹</span><span><strong>Sniper</strong> · Devine le numéro exact de chaque réponse. Points de précision, classement final.</span></div>
-      <div class="rule-line"><span>⚡</span><span><strong>Éclair</strong> · Classique mais avec un <strong>chrono</strong>. Si le temps passe → vie perdue.</span></div>
-      <div class="rule-line"><span>🎭</span><span><strong>Extrême</strong> · Identifie juste le "1" et le "10". Rapide, compétitif, classement.</span></div>
+      <div class="rule-block-title">🎮 Les 6 modes</div>
+      <div class="rule-line"><span>🎯</span><span><strong>Classique</strong> · Range les réponses dans le bon ordre 1→10. Vies en équipe.</span></div>
+      <div class="rule-line"><span>💀</span><span><strong>Survie</strong> · Comme le Classique mais sans limite de manches : tenez le plus longtemps !</span></div>
+      <div class="rule-line"><span>🏹</span><span><strong>Sniper</strong> · Devine le numéro exact de chaque réponse. <strong>+2 pts</strong> au Cap'ten et <strong>+1 pt</strong> au joueur trouvé.</span></div>
+      <div class="rule-line"><span>🎭</span><span><strong>Extrême</strong> · Identifie juste le « 1 » (la pire) et le « 10 » (la meilleure). 2 chances de trouver !</span></div>
+      <div class="rule-line"><span>🙈</span><span><strong>Aveugle</strong> · Place les cartes <strong>une par une</strong> sans pouvoir revenir en arrière.</span></div>
+      <div class="rule-line"><span>⚔️</span><span><strong>Duel</strong> · 2 Cap'tens classent en parallèle. Le plus précis gagne <strong>+3 pts</strong>. Joueurs : <strong>+2</strong> si exact, <strong>+1</strong> si à ±1.</span></div>
+    </div>
+
+    <div class="rule-block">
+      <div class="rule-block-title">⚙️ Paramètres ajustables</div>
+      <div class="rule-line"><span>🔄</span><span><strong>Manches</strong> · 1 à 10 (sauf Survie : illimité).</span></div>
+      <div class="rule-line"><span>❤️</span><span><strong>Vies</strong> · 1 (Hard), 3 (Normal), 5 (Easy) en mode coop.</span></div>
+      <div class="rule-line"><span>⏱️</span><span><strong>Chrono Réponse</strong> · Délai pour écrire sa réponse (45s, 60s, 2min ou sans).</span></div>
     </div>
 
     <div class="rule-block">
       <div class="rule-block-title">👑 Le Cap'ten tourne</div>
       <div class="rule-line"><span>🎲</span><span>À chaque manche, un nouveau Cap'ten est désigné.</span></div>
       <div class="rule-line"><span>💬</span><span>Pendant qu'il réfléchit, les autres <strong>discutent à voix haute</strong> pour l'aider.</span></div>
+      <div class="rule-line"><span>♻️</span><span>Si tu te déconnectes, tu peux reprendre la partie <strong>jusqu'à 60s</strong> après.</span></div>
     </div>
 
     <p style="text-align:center;font-size:.65rem;font-family:'Space Grotesk',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.25);margin-top:.5rem;">Top Ten · Liquid Glass ✦</p>
@@ -2484,7 +3262,7 @@ html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getDatabase, ref, set, get, update, onValue, off, remove,
-  onDisconnect, serverTimestamp
+  onDisconnect, serverTimestamp, runTransaction
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 const firebaseConfig = {
@@ -2506,53 +3284,60 @@ const QUESTIONS = {
     "Ton ami te présente son nouveau bébé, mais il est vraiment très laid. Du compliment le plus hypocrite au compliment le plus sincère.",
     "Tu es aux toilettes chez tes beaux-parents et tu as bouché les WC. De la pire à la meilleure phrase pour annoncer la nouvelle.",
     "Le Père Noël te demande ce que tu veux cette année. De la demande la plus modeste à la plus irréalisable.",
-    "Tu te fais arrêter pour excès de vitesse. De la pire à la meilleure excuse à donner au policier.",
-    "Tu dois convaincre tes amis d'aller voir un film au cinéma. Du pire argument au meilleur argument.",
-    "Un voyant lit ton avenir dans une boule de cristal. De la prédiction la plus banale à la plus terrifiante.",
-    "Le médecin t'annonce les résultats de tes analyses. De la maladie la moins grave (et inventée) à la maladie la plus foudroyante.",
-    "Tu dois vendre un objet cassé sur Le Bon Coin. Du pire argument de vente au meilleur mensonge pour conclure l'affaire.",
-    "Tu essaies de t'incruster dans une soirée privée. De l'excuse la plus pathétique à la couverture la plus solide face au videur.",
-    "Tu viens d'envoyer un message très insultant à ton patron au lieu de l'envoyer à ton collègue. De la pire à la meilleure phrase à lui envoyer dans la seconde pour rattraper le coup.",
-    "Choisissez un objet pour remplacer le papier toilette manquant. Du pire au meilleur objet à portée de main.",
-    "Ton patron te réveille alors que tu dormais profondément. De la pire à la meilleure phrase à dire en ouvrant les yeux.",
-    "Tu es à un date et la personne en face de toi est absolument insupportable. De la pire à la meilleure excuse à inventer pour fuir immédiatement.",
-    "On t'offre un cadeau d'anniversaire absolument hideux devant tous tes amis. Du compliment le moins crédible au mensonge le plus parfait pour faire croire que tu l'adores.",
-    "Tu discutes depuis 10 minutes avec quelqu'un dont tu as totalement oublié le prénom. Du pire au meilleur stratagème pour découvrir son prénom sans qu'il s'en rende compte.",
-    "Le chien de ton ami vient de vomir sur tes chaussures neuves. De la pire à la meilleure remarque à faire à ton ami.",
-    "Le recruteur lors d'un entretien d'embauche te demande : \"Quel est votre plus grand défaut ?\" Du pire défaut (qui te fait recaler direct) au meilleur défaut (qui te donne le job).",
-    "Tu te fais choper par la sécurité du supermarché avec un article non payé dans ta poche. De la pire à la meilleure justification à donner au vigile.",
-    "Tu veux absolument passer devant tout le monde dans une file d'attente. Du pire prétexte à la meilleure excuse pour que les gens te laissent passer.",
-    "Tu trouves un portefeuille avec 500 euros par terre, juste devant son propriétaire qui le cherche. De la pire à la meilleure phrase pour essayer de garder l'argent pour toi en toute impunité.",
-    "Un braqueur de banque te prend en otage pendant un braquage. De la pire à la meilleure phrase pour essayer de sympathiser avec lui et devenir son complice.",
-    "Tu te réveilles après une soirée beaucoup trop arrosée, sans aucun souvenir. Du pire au meilleur endroit où te retrouver en ouvrant les yeux.",
-    "Tu es coincé(e) dans un ascenseur en panne avec un inconnu et tu as une terrible envie de lâcher un pet. De la pire à la meilleure stratégie pour gérer la situation (ou la détourner).",
-    "Tu dois absolument te défendre contre un zombie, mais tu es dans une cuisine. Du pire au meilleur ustensile de cuisine à utiliser comme arme mortelle.",
-    "Tu félicites une femme pour sa grossesse, mais elle te répond sèchement qu'elle n'est pas du tout enceinte. De la pire à la meilleure phrase pour essayer de rattraper ton énorme gaffe.",
-    "Tu découvres que tu as un super-pouvoir. Du pouvoir le plus inutile au pouvoir le plus révolutionnaire.",
-    "La science te permet de fusionner deux animaux pour en créer un nouveau. Du croisement le plus raté et inoffensif au prédateur ultime.",
-    "Tu peux désormais contrôler un élément du quotidien par la pensée (comme Magnéto avec le métal). Du contrôle le plus ridicule au pouvoir le plus impressionnant.",
-    "Tu te réincarnes en objet inanimé après ta mort. De l'objet qui va te faire vivre un enfer à celui qui te garantit la meilleure vie possible.",
-    "Une start-up invente une pilule qui remplace le sommeil, mais elle a un effet secondaire. De l'effet secondaire le plus handicapant à celui qui est presque un avantage.",
-    "Les extraterrestres t'enlèvent et te demandent une bonne raison de ne pas détruire la Terre. Du pire argument au meilleur discours pour sauver l'humanité.",
-    "Au moment de payer l'addition au restaurant, tu te rends compte que tu as oublié ton portefeuille. De la pire à la meilleure proposition à faire au serveur en échange du repas.",
-    "Ton médecin t'annonce qu'il te reste 24 heures à vivre. De la pire à la meilleure façon de dépenser toutes tes économies en une journée.",
-    "Tu dois organiser l'enterrement de vie de célibataire de ton/ta meilleur(e) ami(e) avec un budget de 10 euros. De la pire à la meilleure activité proposée.",
-    "Tu adoptes un perroquet, mais il ne répète qu'une seule phrase très gênante. De la pire à la meilleure phrase qu'il pourrait hurler.",
-    "Tu te réveilles avec un tatouage géant sur le torse dont tu n'as aucun souvenir. Du motif le plus honteux (et difficile à assumer) au tatouage le plus incroyable.",
-    "Tu cherches un cadeau pour l'enfant de 5 ans de quelqu'un que tu détestes. Du cadeau le moins dérangeant au cadeau le plus insupportable pour les parents."
+    "Tu rentres chez toi et tu vois que ton chien a tout détruit. Du calme zen jusqu'à la panique totale.",
+    "Tu es le maire de ta ville. De la pire à la meilleure idée pour rendre la ville plus attractive.",
+    "Tu te retrouves bloqué dans un ascenseur avec une célébrité. De l'idée la plus banale à la plus mémorable pour engager la conversation.",
+    "Tu dois inventer une excuse pour ne pas aller à un mariage. De la plus crédible à la plus ridicule.",
+    "Tu ouvres ta lunch box au bureau. Du repas le plus triste au plus appétissant.",
+    "Tu es coincé sur une île déserte. De l'objet le plus inutile au plus indispensable à avoir avec toi.",
+    "Tu reçois un cadeau d'anniversaire. Du moins enthousiasmant au cadeau de tes rêves.",
+    "Le prof t'interroge à l'oral. De la pire à la meilleure réaction quand tu n'as pas révisé.",
+    "Tu testes une nouvelle recette pour la première fois. Du désastre culinaire au chef-d'œuvre Michelin.",
+    "Tu pars en road trip avec tes potes. De l'imprévu le plus minable au plus mémorable.",
+    "Ton voisin met de la musique très fort à 3h du matin. De la réaction la plus passive à la plus explosive.",
+    "Tu fais un selfie pour un dating profile. De la photo la plus honteuse à celle qui fait fondre les coeurs.",
+    "Tu trouves un billet de 50€ dans la rue. De ce que tu en ferais le moins fun au plus fou.",
+    "Tu rencontres tes beaux-parents pour la première fois. Du plus gros faux-pas à l'attitude irréprochable.",
+    "Tu dois choisir un super-pouvoir. Du plus inutile au plus surpuissant.",
+    "Tu prépares une fête surprise pour ton meilleur ami. Du fail le plus cringe à la fête la plus réussie.",
+    "Tu es un chef étoilé qui doit nommer un nouveau plat. Du nom le plus banal au plus prétentieux.",
+    "Tu écris ta lettre de motivation. De la phrase la plus banale à celle qui te fait recruter direct.",
+    "Tu rentres ivre chez tes parents. De l'excuse la plus crédible à celle qui te grille direct.",
+    "Tu réponds à un message ambigu de ton crush. De la réponse la plus à côté de la plaque à celle qui scelle un rendez-vous.",
+    "Tu présentes ta passion bizarre à de nouveaux amis. Du hobby le moins étrange au plus dérangeant.",
+    "Tu animes un jeu télé. De la question la plus basique au piège diabolique.",
+    "Tu écris ton autobiographie. Du titre le plus ennuyeux au plus accrocheur.",
+    "Tu es prof remplaçant pour un jour. De la matière la plus calme à enseigner à celle qui finit en émeute.",
+    "Tu pars vivre dans un pays étranger. De la destination la plus safe à la plus aventureuse.",
+    "Tu dois choisir un déguisement pour Halloween. Du costume le plus banal au plus terrifiant.",
+    "Tu te lances dans le sport. De l'activité la plus tranquille à la plus extrême."
   ],
   adult: [
     "Tu envoies par erreur une photo très \"personnelle\" à ton groupe familial sur WhatsApp. De la pire à la meilleure phrase pour tenter de justifier cet envoi.",
     "Ton partenaire te regarde droit dans les yeux et demande : \"Avec combien de personnes as-tu couché avant moi ?\". De la pire à la meilleure réponse.",
     "Tu es en plein moment intime avec ton date et ton chat s'assoit sur le lit pour vous fixer intensément. De la pire à la meilleure réaction à avoir.",
-    "Tu arrives aux urgences avec un objet coincé dans un endroit... très gênant. De l'excuse la plus pathétique à la meilleure histoire inventée pour le médecin.",
-    "Ton ex t'envoie un message à 3h du matin qui dit juste : \"Tu dors ?\". De la réponse la plus pitoyable à la meilleure punchline pour le recadrer.",
-    "Tu essaies de draguer quelqu'un de très séduisant lors d'un enterrement. De l'approche la plus glauque à la meilleure technique de séduction.",
-    "Tu te réveilles après une soirée beaucoup trop arrosée et tu découvres un objet insolite dans ton lit. De l'objet le plus drôle à l'objet le plus terrifiant.",
-    "Lors d'un jeu d'Action ou Vérité sans aucune limite, on te donne un défi. Du défi le plus sage au défi le plus illégal/honteux.",
-    "Tu te rends compte au milieu de l'action que tu as oublié de fermer les rideaux et que les voisins d'en face regardent. De la pire à la meilleure façon de réagir.",
-    "La douane fouille ta valise à l'aéroport et sort devant tout le monde ton jouet intime le plus extravagant. De l'excuse la plus pathétique à la meilleure justification assumée.",
-    "Tes parents (ou tes beaux-parents) rentrent sans prévenir alors que tu es en pleine action dans le salon. De la pire à la meilleure phrase à lâcher pour tenter de sauver la situation."
+    "Tu te fais larguer par message. De la réponse la plus pathétique à la plus classe.",
+    "Ton ex t'appelle à 2h du matin bourré(e). De la réaction la plus chill à la pire idée.",
+    "Tu rates ta première nuit avec un nouveau date. De l'excuse la plus pitoyable à la phrase qui sauve la situation.",
+    "Tu te fais griller en train de regarder le téléphone de ton/ta partenaire. De la justification la plus minable à la plus convaincante.",
+    "Tu es à un enterrement de vie de garçon/fille qui dérape. De la décision la plus raisonnable à la plus regrettable.",
+    "Tu reçois une demande inattendue d'un de tes anciens crushs. De la réponse la plus gênée à la plus audacieuse.",
+    "Ton patron te surprend en train de glandouiller au boulot. De l'excuse la plus bidon à la pirouette de génie.",
+    "Tu participes à une soirée jeux entre couples. Du gage le plus innocent au plus chaud.",
+    "Tu sors d'une rupture compliquée. De la pire idée à la meilleure thérapie pour t'en remettre.",
+    "Tu balances un secret en soirée pour briser la glace. Du plus banal au plus explosif.",
+    "Tu rentres chez ton/ta crush pour la première fois. Du détail le moins gênant au red flag absolu.",
+    "Tu fais un Tinder swipe à 3h du mat. Du profil le plus chiant à celui que tu like sans réfléchir.",
+    "Tu écris ta bio Tinder. De la phrase la plus ringarde à celle qui matche à tous les coups.",
+    "Tu te réveilles dans un endroit inconnu après une grosse soirée. De la situation la plus banale à la plus problématique.",
+    "Tu te fais surprendre par tes parents pendant un moment intime. De la réaction la moins gênée à la plus catastrophique.",
+    "Tu décides de tester un site de rencontres bizarre. De la rencontre la plus chiante à la plus dingue.",
+    "Tu reçois un sext par erreur de quelqu'un que tu connais. De la réponse la plus innocente à la plus douteuse.",
+    "Ton/ta partenaire te demande un fantasme. Du plus vanille au plus dingue.",
+    "Tu te confesses à un prêtre après une grosse soirée. Du péché le moins grave au plus impardonnable.",
+    "Tu organises un coup d'un soir. De l'erreur la plus évitable à la plus humiliante.",
+    "Tu joues à action ou vérité avec ton/ta crush. De la question la plus soft à la plus engageante.",
+    "Tu es invité à une partouze entre potes (en théorie). De ta réaction la plus pudique à la plus open."
   ],
 };
 
@@ -2575,6 +3360,38 @@ let revealAnimDone = false;
 let blitzTimerId = null;
 let lastStatus   = null;
 
+// ─── Reconnection / Heartbeat / Watchdog ─────────────────────
+const RECONNECT_GRACE_MS = 5000;     // <5s : reconnexion silencieuse
+const RECONNECT_PROMPT_MS = 60000;   // 5–60s : popup
+const HEARTBEAT_INTERVAL_MS = 8000;  // 8s entre les heartbeats (limite la charge DB)
+const WATCHDOG_INTERVAL_MS = 7000;   // 7s entre vérifs des joueurs absents
+const STALE_AFTER_MS = 30000;        // 30s sans heartbeat → considéré comme déconnecté
+const REMOVE_AFTER_MS = 60000;       // 60s déconnecté → suppression
+
+let heartbeatId = null;
+let watchdogId = null;
+let pendingReconnect = null;         // { roomId, pid, name, joinedAt }
+let draftSaveTimer = null;            // debounce pour sauvegarde brouillon
+
+// ─── Save / clear local session ──────────────────────────────
+function saveSession() {
+  if (!room.id) return;
+  try {
+    sessionStorage.setItem('tt-session', JSON.stringify({
+      pid, name: pname, roomId: room.id, leftAt: Date.now()
+    }));
+  } catch(e){}
+}
+function clearSession() {
+  try { sessionStorage.removeItem('tt-session'); } catch(e){}
+}
+function readSession() {
+  try {
+    const raw = sessionStorage.getItem('tt-session');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
 // ═══════════════════════════════════════════════════════════
 //  4. INIT FIREBASE
 // ═══════════════════════════════════════════════════════════
@@ -2590,7 +3407,7 @@ try {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  5. SPLASH CONTROL (Réparé)
+//  5. SPLASH CONTROL + RECONNECTION CHECK
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   // Pré-remplit le pseudo
@@ -2601,16 +3418,95 @@ window.addEventListener('DOMContentLoaded', () => {
   if (sp) {
     setTimeout(() => {
       sp.classList.add('hide');
-      setTimeout(() => {
+      setTimeout(async () => {
         sp.remove();
-        // Affiche les règles si c'est la première fois
-        if (!localStorage.getItem('tt-welcomed') && document.getElementById('welcome-rules')) {
+        // 1) Tente la reconnexion AVANT d'afficher les règles ou l'écran d'accueil
+        const reconnected = await tryReconnect();
+
+        // 2) Si pas de reconnexion en cours et 1ère visite, montre les règles
+        if (!reconnected && !localStorage.getItem('tt-welcomed') && document.getElementById('welcome-rules')) {
           document.getElementById('welcome-rules').classList.add('open');
         }
       }, 1000);
-    }, 2500); // Temps d'affichage du logo
+    }, 2500);
   }
 });
+
+// ═══════════════════════════════════════════════════════════
+//  RECONNECTION LOGIC
+// ═══════════════════════════════════════════════════════════
+async function tryReconnect() {
+  if (!fbReady) return false;
+  const sess = readSession();
+  if (!sess || !sess.roomId || !sess.pid) return false;
+  if (sess.pid !== pid) {
+    // Ancien pid → on garde celui en mémoire
+    pid = sess.pid;
+    sessionStorage.setItem('pid', pid);
+  }
+  if (sess.name) {
+    pname = sess.name;
+    sessionStorage.setItem('pname', pname);
+  }
+
+  let snap;
+  try { snap = await get(ref(db, `rooms/${sess.roomId}`)); }
+  catch(e) { clearSession(); return false; }
+
+  if (!snap.exists()) { clearSession(); return false; }
+  const data = snap.val();
+  const player = data.players?.[sess.pid];
+
+  if (!player) { clearSession(); return false; }
+
+  // Calcule depuis combien de temps le joueur est déconnecté
+  const now = Date.now();
+  const disc = player.disconnectedAt || 0;
+  const elapsedSinceDisconnect = disc > 0 ? (now - disc) : 0;
+
+  if (disc === 0 || elapsedSinceDisconnect < RECONNECT_GRACE_MS) {
+    // Reconnexion silencieuse (<5s ou jamais marqué déconnecté)
+    showConnectionStatus('reconnecting', 'Reconnexion…');
+    enterRoom(sess.roomId);
+    return true;
+  } else if (elapsedSinceDisconnect < RECONNECT_PROMPT_MS) {
+    // Entre 5 et 60s : on demande au joueur s'il veut revenir
+    pendingReconnect = { roomId: sess.roomId, name: pname, elapsed: elapsedSinceDisconnect };
+    const overlay = document.getElementById('reconnect-overlay');
+    const codeEl = document.getElementById('reconnect-room');
+    const elapsedEl = document.getElementById('reconnect-elapsed');
+    if (codeEl) codeEl.textContent = sess.roomId;
+    if (elapsedEl) elapsedEl.textContent = `Déconnecté il y a ~${Math.round(elapsedSinceDisconnect/1000)}s`;
+    if (overlay) overlay.style.display = 'flex';
+    return true;
+  } else {
+    // >60s : on retire et on retourne à l'accueil
+    try { await remove(ref(db, `rooms/${sess.roomId}/players/${sess.pid}`)); } catch(e){}
+    clearSession();
+    return false;
+  }
+}
+
+window.acceptReconnect = () => {
+  const overlay = document.getElementById('reconnect-overlay');
+  if (overlay) overlay.style.display = 'none';
+  if (pendingReconnect && pendingReconnect.roomId) {
+    showConnectionStatus('reconnecting', 'Reconnexion…');
+    enterRoom(pendingReconnect.roomId);
+  }
+  pendingReconnect = null;
+};
+
+window.declineReconnect = async () => {
+  const overlay = document.getElementById('reconnect-overlay');
+  if (overlay) overlay.style.display = 'none';
+  if (pendingReconnect && pendingReconnect.roomId) {
+    try { await remove(ref(db, `rooms/${pendingReconnect.roomId}/players/${pid}`)); } catch(e){}
+  }
+  clearSession();
+  pendingReconnect = null;
+  showScreen('home');
+};
 
 // ═══════════════════════════════════════════════════════════
 //  6. UTILITIES
@@ -2741,6 +3637,28 @@ window.showConfirm = (text, onConfirm) => {
 };
 
 // ═══════════════════════════════════════════════════════════
+//  CONNECTION STATUS INDICATOR
+// ═══════════════════════════════════════════════════════════
+function showConnectionStatus(state, label) {
+  const ind = document.getElementById('connection-indicator');
+  const lbl = document.getElementById('connection-label');
+  if (!ind) return;
+  ind.classList.remove('online','offline','reconnecting');
+  if (state) ind.classList.add(state);
+  if (lbl && label) lbl.textContent = label;
+  if (state === 'online' || !state) {
+    // Cache après 2s si online
+    ind.classList.add('show');
+    setTimeout(() => ind.classList.remove('show'), 2000);
+  } else {
+    ind.classList.add('show');
+  }
+}
+
+window.addEventListener('online',  () => { if (room.id) showConnectionStatus('online', 'En ligne'); });
+window.addEventListener('offline', () => { if (room.id) showConnectionStatus('offline', 'Hors-ligne'); });
+
+// ═══════════════════════════════════════════════════════════
 //  7. CREATE / JOIN ROOM (Direct from Home)
 // ═══════════════════════════════════════════════════════════
 window.createRoom = async () => {
@@ -2756,6 +3674,7 @@ window.createRoom = async () => {
   if (btn) { btn.disabled = true; btn.innerHTML = 'Création…'; }
 
   const id = rndCode();
+  const now = Date.now();
   const data = {
     host: pid,
     status: 'lobby',
@@ -2770,8 +3689,12 @@ window.createRoom = async () => {
     theme: null,
     drawnTheme: null,
     roundResult: null,
-    createdAt: Date.now(),
-    players: { [pid]: { name, number: null, answer: null, answered: false, score: 0, ready: false } }
+    createdAt: now,
+    players: { [pid]: {
+      name, number: null, answer: null, answered: false, score: 0, ready: false,
+      joinedAt: now, lastSeen: now, disconnectedAt: null,
+      draftAnswer: null, draftTheme: null
+    } }
   };
   
   try {
@@ -2807,8 +3730,11 @@ window.joinRoom = async () => {
       toast('La partie a déjà commencé !', 'err'); return;
     }
 
+    const now = Date.now();
     await set(ref(db, `rooms/${code}/players/${pid}`), {
-      name, number: null, answer: null, answered: false, score: 0, ready: false
+      name, number: null, answer: null, answered: false, score: 0, ready: false,
+      joinedAt: now, lastSeen: now, disconnectedAt: null,
+      draftAnswer: null, draftTheme: null
     });
     
     enterRoom(code);
@@ -2826,48 +3752,329 @@ window.copyCode = () => {
 };
 
 // ═══════════════════════════════════════════════════════════
-//  8. ENTER ROOM (set listener)
+//  8. ENTER ROOM (set listener + heartbeat + watchdog)
 // ═══════════════════════════════════════════════════════════
 function enterRoom(id) {
   if (room.unsub) { try { room.unsub(); } catch(e){} }
   room.id = id;
   $s('lby-code').textContent = id;
+
+  // Au cas où le joueur revient après reconnexion : remet à jour ses timestamps
+  // et efface le marqueur disconnectedAt s'il était posé.
+  const now = Date.now();
+  update(ref(db, `rooms/${id}/players/${pid}`), {
+    name: pname || 'Joueur',
+    lastSeen: now,
+    disconnectedAt: null
+  }).catch(()=>{});
+
+  // Sauvegarde session locale
+  saveSession();
+
   showScreen('lobby');
 
   const roomRef = ref(db, `rooms/${id}`);
   room.unsub = onValue(roomRef, snap => {
     if (!snap.exists()) {
       toast('Le salon a été fermé.', 'err');
-      if (room.unsub) { try { room.unsub(); } catch(e){} }
-      room.id = null; room.data = null;
+      cleanRoomLocal();
       showScreen('home');
       return;
     }
     room.data = snap.val();
+
+    // Si je ne suis plus dans la liste des joueurs (kick par watchdog) → retour home
+    if (!room.data.players?.[pid]) {
+      toast('Tu as été déconnecté du salon.', 'err');
+      cleanRoomLocal();
+      showScreen('home');
+      return;
+    }
+
+    showConnectionStatus('online', 'En ligne');
     dispatch(room.data);
+  }, err => {
+    showConnectionStatus('offline', 'Hors-ligne');
   });
 
-  // Clean up on page close
-  onDisconnect(ref(db, `rooms/${id}/players/${pid}`)).remove();
-  window.addEventListener('beforeunload', () => {
-    try { remove(ref(db, `rooms/${id}/players/${pid}`)); } catch(e){}
-  });
+  // ─── onDisconnect : marque la déconnexion sans tout supprimer ───
+  // (cela permet la reconnexion ensuite)
+  try {
+    onDisconnect(ref(db, `rooms/${id}/players/${pid}/disconnectedAt`)).set(serverTimestamp());
+    onDisconnect(ref(db, `rooms/${id}/players/${pid}/lastSeen`)).set(serverTimestamp());
+  } catch(e){}
+
+  // Avant fermeture page : on met à jour la session locale avec le timestamp actuel
+  // pour gérer la reconnexion <5s.
+  window.addEventListener('beforeunload', beforeUnloadHandler);
+
+  startHeartbeat();
+  startWatchdog();
+}
+
+function beforeUnloadHandler() {
+  if (room.id) {
+    try {
+      sessionStorage.setItem('tt-session', JSON.stringify({
+        pid, name: pname, roomId: room.id, leftAt: Date.now()
+      }));
+    } catch(e){}
+  }
+}
+
+function cleanRoomLocal() {
+  if (room.unsub) { try { room.unsub(); } catch(e){} }
+  if (heartbeatId) { clearInterval(heartbeatId); heartbeatId = null; }
+  if (watchdogId)  { clearInterval(watchdogId);  watchdogId  = null; }
+  if (window._ansTimerInt) { clearInterval(window._ansTimerInt); window._ansTimerInt = null; }
+  if (window._ansInterval) { clearInterval(window._ansInterval); window._ansInterval = null; }
+  if (window._ansTimeout)  { clearTimeout(window._ansTimeout);   window._ansTimeout  = null; }
+  if (window._tcInterval)  { clearInterval(window._tcInterval);  window._tcInterval  = null; }
+  if (window._tcTimeout)   { clearTimeout(window._tcTimeout);    window._tcTimeout   = null; }
+  if (window._tvInterval)  { clearInterval(window._tvInterval);  window._tvInterval  = null; }
+  if (window._tvTimeout)   { clearTimeout(window._tvTimeout);    window._tvTimeout   = null; }
+  if (window._tvrTimeout)  { clearTimeout(window._tvrTimeout);   window._tvrTimeout  = null; }
+  if (draftSaveTimer)      { clearTimeout(draftSaveTimer);       draftSaveTimer      = null; }
+  window._tcActive = false; window._tvActive = false; window._tvrActive = false;
+  window._capBoardBuilt = false; window._specAnsBuilt = false; window._blindValidating = false;
+  if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+  
+  // Annule les onDisconnect actifs avant de partir proprement
+  if (room.id) {
+    try { onDisconnect(ref(db, `rooms/${room.id}/players/${pid}/disconnectedAt`)).cancel(); } catch(e){}
+    try { onDisconnect(ref(db, `rooms/${room.id}/players/${pid}/lastSeen`)).cancel(); } catch(e){}
+  }
+  window.removeEventListener('beforeunload', beforeUnloadHandler);
+
+  room.id = null; room.data = null; room.unsub = null;
+  revealAnimDone = false; lastStatus = null;
+  dragState = { selected: null, placed: {} };
+  sniperGuesses = {};
+  extremeGuess = { low: null, high: null };
+  clearSession();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HEARTBEAT (envoie un signe de vie régulier au DB)
+// ═══════════════════════════════════════════════════════════
+function startHeartbeat() {
+  if (heartbeatId) clearInterval(heartbeatId);
+  const send = () => {
+    if (!room.id || !pid) return;
+    update(ref(db, `rooms/${room.id}/players/${pid}`), {
+      lastSeen: Date.now(),
+      disconnectedAt: null
+    }).catch(() => {});
+    saveSession(); // met à jour leftAt
+  };
+  send();
+  heartbeatId = setInterval(send, HEARTBEAT_INTERVAL_MS);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  WATCHDOG (purge des joueurs morts, transfert de l'hôte, fermeture salons vides)
+//  → Seul le joueur "leader" (le plus ancien actif) exécute la purge.
+// ═══════════════════════════════════════════════════════════
+function startWatchdog() {
+  if (watchdogId) clearInterval(watchdogId);
+  const tick = async () => {
+    if (!room.id || !room.data) return;
+    const d = room.data;
+    const players = d.players || {};
+    const ids = Object.keys(players);
+    if (ids.length === 0) return;
+
+    const now = Date.now();
+
+    // Détermine le "leader" : joueur actif (lastSeen frais OU c'est moi-même)
+    // avec le plus petit joinedAt.
+    const activeIds = ids.filter(id => {
+      if (id === pid) return true; // moi-même : toujours considéré actif si je tourne ce code
+      const p = players[id] || {};
+      if (p.disconnectedAt) return false; // marqué déconnecté → pas leader potentiel
+      const ls = p.lastSeen || p.joinedAt || 0;
+      return (now - ls) < STALE_AFTER_MS;
+    });
+    if (activeIds.length === 0) return;
+
+    activeIds.sort((a, b) => (players[a].joinedAt || 0) - (players[b].joinedAt || 0));
+    const leaderId = activeIds[0];
+    if (leaderId !== pid) return; // Ce n'est pas à moi de purger
+
+    // Purge des joueurs déconnectés depuis trop longtemps
+    const updates = {};
+    let removedAny = false;
+
+    ids.forEach(id => {
+      const p = players[id] || {};
+      const lastSeen = p.lastSeen || p.joinedAt || 0;
+      const disc = p.disconnectedAt || 0;
+
+      // Si pas de heartbeat depuis longtemps : marquer comme déconnecté
+      const staleNow = (now - lastSeen) > STALE_AFTER_MS && !disc && id !== pid;
+      if (staleNow) {
+        updates[`rooms/${room.id}/players/${id}/disconnectedAt`] = lastSeen || now - STALE_AFTER_MS;
+      }
+
+      // Si déconnecté depuis trop longtemps : retirer
+      const finalDisc = disc || (staleNow ? lastSeen : 0);
+      if (finalDisc && (now - finalDisc) > REMOVE_AFTER_MS && id !== pid) {
+        updates[`rooms/${room.id}/players/${id}`] = null;
+        removedAny = true;
+      }
+    });
+
+    if (Object.keys(updates).length > 0) {
+      try { await update(ref(db), updates); } catch(e){}
+    }
+
+    if (!removedAny) return;
+
+    // Recharge les données après suppression
+    let snap;
+    try { snap = await get(ref(db, `rooms/${room.id}`)); } catch(e) { return; }
+    if (!snap.exists()) return;
+    const newData = snap.val();
+    const remaining = newData.players || {};
+    const remainingIds = Object.keys(remaining);
+
+    if (remainingIds.length === 0) {
+      // Salon vide → on ferme
+      try { await remove(ref(db, `rooms/${room.id}`)); } catch(e){}
+      return;
+    }
+
+    // Hôte parti ? On transfère au plus ancien
+    if (!remaining[newData.host]) {
+      const sorted = remainingIds
+        .map(id => ({ id, joinedAt: remaining[id].joinedAt || 0 }))
+        .sort((a,b) => a.joinedAt - b.joinedAt);
+      const newHost = sorted[0].id;
+      try {
+        await update(ref(db, `rooms/${room.id}`), { host: newHost });
+        if (newHost === pid) toast('👑 Tu es le nouvel hôte !', 'ok');
+      } catch(e){}
+    }
+
+    // Cap'ten parti en pleine manche ? On reset au lobby (l'hôte relance proprement)
+    const inGame = !['lobby', 'config', 'gameover'].includes(newData.status);
+    const captainGone = inGame && newData.captainId && !remaining[newData.captainId];
+    const captain2Gone = inGame && newData.captainId2 && !remaining[newData.captainId2];
+    if (captainGone || captain2Gone) {
+      try {
+        const updates = {};
+        updates[`rooms/${room.id}/status`] = 'lobby';
+        updates[`rooms/${room.id}/captainId`] = null;
+        updates[`rooms/${room.id}/captainId2`] = null;
+        updates[`rooms/${room.id}/challengerId`] = null;
+        updates[`rooms/${room.id}/theme`] = null;
+        updates[`rooms/${room.id}/round`] = 0;
+        updates[`rooms/${room.id}/timerEndsAt`] = null;
+        updates[`rooms/${room.id}/captainGuess`] = null;
+        updates[`rooms/${room.id}/roundResult`] = null;
+        updates[`rooms/${room.id}/liveSort`] = null;
+        updates[`rooms/${room.id}/liveSortDuel`] = null;
+        updates[`rooms/${room.id}/lastRoundPts`] = null;
+        remainingIds.forEach(id => {
+          updates[`rooms/${room.id}/players/${id}/answer`] = null;
+          updates[`rooms/${room.id}/players/${id}/answered`] = false;
+          updates[`rooms/${room.id}/players/${id}/number`] = null;
+          updates[`rooms/${room.id}/players/${id}/ready`] = false;
+          updates[`rooms/${room.id}/players/${id}/themeProposal`] = null;
+          updates[`rooms/${room.id}/players/${id}/vote`] = null;
+          updates[`rooms/${room.id}/players/${id}/duelReady`] = null;
+        });
+        await update(ref(db), updates);
+        toast('Le Cap\'ten s\'est déconnecté · retour au salon', 'err');
+      } catch(e){}
+    }
+  };
+  tick();
+  watchdogId = setInterval(tick, WATCHDOG_INTERVAL_MS);
 }
 
 window.leaveRoom = async () => {
   if (!room.id) return;
   
   window.showConfirm("Es-tu sûr de vouloir quitter ce salon ?", async () => {
-    try { 
-      await remove(ref(db, `rooms/${room.id}/players/${pid}`)); 
-    } catch(e){}
-    if (room.unsub) { try { room.unsub(); } catch(e){} }
-    room.id = null; room.data = null; room.unsub = null;
-    revealAnimDone = false; lastStatus = null;
-    showScreen('home');
+    await leaveRoomCore();
     toast("Tu as quitté le salon", "info");
   });
 };
+
+// ─── Quitter proprement (sans confirmation) ───
+async function leaveRoomCore() {
+  if (!room.id) { showScreen('home'); return; }
+  const oldRoomId = room.id;
+
+  // ─── Récupération si je suis le Cap'ten en cours de partie ───
+  // Si je quitte alors que je suis le Cap'ten (ou un des deux en mode Duel),
+  // le tour ne peut pas continuer : on retourne au lobby pour que l'hôte relance proprement.
+  const d = room.data;
+  const inGame = d && !['lobby', 'config', 'gameover'].includes(d.status);
+  const wasCaptain = d && (d.captainId === pid || d.captainId2 === pid);
+  const recoverToLobby = inGame && wasCaptain;
+
+  // Si je suis l'hôte ET que je n'ai pas transféré l'hôte volontairement :
+  // on cherche le plus ancien autre joueur et on lui passe le pouvoir.
+  if (d && d.host === pid) {
+    const others = Object.entries(d.players || {})
+      .filter(([id]) => id !== pid)
+      .sort((a,b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
+    if (others.length > 0) {
+      try { await update(ref(db, `rooms/${oldRoomId}`), { host: others[0][0] }); } catch(e){}
+    }
+  }
+
+  // Si j'étais Cap'ten en pleine partie → retour au lobby pour que la partie redémarre proprement
+  if (recoverToLobby) {
+    try {
+      const updates = {};
+      updates[`rooms/${oldRoomId}/status`] = 'lobby';
+      updates[`rooms/${oldRoomId}/captainId`] = null;
+      updates[`rooms/${oldRoomId}/captainId2`] = null;
+      updates[`rooms/${oldRoomId}/challengerId`] = null;
+      updates[`rooms/${oldRoomId}/theme`] = null;
+      updates[`rooms/${oldRoomId}/round`] = 0;
+      updates[`rooms/${oldRoomId}/timerEndsAt`] = null;
+      updates[`rooms/${oldRoomId}/captainGuess`] = null;
+      updates[`rooms/${oldRoomId}/roundResult`] = null;
+      updates[`rooms/${oldRoomId}/liveSort`] = null;
+      updates[`rooms/${oldRoomId}/liveSortDuel`] = null;
+      updates[`rooms/${oldRoomId}/lastRoundPts`] = null;
+      // Reset des états des joueurs restants
+      Object.keys(d.players || {}).forEach(otherId => {
+        if (otherId === pid) return;
+        updates[`rooms/${oldRoomId}/players/${otherId}/answer`] = null;
+        updates[`rooms/${oldRoomId}/players/${otherId}/answered`] = false;
+        updates[`rooms/${oldRoomId}/players/${otherId}/number`] = null;
+        updates[`rooms/${oldRoomId}/players/${otherId}/ready`] = false;
+        updates[`rooms/${oldRoomId}/players/${otherId}/themeProposal`] = null;
+        updates[`rooms/${oldRoomId}/players/${otherId}/vote`] = null;
+        updates[`rooms/${oldRoomId}/players/${otherId}/duelReady`] = null;
+        updates[`rooms/${oldRoomId}/players/${otherId}/draftAnswer`] = null;
+        updates[`rooms/${oldRoomId}/players/${otherId}/draftTheme`] = null;
+      });
+      await update(ref(db), updates);
+    } catch(e){}
+  }
+
+  // Annule onDisconnect avant de retirer le joueur
+  try { onDisconnect(ref(db, `rooms/${oldRoomId}/players/${pid}/disconnectedAt`)).cancel(); } catch(e){}
+  try { onDisconnect(ref(db, `rooms/${oldRoomId}/players/${pid}/lastSeen`)).cancel(); } catch(e){}
+  try { await remove(ref(db, `rooms/${oldRoomId}/players/${pid}`)); } catch(e){}
+
+  // Si je suis le dernier joueur, on supprime le salon
+  try {
+    const snap = await get(ref(db, `rooms/${oldRoomId}/players`));
+    if (!snap.exists() || Object.keys(snap.val() || {}).length === 0) {
+      await remove(ref(db, `rooms/${oldRoomId}`));
+    }
+  } catch(e){}
+
+  cleanRoomLocal();
+  showScreen('home');
+}
 
 window.goHome = () => {
   if (room.id) { window.leaveRoom(); return; }
@@ -2882,9 +4089,28 @@ function dispatch(d) {
   // Detect status change → reset volatile local state
   if (d.status !== lastStatus) {
     if (d.status === 'reveal') revealAnimDone = false;
-    if (d.status === 'resolving') { dragState = { selected: null, placed: {} }; sniperGuesses = {}; extremeGuess = { low: null, high: null }; window._capBoardBuilt = false; }
+    if (d.status === 'resolving') {
+      dragState = { selected: null, placed: {} };
+      sniperGuesses = {};
+      extremeGuess = { low: null, high: null };
+      window._capBoardBuilt = false;
+      window._specAnsBuilt = false;     // ⚠ AJOUT : reset spectateurs duel
+      window._blindValidating = false;  // ⚠ AJOUT : reset auto-validation aveugle
+    }
     if (d.status === 'theme-choice') { /* fresh state */ }
-    if (d.status === 'answering' && blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+    if (d.status === 'answering') {
+      if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+    }
+    if (d.status === 'lobby' || d.status === 'config') {
+      // Reset complet entre parties
+      dragState = { selected: null, placed: {} };
+      sniperGuesses = {};
+      extremeGuess = { low: null, high: null };
+      window._capBoardBuilt = false;
+      window._specAnsBuilt = false;
+      window._blindValidating = false;
+      revealAnimDone = false;
+    }
     lastStatus = d.status;
   }
   switch (d.status) {
@@ -2900,6 +4126,10 @@ function dispatch(d) {
     case 'leaderboard':  renderLeaderboard(d); break;
     case 'gameover':     renderGameover(d); break;
     case 'theme-vote-result': renderThemeVoteResult(d); break;
+    default:
+      // Statut inconnu → on retourne au lobby pour éviter un écran figé
+      console.warn('Unknown status:', d.status);
+      if (d.host === pid) update(ref(db, `rooms/${room.id}`), { status: 'lobby' });
   }
 }
 
@@ -2924,13 +4154,23 @@ function renderLobby(d) {
   // Liste des joueurs
   const el = $s('lby-players');
   el.innerHTML = '';
-  Object.entries(players).forEach(([id, p]) => {
+  const now = Date.now();
+  // Sort by joinedAt for stable order
+  const sortedPlayers = Object.entries(players).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
+  sortedPlayers.forEach(([id, p]) => {
     const item = document.createElement('div');
     item.className = 'player-item';
     item.style.animation = 'none'; // ✅ Empêche le clignotement
+
+    // Status de connexion
+    const lastSeen = p.lastSeen || p.joinedAt || 0;
+    const isStale = (now - lastSeen) > STALE_AFTER_MS;
+    const isDisc = p.disconnectedAt && (now - p.disconnectedAt) > 1000;
+    const offline = isStale || isDisc;
+
     item.innerHTML = `
-      <div class="player-avatar">${(p.name || '?').charAt(0).toUpperCase()}</div>
-      <div class="player-name">${escapeHtml(p.name || '???')}</div>
+      <div class="player-avatar" style="${offline ? 'opacity:.5;filter:grayscale(.7);' : ''}">${(p.name || '?').charAt(0).toUpperCase()}</div>
+      <div class="player-name" style="${offline ? 'opacity:.55;' : ''}">${escapeHtml(p.name || '???')}${offline ? ' <span style="font-size:.62rem;color:rgb(var(--accent-rgb));font-family:\'Space Grotesk\',sans-serif;font-weight:700;letter-spacing:.05em;">↻ déconnecté</span>' : ''}</div>
       ${id === d.host ? '<div class="player-host">Hôte</div>' : ''}
     `;
     el.appendChild(item);
@@ -3039,7 +4279,7 @@ function renderConfigParams(mode, d, isHost) {
 
   html += `
     <div style="display:flex; flex-direction:column; gap:.5rem;">
-      <label style="font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em;">Chrono Cap'ten</label>
+      <label style="font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em;">Chrono Réponse</label>
       <select class="input" style="padding:.6rem;" onchange="if(${isHost}) window.updateDbTimer(this.value)" ${!isHost ? 'disabled' : ''}>
         <option value="0"   ${d.timerSec===0?'selected':''}>Sans chrono</option>
         <option value="45"  ${d.timerSec===45?'selected':''}>45s (Rapide)</option>
@@ -3121,6 +4361,9 @@ window.startGame = async () => {
 
     u[`rooms/${room.id}/duelQueue`] = finalQueue;
     u[`rooms/${room.id}/drawnTheme`] = [pickRandomTheme(d.level), pickRandomTheme(d.level), pickRandomTheme(d.level)];
+    u[`rooms/${room.id}/duelComputed`] = null;
+    u[`rooms/${room.id}/duelResult`] = null;
+    u[`rooms/${room.id}/liveSortDuel`] = null;
     
     u[`rooms/${room.id}/lives`] = 0; 
     u[`rooms/${room.id}/maxLives`] = 0;
@@ -3350,8 +4593,46 @@ function renderThemeChoice(d) {
     const tcCustom = $s('tc-custom');
     const turnKey = d.round + '_' + (d.currentDuelNum || 1) + '_' + d.captainId + '_' + (d.captainId2 || '');
     if (tcCustom && tcCustom.dataset.turn !== turnKey) {
-        tcCustom.value = '';
+        // On restaure le brouillon de thème si c'est le même tour
+        const me = d.players?.[pid] || {};
+        const savedDraft = me.draftTheme || '';
+        const sameTurnDraft = me.draftThemeTurnKey === turnKey ? savedDraft : '';
+        tcCustom.value = sameTurnDraft;
         tcCustom.dataset.turn = turnKey;
+        // Bind le listener une seule fois
+        if (!tcCustom.dataset.draftBound) {
+          tcCustom.dataset.draftBound = '1';
+          // Mise à jour du compteur de caractères
+          const counter = document.getElementById('tc-custom-count');
+          const updateCount = () => {
+            if (counter) {
+              const len = tcCustom.value.length;
+              counter.textContent = `${len} / 240`;
+              counter.style.color = len > 220 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+            }
+          };
+          updateCount();
+          tcCustom.addEventListener('input', () => {
+            updateCount();
+            if (!room.id) return;
+            if (draftSaveTimer) clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(() => {
+              const tk = tcCustom.dataset.turn || '';
+              update(ref(db, `rooms/${room.id}/players/${pid}`), {
+                draftTheme: tcCustom.value || null,
+                draftThemeTurnKey: tk
+              }).catch(()=>{});
+            }, 600);
+          });
+        } else {
+          // Compteur initial au cas où la draft a été restaurée
+          const counter = document.getElementById('tc-custom-count');
+          if (counter) {
+            const len = tcCustom.value.length;
+            counter.textContent = `${len} / 240`;
+            counter.style.color = len > 220 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+          }
+        }
     }
 
     const btnSubmit = $s('btn-tc-submit');
@@ -3387,7 +4668,9 @@ function renderThemeChoice(d) {
         if (titleEl) titleEl.textContent = d.mode === 'duel' ? "Les Cap'tens réfléchissent..." : "Le Cap'ten réfléchit...";
         if (d.mode === 'duel' && $s('tc-wait-name')) {
             let readyCount = (c1Ready ? 1 : 0) + (c2Ready ? 1 : 0);
-            $s('tc-wait-name').innerHTML = `${d.players[d.captainId]?.name || "Un Cap'ten"} et ${d.players[d.captainId2]?.name || "un autre"} préparent leurs thèmes... <br>
+            const n1 = escapeHtml(d.players[d.captainId]?.name || "Un Cap'ten");
+            const n2 = escapeHtml(d.players[d.captainId2]?.name || "un autre");
+            $s('tc-wait-name').innerHTML = `${n1} et ${n2} préparent leurs thèmes... <br>
             <strong style="color:rgb(var(--success-rgb)); font-size:1.1rem; display:block; margin-top:0.5rem;">${readyCount}/2 prêts</strong>`;
         }
     }
@@ -3438,10 +4721,25 @@ window.drawThemeAndFill = () => {
   const inp = $s('tc-custom');
   if (inp) {
     inp.value = newTheme;
+    // Met à jour le compteur de caractères
+    const counter = document.getElementById('tc-custom-count');
+    if (counter) {
+      const len = newTheme.length;
+      counter.textContent = `${len} / 240`;
+      counter.style.color = len > 220 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+    }
     // Petit effet visuel pour montrer que ça a changé
     inp.style.transition = 'transform 0.1s ease';
     inp.style.transform = 'scale(0.98)';
     setTimeout(() => inp.style.transform = 'scale(1)', 100);
+    // Sauvegarde le brouillon en BDD pour la persistance
+    if (room.id) {
+      const tk = inp.dataset.turn || '';
+      update(ref(db, `rooms/${room.id}/players/${pid}`), {
+        draftTheme: newTheme,
+        draftThemeTurnKey: tk
+      }).catch(()=>{});
+    }
   }
 };
 
@@ -3456,7 +4754,10 @@ window.submitCapTheme = async () => {
   // LOGIQUE DUEL
   if (d.mode === 'duel') {
       // ✅ CORRECTION : On enregistre JUSTE le thème. C'est le chrono qui changera la page !
-      await update(ref(db, `rooms/${room.id}/players/${pid}`), { themeProposal: theme });
+      await update(ref(db, `rooms/${room.id}/players/${pid}`), {
+        themeProposal: theme,
+        draftTheme: null, draftThemeTurnKey: null
+      });
   } 
   // LOGIQUE CLASSIQUE
   else {
@@ -3474,7 +4775,12 @@ window.submitCapTheme = async () => {
       Object.keys(players).forEach(id => {
         u[`rooms/${room.id}/players/${id}/answer`]   = null;
         u[`rooms/${room.id}/players/${id}/answered`] = false;
+        u[`rooms/${room.id}/players/${id}/draftAnswer`] = null;
+        u[`rooms/${room.id}/players/${id}/draftTurnKey`] = null;
       });
+      // Brouillon de thème nettoyé pour le Cap'ten qui vient de valider
+      u[`rooms/${room.id}/players/${pid}/draftTheme`] = null;
+      u[`rooms/${room.id}/players/${pid}/draftThemeTurnKey`] = null;
       await update(ref(db), u);
   }
 };
@@ -3780,10 +5086,50 @@ function renderAnswering(d) {
 
       const turnKey = (d.startedAt || 0) + '_' + d.round + '_' + d.captainId;
       if (txt && txt.dataset.turn !== turnKey) { 
-        txt.value = ''; 
+        // Nouveau tour : restaure le brouillon SI c'est le même tour, sinon vide
+        const me = d.players?.[pid] || {};
+        // Restaure brouillon seulement si on n'a pas encore validé
+        const savedDraft = me.draftAnswer || '';
+        const sameTurnDraft = me.draftTurnKey === turnKey ? savedDraft : '';
+        txt.value = sameTurnDraft;
         txt.dataset.turn = turnKey; 
         const flipCard = document.querySelector('.flip-card');
         if (flipCard) flipCard.classList.remove('flipped');
+        // Attache le listener UNE seule fois
+        if (!txt.dataset.draftBound) {
+          txt.dataset.draftBound = '1';
+          // Mise à jour du compteur de caractères (immédiate, pas debounced)
+          const counter = document.getElementById('ans-text-count');
+          const updateCount = () => {
+            if (counter) {
+              const len = txt.value.length;
+              counter.textContent = `${len} / 200`;
+              counter.style.color = len > 180 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+            }
+          };
+          updateCount();
+          txt.addEventListener('input', () => {
+            updateCount();
+            if (!room.id) return;
+            // Debounce sauvegarde brouillon : 600ms après la dernière touche
+            if (draftSaveTimer) clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(() => {
+              const tk = txt.dataset.turn || '';
+              update(ref(db, `rooms/${room.id}/players/${pid}`), {
+                draftAnswer: txt.value || null,
+                draftTurnKey: tk
+              }).catch(()=>{});
+            }, 600);
+          });
+        } else {
+          // Compteur initial au cas où la draft a été restaurée
+          const counter = document.getElementById('ans-text-count');
+          if (counter) {
+            const len = txt.value.length;
+            counter.textContent = `${len} / 200`;
+            counter.style.color = len > 180 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+          }
+        }
       }
     }
   }
@@ -3830,7 +5176,10 @@ window.submitAnswer = async () => {
   
   $s('ans-text').disabled = true;
   
-  await update(ref(db, `rooms/${room.id}/players/${pid}`), { answer: val, answered: true });
+  await update(ref(db, `rooms/${room.id}/players/${pid}`), {
+    answer: val, answered: true,
+    draftAnswer: null, draftTurnKey: null   // brouillon nettoyé une fois validé
+  });
   toast('Réponse envoyée ✓', 'ok');
 };
 
@@ -3871,6 +5220,9 @@ function renderCaptain(d) {
   ['cap-classic','cap-sniper','cap-extreme','cap-wait','cap-blind','cap-duel'].forEach(id => {
       if ($s(id)) $s(id).style.display = 'none';
   });
+  // Cache l'arena VS sauf en mode duel
+  const arenaEl = $s('duel-arena-hdr');
+  if (arenaEl) arenaEl.style.display = (d.mode === 'duel') ? 'flex' : 'none';
   if ($s('cap-timer-wrap')) $s('cap-timer-wrap').style.display = 'none';
 
   const themeLabel = $s('cap-theme-label');
@@ -3893,6 +5245,42 @@ function renderCaptain(d) {
       const liveSortDuel = d.liveSortDuel || {};
       const c1Ready = d.players[d.captainId]?.duelReady;
       const c2Ready = d.players[d.captainId2]?.duelReady;
+
+      // ─── Arena VS header (visible pour tous) ───
+      const arena = $s('duel-arena-hdr');
+      if (arena) {
+        arena.style.display = 'flex';
+        const c1 = d.players[d.captainId] || {};
+        const c2 = d.players[d.captainId2] || {};
+        const av1 = $s('duel-arena-av1');
+        const av2 = $s('duel-arena-av2');
+        const n1 = $s('duel-arena-name1');
+        const n2 = $s('duel-arena-name2');
+        const s1 = $s('duel-arena-status1');
+        const s2 = $s('duel-arena-status2');
+        if (av1) av1.firstChild.textContent = (c1.name || '?').charAt(0).toUpperCase();
+        if (av2) av2.firstChild.textContent = (c2.name || '?').charAt(0).toUpperCase();
+        if (n1) n1.textContent = c1.name || "Cap'ten 1";
+        if (n2) n2.textContent = c2.name || "Cap'ten 2";
+        if (s1) {
+          s1.textContent = c1Ready ? '✓ Prêt' : '⏳ Réfléchit';
+          s1.className = 'duel-fighter-status ' + (c1Ready ? 'ready' : 'thinking');
+        }
+        if (s2) {
+          s2.textContent = c2Ready ? '✓ Prêt' : '⏳ Réfléchit';
+          s2.className = 'duel-fighter-status ' + (c2Ready ? 'ready' : 'thinking');
+        }
+      }
+
+      // ─── Race-safe : si les 2 Cap'tens sont prêts, l'hôte calcule les scores ───
+      if (c1Ready && c2Ready && d.host === pid && d.status === 'resolving' && !d.duelComputed) {
+        // Petit délai pour laisser le temps à liveSortDuel d'être bien synchronisé
+        setTimeout(() => {
+          if (room.data?.status === 'resolving' && !room.data?.duelComputed) {
+            computeDuelScores(room.data);
+          }
+        }, 300);
+      }
 
       if (isCap) {
           const isMeReady = d.players[pid]?.duelReady;
@@ -3941,13 +5329,29 @@ function renderCaptain(d) {
           if (specAns && !window._specAnsBuilt) {
               specAns.innerHTML = '';
               respondants.forEach(([id, p]) => {
-                  specAns.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); font-size:0.95rem; font-weight:600;"><span style="color:var(--muted); font-size:0.75rem; text-transform:uppercase;">${escapeHtml(p.name)}</span><br>${escapeHtml(p.answer || '–')}</div>`;
+                  const card = document.createElement('div');
+                  card.className = 'duel-spec-card';
+                  card.innerHTML = `
+                    <div class="from">${escapeHtml(p.name)}</div>
+                    <div class="ans">${escapeHtml(p.answer || '–')}</div>
+                  `;
+                  specAns.appendChild(card);
               });
               window._specAnsBuilt = true;
           }
 
-          if ($s('duel-spec-name1')) $s('duel-spec-name1').textContent = `${d.players[d.captainId]?.name || 'Cap\'ten 1'} ${c1Ready ? '✅' : '⏳'}`;
-          if ($s('duel-spec-name2')) $s('duel-spec-name2').textContent = `${d.players[d.captainId2]?.name || 'Cap\'ten 2'} ${c2Ready ? '✅' : '⏳'}`;
+          if ($s('duel-spec-name1')) $s('duel-spec-name1').textContent = d.players[d.captainId]?.name || "Cap'ten 1";
+          if ($s('duel-spec-name2')) $s('duel-spec-name2').textContent = d.players[d.captainId2]?.name || "Cap'ten 2";
+          const ss1 = $s('duel-spec-status1');
+          const ss2 = $s('duel-spec-status2');
+          if (ss1) {
+            ss1.textContent = c1Ready ? '✓ Validé' : '⏳ Classe…';
+            ss1.className = 'status-pill ' + (c1Ready ? 'ready' : 'thinking');
+          }
+          if (ss2) {
+            ss2.textContent = c2Ready ? '✓ Validé' : '⏳ Classe…';
+            ss2.className = 'status-pill ' + (c2Ready ? 'ready' : 'thinking');
+          }
 
           buildStaticTimeline($s('duel-timeline-spec1'), liveSortDuel[d.captainId] || {}, players);
           buildStaticTimeline($s('duel-timeline-spec2'), liveSortDuel[d.captainId2] || {}, players);
@@ -4010,7 +5414,8 @@ function renderCaptain(d) {
       }
   }
 
-  if (d.mode === 'blitz') startBlitzTimer(d);
+  if (d.mode === 'blind') buildClassicCards(respondants);
+  // (Note : pas de timer actif sur la phase Cap'ten — le chrono n'est utilisé que sur la phase de réponse)
 }
 
 // ─── CLASSIC / BLITZ ─────────────────────────────
@@ -4365,20 +5770,6 @@ function refreshDuelSlot(slot, placedPid) {
   `;
 }
 
-window.removeDuelSlot = slot => {
-  const evicted = dragState.placed[slot];
-  if (!evicted) return;
-  delete dragState.placed[slot];
-  refreshDuelSlot(slot, null);
-  const tag = document.getElementById(`duel-tag-${evicted}`);
-  if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
-  
-  const d = room.data;
-  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId && i !== d.captainId2);
-  $s('btn-validate-duel').disabled = Object.keys(dragState.placed).length < respondants.length;
-  update(ref(db, `rooms/${room.id}/liveSortDuel/${pid}`), dragState.placed);
-};
-
 // Construit une timeline figée pour les spectateurs
 function buildStaticTimeline(container, sortData, playersData) {
     container.innerHTML = '';
@@ -4408,75 +5799,75 @@ function buildStaticTimeline(container, sortData, playersData) {
 // 💥 VALIDATION DU DUEL ET CALCUL DES POINTS
 window.validateDuel = async () => {
     const d = room.data; if (!d) return;
-    
-    // Le Cap'ten indique qu'il a fini
-    const updates = {};
-    updates[`rooms/${room.id}/players/${pid}/duelReady`] = true;
-    
-    // Vérifier si l'autre Cap'ten a déjà fini
-    const otherCapId = (d.captainId === pid) ? d.captainId2 : d.captainId;
-    const otherReady = d.players[otherCapId]?.duelReady;
-    
-    if (otherReady) {
-        // Les deux ont fini ! On calcule les scores
-        const liveSort = d.liveSortDuel || {};
-        const sort1 = liveSort[d.captainId] || {}; // Classement Cap 1 (si manquant, triche sécurité)
-        const sort2 = (pid === d.captainId2) ? dragState.placed : (liveSort[d.captainId2] || {});
-        
-        const respondants = Object.entries(d.players).filter(([i]) => i !== d.captainId && i !== d.captainId2);
-        
-        let error1 = 0, error2 = 0;
-        let playerPoints = {};
-        respondants.forEach(([id]) => playerPoints[id] = 0);
-
-        respondants.forEach(([id, p]) => {
-            const real = p.number;
-            
-            // Calcul Cap'ten 1
-            const slot1 = Object.keys(sort1).find(k => sort1[k] === id);
-            const guess1 = slot1 ? parseInt(slot1) : 0;
-            if (guess1) {
-                error1 += Math.abs(guess1 - real);
-                if (guess1 === real) playerPoints[id] += 2; // +2 si exact
-                else if (Math.abs(guess1 - real) === 1) playerPoints[id] += 1; // +1 si à côté
-            } else error1 += 10; // Pénalité si carte non placée
-            
-            // Calcul Cap'ten 2
-            const slot2 = Object.keys(sort2).find(k => sort2[k] === id);
-            const guess2 = slot2 ? parseInt(slot2) : 0;
-            if (guess2) {
-                error2 += Math.abs(guess2 - real);
-                if (guess2 === real) playerPoints[id] += 2;
-                else if (Math.abs(guess2 - real) === 1) playerPoints[id] += 1;
-            } else error2 += 10;
-        });
-
-        let cap1Pts = 0, cap2Pts = 0;
-        if (error1 < error2) cap1Pts = 3;
-        else if (error2 < error1) cap2Pts = 3;
-        else { cap1Pts = 1; cap2Pts = 1; } // Égalité
-
-        updates[`rooms/${room.id}/duelResult`] = { error1, error2, cap1Pts, cap2Pts };
-        let allRoundPts = { [d.captainId]: cap1Pts, [d.captainId2]: cap2Pts };
-        respondants.forEach(([id]) => { if (playerPoints[id] > 0) allRoundPts[id] = playerPoints[id]; });
-        updates[`rooms/${room.id}/lastRoundPts`] = allRoundPts;
-        // Distribution des points aux Capitaines
-        updates[`rooms/${room.id}/players/${d.captainId}/score`] = (d.players[d.captainId]?.score || 0) + cap1Pts;
-        updates[`rooms/${room.id}/players/${d.captainId2}/score`] = (d.players[d.captainId2]?.score || 0) + cap2Pts;
-        
-        // Distribution des points aux Répondants
-        respondants.forEach(([id]) => {
-            if (playerPoints[id] > 0) {
-                updates[`rooms/${room.id}/players/${id}/score`] = (d.players[id]?.score || 0) + playerPoints[id];
-            }
-        });
-        
-        // On passe à la révélation des résultats !
-        updates[`rooms/${room.id}/status`] = 'round-reveal';
-    }
-    
-    await update(ref(db), updates);
+    // Étape 1 : on marque uniquement le Cap'ten comme "prêt"
+    // Le calcul des scores est déclenché par l'hôte dans renderCaptain (race-safe).
+    // Avant ça, on s'assure que la timeline du Cap'ten est bien sauvée en BDD.
+    try {
+      await set(ref(db, `rooms/${room.id}/liveSortDuel/${pid}`),
+        Object.keys(dragState.placed).length > 0 ? dragState.placed : { _empty: true });
+    } catch(e){}
+    await update(ref(db, `rooms/${room.id}/players/${pid}`), { duelReady: true });
 };
+
+// Calcul des scores du duel — appelé UNIQUEMENT par l'hôte quand les 2 Cap'tens sont prêts
+async function computeDuelScores(d) {
+    if (!d || d.mode !== 'duel') return;
+    if (d.host !== pid) return; // sécurité : seul l'hôte calcule
+    if (d.status !== 'resolving') return;
+    if (d.duelComputed) return;  // évite re-calcul
+    const c1 = d.captainId, c2 = d.captainId2;
+    if (!d.players?.[c1]?.duelReady || !d.players?.[c2]?.duelReady) return;
+
+    const liveSort = d.liveSortDuel || {};
+    const sort1 = liveSort[c1] || {};
+    const sort2 = liveSort[c2] || {};
+
+    const respondants = Object.entries(d.players).filter(([i]) => i !== c1 && i !== c2);
+
+    let error1 = 0, error2 = 0;
+    let playerPoints = {};
+    respondants.forEach(([id]) => playerPoints[id] = 0);
+
+    respondants.forEach(([id, p]) => {
+        const real = p.number;
+        const slot1Str = Object.keys(sort1).find(k => sort1[k] === id);
+        const guess1 = slot1Str ? parseInt(slot1Str) : 0;
+        if (guess1) {
+            error1 += Math.abs(guess1 - real);
+            if (guess1 === real) playerPoints[id] += 2;
+            else if (Math.abs(guess1 - real) === 1) playerPoints[id] += 1;
+        } else error1 += 10;
+
+        const slot2Str = Object.keys(sort2).find(k => sort2[k] === id);
+        const guess2 = slot2Str ? parseInt(slot2Str) : 0;
+        if (guess2) {
+            error2 += Math.abs(guess2 - real);
+            if (guess2 === real) playerPoints[id] += 2;
+            else if (Math.abs(guess2 - real) === 1) playerPoints[id] += 1;
+        } else error2 += 10;
+    });
+
+    let cap1Pts = 0, cap2Pts = 0;
+    if (error1 < error2) cap1Pts = 3;
+    else if (error2 < error1) cap2Pts = 3;
+    else { cap1Pts = 1; cap2Pts = 1; }
+
+    const updates = {};
+    updates[`rooms/${room.id}/duelResult`] = { error1, error2, cap1Pts, cap2Pts };
+    updates[`rooms/${room.id}/duelComputed`] = true;
+    let allRoundPts = { [c1]: cap1Pts, [c2]: cap2Pts };
+    respondants.forEach(([id]) => { if (playerPoints[id] > 0) allRoundPts[id] = playerPoints[id]; });
+    updates[`rooms/${room.id}/lastRoundPts`] = allRoundPts;
+    updates[`rooms/${room.id}/players/${c1}/score`] = (d.players[c1]?.score || 0) + cap1Pts;
+    updates[`rooms/${room.id}/players/${c2}/score`] = (d.players[c2]?.score || 0) + cap2Pts;
+    respondants.forEach(([id]) => {
+        if (playerPoints[id] > 0) {
+            updates[`rooms/${room.id}/players/${id}/score`] = (d.players[id]?.score || 0) + playerPoints[id];
+        }
+    });
+    updates[`rooms/${room.id}/status`] = 'round-reveal';
+    try { await update(ref(db), updates); } catch(e){}
+}
 
 function refreshClassicSlot(slot, placedPid) {
   const tl = $s('cap-timeline');
@@ -4502,21 +5893,6 @@ function refreshClassicSlot(slot, placedPid) {
     </div>
   `;
 }
-
-window.removeClassicSlot = slot => {
-  const evicted = dragState.placed[slot];
-  if (!evicted) return;
-  delete dragState.placed[slot];
-  refreshClassicSlot(slot, null);
-  const tag = document.getElementById(`tag-${evicted}`);
-  if (tag) { tag.textContent = '—'; tag.className = 'card-slot-tag'; }
-  const d = room.data;
-  const respondants = Object.entries(d.players || {}).filter(([i]) => i !== d.captainId);
-  updateValidateClassic(respondants.length);
-  if (room.data.captainId === pid) {
-      set(ref(db, `rooms/${room.id}/liveSort`), dragState.placed);
-  }
-};
 
 function updateValidateClassic(total) {
   $s('btn-validate-classic').disabled = Object.keys(dragState.placed).length < total;
@@ -4819,41 +6195,241 @@ function renderRoundReveal(d) {
       $s('rv-lives').style.display = 'none';
   }
 
+  // ─── Récap stats Cap'ten (exact / ±1 / ratés) ───
+  // Construction de la map "vraie position" par pid
   const respondants = Object.entries(players).filter(([i]) => i !== d.captainId && i !== d.captainId2).sort((a, b) => a[1].number - b[1].number);
 
-  respondants.forEach(([id, p], idx) => {
-    const it = document.createElement('div');
-    let isCorrect = false;
-    let badgeHtml = '';
-    
-    if (m.coop) {
-        isCorrect = d.roundResult === 'correct';
-        if (d.mode === 'extreme') {
-            const pickedLow = d.captainGuess?.low === id;
-            const pickedHigh = d.captainGuess?.high === id;
-            if ((pickedLow && p.number === 1) || (pickedHigh && p.number === 10)) isCorrect = true;
-            else if (pickedLow || pickedHigh) isCorrect = false;
-            else isCorrect = true; 
-        }
+  // Helper : récupère le slot deviné par le Cap'ten pour un joueur donné
+  function guessedSlotFor(playerId, captainGuess) {
+    if (!captainGuess) return null;
+    // Pour modes classique / sniper / blind / duel : c'est un objet { slot: pid }
+    // Pour mode extreme : c'est { low: pid, high: pid }
+    if (d.mode === 'extreme') {
+      if (captainGuess.low === playerId)  return 1;
+      if (captainGuess.high === playerId) return 10;
+      return null;
+    }
+    for (const k in captainGuess) {
+      if (captainGuess[k] === playerId) return parseInt(k);
+    }
+    return null;
+  }
+
+  // Pour le mode Duel, on affiche la version du Cap'ten 1 par défaut
+  // (un toggle pourrait être ajouté plus tard)
+  let primaryGuess = d.captainGuess;
+  let secondaryGuess = null;
+  if (d.mode === 'duel') {
+    primaryGuess = (d.liveSortDuel || {})[d.captainId] || null;
+    secondaryGuess = (d.liveSortDuel || {})[d.captainId2] || null;
+  }
+
+  // Calcule stats pour le résumé
+  let exactCount = 0, closeCount = 0, missCount = 0;
+  respondants.forEach(([id, p]) => {
+    if (m.coop && d.mode !== 'extreme') {
+      // Pour Classique/Survie/Aveugle, on regarde l'ordre relatif (déjà encodé dans roundResult)
+      // Mais on va aussi compter par slot pour l'affichage
+      const guessed = guessedSlotFor(id, primaryGuess);
+      if (guessed === p.number) exactCount++;
+      else if (guessed && Math.abs(guessed - p.number) === 1) closeCount++;
+      else missCount++;
     } else {
-        const pEarned = d.lastRoundPts?.[id] || 0;
-        isCorrect = pEarned > 0;
-        if (pEarned > 0) badgeHtml = `<div class="result-pts pos">+${pEarned}</div>`;
-        else badgeHtml = `<div class="result-pts zero">0</div>`;
+      const guessed = guessedSlotFor(id, primaryGuess);
+      if (guessed === p.number) exactCount++;
+      else if (guessed && Math.abs(guessed - p.number) === 1) closeCount++;
+      else missCount++;
+    }
+  });
+
+  // Affiche la barre de stats si on a un Cap'ten qui a placé des cartes (pas pour extreme, qui a sa propre logique)
+  if (respondants.length > 0 && primaryGuess && d.mode !== 'extreme') {
+    const summary = document.createElement('div');
+    summary.className = 'verify-summary';
+    summary.style.animation = 'verifyIn .55s cubic-bezier(.34,1.56,.64,1) forwards';
+    summary.innerHTML = `
+      <div class="stat ok">
+        <div class="num">${exactCount}</div>
+        <div class="lbl">✓ Exact</div>
+      </div>
+      <div class="sep"></div>
+      <div class="stat near">
+        <div class="num">${closeCount}</div>
+        <div class="lbl">~ Proche</div>
+      </div>
+      <div class="sep"></div>
+      <div class="stat bad">
+        <div class="num">${missCount}</div>
+        <div class="lbl">✗ Raté</div>
+      </div>
+    `;
+    resultsEl.appendChild(summary);
+
+    // Petit titre "Vérification" si Cap'ten a placé
+    const caption = document.createElement('div');
+    caption.style.cssText = "font-family:'Space Grotesk',sans-serif;font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:.4rem 0 .2rem;text-align:center;";
+    caption.textContent = d.mode === 'duel' 
+      ? `Vérification — Classement de ${escapeHtml(players[d.captainId]?.name || 'Cap\'ten 1')}`
+      : '🔍 Vérification du classement';
+    resultsEl.appendChild(caption);
+  }
+
+  // ─── Affichage des lignes par numéro réel (1 → 10) ───
+  respondants.forEach(([id, p], idx) => {
+    const guessed = guessedSlotFor(id, primaryGuess);
+    const realNum = p.number;
+    let kind = 'miss';
+    let badgeContent = '';
+
+    if (m.coop && d.mode !== 'extreme') {
+      // Pour les modes coop classiques, on utilise roundResult global ET la précision du Cap'ten
+      if (guessed === realNum) {
+        kind = 'exact';
+        badgeContent = '<span style="font-size:.85rem;">🎯</span> Exact';
+      } else if (guessed && Math.abs(guessed - realNum) === 1) {
+        kind = 'close';
+        const diff = guessed - realNum;
+        badgeContent = `${diff > 0 ? '+' : ''}${diff}`;
+      } else if (guessed) {
+        kind = 'miss';
+        const diff = guessed - realNum;
+        badgeContent = `${diff > 0 ? '+' : ''}${diff}`;
+      } else {
+        kind = 'miss';
+        badgeContent = '?';
+      }
+    } else if (d.mode === 'extreme') {
+      const pickedLow = d.captainGuess?.low === id;
+      const pickedHigh = d.captainGuess?.high === id;
+      if ((pickedLow && p.number === 1) || (pickedHigh && p.number === 10)) {
+        kind = 'exact';
+        badgeContent = `<span style="font-size:.85rem;">🎯</span> ${pickedLow ? 'Le 1' : 'Le 10'} trouvé`;
+      } else if (pickedLow || pickedHigh) {
+        kind = 'miss';
+        badgeContent = `❌ ${pickedLow ? 'Pas le 1' : 'Pas le 10'}`;
+      } else {
+        // Pas un extrême choisi : neutre (le joueur n'avait pas à être placé)
+        kind = 'close';
+        badgeContent = 'Neutre';
+      }
+    } else {
+      // Sniper / Duel
+      if (guessed === realNum) {
+        kind = 'exact';
+        badgeContent = '<span style="font-size:.85rem;">🎯</span> Exact';
+      } else if (guessed && Math.abs(guessed - realNum) === 1) {
+        kind = 'close';
+        const diff = guessed - realNum;
+        badgeContent = `${diff > 0 ? '+' : ''}${diff}`;
+      } else if (guessed) {
+        kind = 'miss';
+        const diff = guessed - realNum;
+        badgeContent = `${diff > 0 ? '+' : ''}${diff}`;
+      } else {
+        kind = 'miss';
+        badgeContent = '—';
+      }
     }
 
-    it.className = `result-item ${isCorrect ? 'correct' : 'wrong'}`;
-    it.style.animation = `floatIn 0.6s cubic-bezier(.34,1.56,.64,1) ${idx * 0.8}s both`;
+    const earned = d.lastRoundPts?.[id] || 0;
+    const earnedHtml = (!m.coop && earned > 0) ? ` <span style="opacity:.6">·</span> <span style="color:rgb(var(--success-rgb));font-weight:900;">+${earned}</span>` : '';
+
+    // Construit le bloc "réel + deviné"
+    const realColor = numColor(realNum);
+    const guessColor = guessed ? numColor(guessed) : '#777';
+
+    const guessCell = (guessed && d.mode !== 'extreme') 
+      ? `<div class="verify-num-cell guess">
+           <div class="label">Cap'ten</div>
+           <div class="num n${guessed}" style="color:${guessColor}">${guessed}</div>
+         </div>
+         <div class="verify-arrow">→</div>`
+      : (d.mode === 'extreme' && (d.captainGuess?.low === id || d.captainGuess?.high === id))
+        ? `<div class="verify-num-cell guess">
+             <div class="label">Cap'ten</div>
+             <div class="num" style="color:${d.captainGuess?.low === id ? '#0099ff' : '#ff003c'}">${d.captainGuess?.low === id ? '1' : '10'}</div>
+           </div>
+           <div class="verify-arrow">→</div>`
+        : '';
+
+    const it = document.createElement('div');
+    it.className = `verify-row ${kind}`;
+    it.style.animationDelay = `${idx * 0.12 + 0.2}s`;
     it.innerHTML = `
-      <div class="result-num n${p.number}" style="color:${numColor(p.number)};text-shadow:0 0 20px ${numColor(p.number)}">${p.number}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:.65rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(p.name)}</div>
-        <div style="font-weight:600;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.answer)}</div>
+      <div class="verify-numbers">
+        ${guessCell}
+        <div class="verify-num-cell">
+          <div class="label">Réel</div>
+          <div class="num n${realNum}" style="color:${realColor}">${realNum}</div>
+        </div>
       </div>
-      ${badgeHtml}
+      <div class="verify-content">
+        <div class="who">${escapeHtml(p.name)}${earnedHtml}</div>
+        <div class="ans">${escapeHtml(p.answer || '–')}</div>
+      </div>
+      <div class="verify-badge ${kind}">${badgeContent}</div>
     `;
     resultsEl.appendChild(it);
   });
+
+  // ─── Pour Duel : affiche également la timeline du 2e Cap'ten ───
+  if (d.mode === 'duel' && secondaryGuess && players[d.captainId2]) {
+    const sep = document.createElement('div');
+    sep.style.cssText = "font-family:'Space Grotesk',sans-serif;font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:1rem 0 .2rem;text-align:center;";
+    sep.textContent = `Vérification — Classement de ${escapeHtml(players[d.captainId2].name || 'Cap\'ten 2')}`;
+    resultsEl.appendChild(sep);
+
+    respondants.forEach(([id, p], idx) => {
+      const guessed = guessedSlotFor(id, secondaryGuess);
+      const realNum = p.number;
+      let kind = 'miss';
+      let badgeContent = '';
+      if (guessed === realNum) {
+        kind = 'exact';
+        badgeContent = '<span style="font-size:.85rem;">🎯</span> Exact';
+      } else if (guessed && Math.abs(guessed - realNum) === 1) {
+        kind = 'close';
+        const diff = guessed - realNum;
+        badgeContent = `${diff > 0 ? '+' : ''}${diff}`;
+      } else if (guessed) {
+        kind = 'miss';
+        const diff = guessed - realNum;
+        badgeContent = `${diff > 0 ? '+' : ''}${diff}`;
+      } else {
+        kind = 'miss';
+        badgeContent = '—';
+      }
+
+      const realColor = numColor(realNum);
+      const guessColor = guessed ? numColor(guessed) : '#777';
+      const guessCell = guessed
+        ? `<div class="verify-num-cell guess">
+             <div class="label">Cap'ten</div>
+             <div class="num n${guessed}" style="color:${guessColor}">${guessed}</div>
+           </div>
+           <div class="verify-arrow">→</div>`
+        : '';
+
+      const it = document.createElement('div');
+      it.className = `verify-row ${kind}`;
+      it.style.animationDelay = `${idx * 0.10 + 0.4}s`;
+      it.innerHTML = `
+        <div class="verify-numbers">
+          ${guessCell}
+          <div class="verify-num-cell">
+            <div class="label">Réel</div>
+            <div class="num n${realNum}" style="color:${realColor}">${realNum}</div>
+          </div>
+        </div>
+        <div class="verify-content">
+          <div class="who">${escapeHtml(p.name)}</div>
+          <div class="ans">${escapeHtml(p.answer || '–')}</div>
+        </div>
+        <div class="verify-badge ${kind}">${badgeContent}</div>
+      `;
+      resultsEl.appendChild(it);
+    });
+  }
 
   buildRevealActions(d, m);
 }
@@ -4915,19 +6491,70 @@ function renderLeaderboard(d) {
   const sorted = Object.entries(players)
     .sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
 
+  // Score max pour calculer les pourcentages des barres
+  const topScore = Math.max(1, ...sorted.map(([,p]) => p.score || 0));
+
+  // Mise en avant du Cap'ten du tour précédent (si applicable)
+  const lastCapId = d.captainId;
+  const lastCapPts = lastCapId ? (d.lastRoundPts?.[lastCapId] || 0) : 0;
+  const lastCap2Id = d.captainId2;
+  const lastCap2Pts = lastCap2Id ? (d.lastRoundPts?.[lastCap2Id] || 0) : 0;
+
   const el = $s('lb-list');
   el.innerHTML = '';
+
+  // En haut : récap des Cap'tens du tour précédent
+  if (lastCapId && players[lastCapId]) {
+    const card = document.createElement('div');
+    card.className = 'captain-score-card';
+    const ptsHtml = lastCapPts > 0 
+      ? `<div class="lb-trend up">+${lastCapPts} pts</div>`
+      : `<div class="lb-trend same">+0 pts</div>`;
+    card.innerHTML = `
+      <div class="crown">👑</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.62rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.08em;">Cap'ten ${d.mode === 'duel' ? '1' : 'du tour'}</div>
+        <div style="font-weight:700;font-size:.95rem;color:#fff;">${escapeHtml(players[lastCapId].name)}</div>
+      </div>
+      ${ptsHtml}
+    `;
+    el.appendChild(card);
+  }
+  if (lastCap2Id && players[lastCap2Id]) {
+    const card = document.createElement('div');
+    card.className = 'captain-score-card';
+    const ptsHtml = lastCap2Pts > 0 
+      ? `<div class="lb-trend up">+${lastCap2Pts} pts</div>`
+      : `<div class="lb-trend same">+0 pts</div>`;
+    card.innerHTML = `
+      <div class="crown">👑</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.62rem;color:var(--muted);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.08em;">Cap'ten 2</div>
+        <div style="font-weight:700;font-size:.95rem;color:#fff;">${escapeHtml(players[lastCap2Id].name)}</div>
+      </div>
+      ${ptsHtml}
+    `;
+    el.appendChild(card);
+  }
+
   sorted.forEach(([id, p], idx) => {
     const rank = idx + 1;
     const row = document.createElement('div');
     row.className = `lb-row ${id === pid ? 'self' : ''} top${rank <= 3 ? rank : ''}`;
     row.style.animationDelay = `${idx * 0.08}s`;
+    const score = p.score || 0;
+    const pct = topScore > 0 ? Math.max(8, Math.round((score / topScore) * 100)) : 0;
+    row.style.setProperty('--lb-pct', pct + '%');
+
     const emoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+    const gained = d.lastRoundPts?.[id] || 0;
+    const gainedHtml = gained > 0 ? `<div class="lb-trend up">+${gained}</div>` : '';
     row.innerHTML = `
       <div class="lb-rank">${emoji || '#' + rank}</div>
       <div class="player-avatar">${(p.name||'?').charAt(0).toUpperCase()}</div>
       <div class="player-name">${escapeHtml(p.name)}</div>
-      <div class="lb-pts">${p.score || 0} pts</div>
+      ${gainedHtml}
+      <div class="lb-pts">${score} pts</div>
     `;
     el.appendChild(row);
   });
@@ -5000,6 +6627,7 @@ window.startTurn = async (isNewRound) => {
       u[`rooms/${room.id}/liveSort`] = null;
       u[`rooms/${room.id}/liveSortDuel`] = null;
       u[`rooms/${room.id}/duelResult`] = null;
+      u[`rooms/${room.id}/duelComputed`] = null;
       u[`rooms/${room.id}/roundResult`] = null;
       u[`rooms/${room.id}/timerEndsAt`] = null;
       u[`rooms/${room.id}/winningTheme`] = null;
@@ -5034,6 +6662,9 @@ window.startTurn = async (isNewRound) => {
   // --- LOGIQUE CLASSIQUE / AUTRES MODES ---
   let queue = d.captainQueue || [];
   let round = d.round || 1;
+
+  // Filtre la queue : on enlève les joueurs qui ne sont plus dans la salle (kickés par le watchdog)
+  queue = queue.filter(id => ids.includes(id));
 
   if (isNewRound || queue.length === 0) {
     queue = shuffle([...ids]);
@@ -5132,14 +6763,18 @@ function renderGameover(d) {
     // Rest of leaderboard
     const lb = $s('go-leaderboard');
     lb.innerHTML = '';
+    const allTopScore = Math.max(1, ...sorted.map(([,p]) => p.score || 0));
     sorted.slice(3).forEach(([id, p], idx) => {
       const row = document.createElement('div');
       row.className = `lb-row ${id === pid ? 'self' : ''}`;
+      const score = p.score || 0;
+      const pct = allTopScore > 0 ? Math.max(8, Math.round((score / allTopScore) * 100)) : 0;
+      row.style.setProperty('--lb-pct', pct + '%');
       row.innerHTML = `
         <div class="lb-rank">#${idx + 4}</div>
         <div class="player-avatar">${(p.name||'?').charAt(0).toUpperCase()}</div>
         <div class="player-name">${escapeHtml(p.name)}</div>
-        <div class="lb-pts">${p.score || 0} pts</div>
+        <div class="lb-pts">${score} pts</div>
       `;
       lb.appendChild(row);
     });
@@ -5176,6 +6811,7 @@ window.restartGame = async () => {
 window.openSettings = () => {
   const sessionBtns = document.getElementById('settings-session-btns');
   const returnBtn = document.getElementById('btn-return-lobby');
+  const hostLeaveBtn = document.getElementById('btn-host-leave');
   
   if (room && room.id) {
     sessionBtns.style.display = 'block';
@@ -5188,6 +6824,14 @@ window.openSettings = () => {
     } else {
       returnBtn.style.opacity = '1';
       returnBtn.style.pointerEvents = 'auto';
+    }
+
+    // Bouton "Quitter et transférer l'hôte" visible uniquement si je suis l'hôte
+    // ET qu'il y a au moins un autre joueur
+    const isHost = room.data && room.data.host === pid;
+    const hasOthers = room.data && Object.keys(room.data.players || {}).length > 1;
+    if (hostLeaveBtn) {
+      hostLeaveBtn.style.display = (isHost && hasOthers) ? 'block' : 'none';
     }
   } else {
     sessionBtns.style.display = 'none';
@@ -5203,15 +6847,71 @@ window.closeSettings = () => $s('settings-overlay').classList.remove('open');
 window.settingsLeaveGame = () => {
   window.closeSettings(); // Ferme d'abord le menu paramètres
   window.showConfirm("Veux-tu vraiment quitter la partie en cours ?", () => {
-    window.leaveRoomActual(); // On crée une petite fonction interne pour le départ sans re-demander
+    leaveRoomCore(); // Plus de location.reload() : on nettoie l'état proprement
   });
 };
 
-// Fonction technique pour quitter sans popup (appelée par showConfirm)
-window.leaveRoomActual = async () => {
-  try { await remove(ref(db, `rooms/${room.id}/players/${pid}`)); } catch(e){}
-  location.reload(); // Un reload est plus propre pour réinitialiser tout l'état
+// Conservé pour compatibilité externe (ne fait plus de reload)
+window.leaveRoomActual = async () => { await leaveRoomCore(); };
+
+// ─── Quitter en transférant le rôle d'hôte ───
+window.hostLeaveWithTransfer = () => {
+  window.closeSettings();
+  if (!room.data || room.data.host !== pid) {
+    toast("Tu n'es pas l'hôte.", "err"); return;
+  }
+  const others = Object.entries(room.data.players || {})
+    .filter(([id]) => id !== pid)
+    .sort((a,b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
+
+  if (others.length === 0) {
+    // Personne d'autre : on quitte tout simplement (le salon sera fermé)
+    window.showConfirm("Personne d'autre n'est dans le salon. Quitter va le fermer. Confirmer ?", () => {
+      leaveRoomCore();
+    });
+    return;
+  }
+
+  // Affiche le modal de transfert
+  const list = document.getElementById('host-transfer-list');
+  if (!list) return;
+  list.innerHTML = '';
+  others.forEach(([id, p], idx) => {
+    const tile = document.createElement('div');
+    tile.className = 'host-transfer-tile' + (idx === 0 ? ' oldest' : '');
+    const dur = Math.max(0, Math.round((Date.now() - (p.joinedAt || Date.now())) / 60000));
+    tile.innerHTML = `
+      <div class="player-avatar">${(p.name||'?').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="player-name">${escapeHtml(p.name || '???')}</div>
+        <div class="since">${idx === 0 ? '★ Plus ancien · ' : ''}depuis ${dur}min</div>
+      </div>
+      ${idx === 0 ? '<div style="font-size:1.1rem;">⭐</div>' : ''}
+    `;
+    tile.onclick = () => transferHostAndLeave(id);
+    list.appendChild(tile);
+  });
+  document.getElementById('host-transfer-overlay').style.display = 'flex';
 };
+
+window.closeHostTransfer = () => {
+  const o = document.getElementById('host-transfer-overlay');
+  if (o) o.style.display = 'none';
+};
+
+async function transferHostAndLeave(newHostId) {
+  if (!room.id) return;
+  closeHostTransfer();
+  const oldRoomId = room.id;
+  try { await update(ref(db, `rooms/${oldRoomId}`), { host: newHostId }); } catch(e){}
+  // Annule onDisconnect avant retrait
+  try { onDisconnect(ref(db, `rooms/${oldRoomId}/players/${pid}/disconnectedAt`)).cancel(); } catch(e){}
+  try { onDisconnect(ref(db, `rooms/${oldRoomId}/players/${pid}/lastSeen`)).cancel(); } catch(e){}
+  try { await remove(ref(db, `rooms/${oldRoomId}/players/${pid}`)); } catch(e){}
+  cleanRoomLocal();
+  showScreen('home');
+  toast('👑 Hôte transféré avec succès', 'ok');
+}
 
 // Retourner au salon (Hôte uniquement)
 window.settingsReturnLobby = async () => {
@@ -5281,21 +6981,48 @@ window.closeWelcome  = () => {
   }
 })();
 
+// ─── Mode Fluide (anti-lag) ─────────────────────
+(function initPerfMode() {
+  function isLowEndDevice() {
+    const cores = navigator.hardwareConcurrency || 4;
+    const ram   = navigator.deviceMemory || 4;
+    return cores <= 4 || ram <= 4;
+  }
+
+  const perfToggle = document.getElementById('perf-mode-toggle');
+  const saved = localStorage.getItem('tt-perf-mode'); // 'true' | 'false' | null
+  let useLow = false;
+
+  if (saved === 'true') useLow = true;
+  else if (saved === null && isLowEndDevice()) useLow = true; // détection auto au 1er chargement
+
+  if (useLow) {
+    document.body.classList.add('low-end-mode');
+    if (perfToggle) perfToggle.checked = true;
+  }
+
+  if (perfToggle) {
+    perfToggle.addEventListener('change', e => {
+      if (e.target.checked) {
+        document.body.classList.add('low-end-mode');
+        localStorage.setItem('tt-perf-mode', 'true');
+      } else {
+        document.body.classList.remove('low-end-mode');
+        localStorage.setItem('tt-perf-mode', 'false');
+      }
+    });
+  }
+})();
+
 // Close overlays on Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     window.closeSettings(); window.closeRules(); window.closeModal(); window.closeAdult(); window.closeWelcome();
+    window.closeHostTransfer && window.closeHostTransfer();
   }
 });
 
 // Expose window methods (some already assigned above via window.*)
-// Clean exit
-window.cfgSetMode = async (mode) => {
-  if (!room.data || room.data.host !== pid) return;
-  await update(ref(db, `rooms/${room.id}`), { mode });
-  renderConfigParams(mode); // Rafraîchit les options
-};
-
 window.unsubmitAnswer = async () => {
   if (!room.id || !room.data) return;
   
