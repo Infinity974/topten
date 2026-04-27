@@ -1641,13 +1641,29 @@ html.light-mode .input-clear-btn:hover {
 /* ═══════════════════════════════════════════════════════════
    29. LIGHT MODE
 ═══════════════════════════════════════════════════════════ */
-html.light-mode { --bg-dark: #f2f0f8; background-color: #f2f0f8; }
+html.light-mode #splash-screen { background: #f2f0f8 !important; }
+html.light-mode .splash-digit { color: #14121e !important; }
+html.light-mode .splash-title { color: #14121e !important; }
+html.light-mode .splash-subtitle { color: rgba(20,18,30,.55) !important; }
+html.light-mode .splash-scanline { opacity: .3 !important; }
+html.light-mode {
+  --bg-dark: #f2f0f8;
+  background-color: #f2f0f8;
+  /* ⚠ Redéfinition globale des variables de couleurs en mode clair */
+  --muted: rgba(20, 18, 30, 0.62);
+  --dim:   rgba(20, 18, 30, 0.40);
+}
+html.light-mode #cfg-mode-desc {
+  background: rgba(255,255,255,.85) !important;
+  border-color: rgba(0,0,0,.07) !important;
+  color: #14121e !important;
+}
 html.light-mode body {
   background-color: #f2f0f8;
   color: #14121e;
 }
-html.light-mode p { color: rgba(20,18,30,.55); }
-html.light-mode h3 { color: rgba(20,18,30,.55); }
+html.light-mode p { color: rgba(20,18,30,.62); }
+html.light-mode h3 { color: rgba(20,18,30,.62); }
 html.light-mode .bg-orb-1 { background: radial-gradient(circle at 38% 38%, rgba(var(--primary-rgb),.15) 0%, transparent 66%); }
 html.light-mode .bg-orb-2 { background: radial-gradient(circle at 62% 62%, rgba(var(--success-rgb),.12) 0%, transparent 66%); }
 html.light-mode .bg-orb-3 { background: radial-gradient(circle at 50% 50%, rgba(var(--secondary-rgb),.10) 0%, transparent 66%); }
@@ -1658,80 +1674,230 @@ html.light-mode .glass, html.light-mode .glass2, html.light-mode .mode-card, htm
   border: 1px solid rgba(255,255,255,.55);
   border-top: 2px solid #ffffff;
   box-shadow: 0 10px 30px rgba(100,100,140,.15);
-}
-html.light-mode .input, html.light-mode textarea.input, html.light-mode select.input {
-  background: rgba(255,255,255,.7);
   color: #14121e;
-  border-color: rgba(0,0,0,.08);
-  border-top-color: rgba(0,0,0,.05);
+}
+
+/* ⚠ FIX MODE-CARD : les titres "Classique", "Survie", etc. étaient en blanc */
+html.light-mode .mode-card .lv-name,
+html.light-mode .mode-card .mode-name,
+html.light-mode .mode-card h3,
+html.light-mode .level-opt .lv-name {
+  color: #14121e !important;
+}
+html.light-mode .mode-card,
+html.light-mode .level-opt,
+html.light-mode .config-card {
+  color: #14121e !important;
+}
+html.light-mode .level-opt .lv-desc,
+html.light-mode .mode-card .mode-desc {
+  color: rgba(20,18,30,.62) !important;
+}
+
+/* ⚠ FIX TITRES DE SECTION ("MODE DE JEU", "NIVEAU", "PARAMÈTRES DE LA PARTIE", "LE CONCEPT", etc.) */
+/* Ces titres utilisaient color: #fff hardcodé. On force le sombre en mode clair. */
+html.light-mode .rule-block-title,
+html.light-mode .settings-section-title,
+html.light-mode .section-title {
+  color: #14121e !important;
+}
+
+/* ⚠ FIX LABELS DES PARAMÈTRES ("MANCHES", "VIES D'ÉQUIPE", "CHRONO RÉPONSE") */
+html.light-mode label {
+  color: rgba(20,18,30,.70) !important;
+}
+
+/* ⚠ FIX TITRES H2 partout (style="color:#fff" inline est battu par !important) */
+html.light-mode h2 {
+  color: #14121e !important;
+}
+
+html.light-mode .input, html.light-mode textarea.input, html.light-mode select.input {
+  background: rgba(255,255,255,.9);
+  color: #14121e;
+  border-color: rgba(0,0,0,.10);
+  border-top-color: rgba(0,0,0,.06);
   box-shadow: inset 0 2px 6px rgba(100,100,140,.08);
 }
-html.light-mode .input::placeholder, html.light-mode textarea.input::placeholder { color: rgba(20,18,30,.35); }
+html.light-mode .input::placeholder, html.light-mode textarea.input::placeholder { color: rgba(20,18,30,.42); }
 html.light-mode select.input option { background: #fff; color: #14121e; }
 html.light-mode .player-item {
-  background: rgba(255,255,255,.6);
-  border-color: rgba(0,0,0,.06);
-  border-top-color: rgba(255,255,255,.95);
-}
-html.light-mode .theme-card {
-  background: linear-gradient(145deg, rgba(var(--primary-rgb),.10) 0%, rgba(var(--secondary-rgb),.04) 100%), rgba(255,255,255,.65);
-}
-html.light-mode .theme-text { color: #14121e; }
-html.light-mode .btn-secondary {
   background: rgba(255,255,255,.7);
-  color: rgba(20,18,30,.85);
   border-color: rgba(0,0,0,.08);
   border-top-color: rgba(255,255,255,.95);
+  color: #14121e;
 }
+html.light-mode .player-name { color: #14121e !important; }
+html.light-mode .theme-card {
+  background: linear-gradient(145deg, rgba(var(--primary-rgb),.10) 0%, rgba(var(--secondary-rgb),.04) 100%), rgba(255,255,255,.75);
+}
+html.light-mode .theme-text { color: #14121e !important; }
+html.light-mode .theme-label { color: rgba(20,18,30,.55) !important; }
+
+/* ⚠ FIX BOUTON SECONDAIRE ("Comment jouer ?", etc.) */
+html.light-mode .btn-secondary {
+  background: rgba(255,255,255,.95);
+  color: #14121e !important;
+  border-color: rgba(0,0,0,.10);
+  border-top-color: rgba(255,255,255,1);
+}
+html.light-mode .btn-secondary:hover {
+  background: #ffffff;
+}
+
 html.light-mode .game-hdr {
   background: linear-gradient(145deg, rgba(255,255,255,.85) 0%, rgba(255,255,255,.5) 100%);
   border-color: rgba(0,0,0,.06);
   border-top-color: rgba(255,255,255,.95);
 }
-html.light-mode .hdr-round-label { color: rgba(20,18,30,.55); }
+html.light-mode .hdr-round-label { color: rgba(20,18,30,.55) !important; }
+html.light-mode .hdr-round-val   { color: #14121e !important; }
 html.light-mode .answer-card {
-  background: linear-gradient(145deg, rgba(255,255,255,.85) 0%, rgba(255,255,255,.5) 100%);
+  background: linear-gradient(145deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.65) 100%);
   color: #14121e;
 }
-html.light-mode .answer-card .card-player { color: rgba(20,18,30,.55); }
+html.light-mode .answer-card .card-player { color: rgba(20,18,30,.55) !important; }
+html.light-mode .answer-card .card-answer { color: #14121e !important; }
 html.light-mode .timeline-wrap {
   background: rgba(255,255,255,.55);
 }
-html.light-mode #modal, html.light-mode #welcome-panel, html.light-mode #settings-panel, html.light-mode #rules-panel, html.light-mode #adult-panel {
+html.light-mode #modal, html.light-mode #welcome-panel, html.light-mode #settings-panel, html.light-mode #rules-panel, html.light-mode #adult-panel,
+html.light-mode #reconnect-panel, html.light-mode #host-transfer-panel {
   background: linear-gradient(145deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.85) 100%);
   color: #14121e;
   border-color: rgba(0,0,0,.08);
   border-top-color: rgba(255,255,255,.9);
 }
-html.light-mode #modal h2, html.light-mode #welcome-panel h2, html.light-mode #settings-panel h2, html.light-mode #rules-panel h2 { color: #14121e; }
-html.light-mode .settings-section, html.light-mode .rule-block {
-  background: rgba(255,255,255,.7);
-  border-color: rgba(0,0,0,.08);
+html.light-mode #modal h2,
+html.light-mode #welcome-panel h2,
+html.light-mode #settings-panel h2,
+html.light-mode #rules-panel h2,
+html.light-mode #adult-panel h2,
+html.light-mode #reconnect-panel h2,
+html.light-mode #host-transfer-panel h2 { color: #14121e !important; }
+html.light-mode #welcome-panel p,
+html.light-mode #settings-panel p,
+html.light-mode #rules-panel p,
+html.light-mode #adult-panel p,
+html.light-mode #modal p,
+html.light-mode #reconnect-panel p,
+html.light-mode #host-transfer-panel p {
+  color: rgba(20,18,30,.62) !important;
 }
-html.light-mode .rule-line { color: rgba(20,18,30,.60); }
-html.light-mode .rule-line strong { color: #14121e; }
+html.light-mode .settings-section, html.light-mode .rule-block {
+  background: rgba(255,255,255,.85);
+  border-color: rgba(0,0,0,.08);
+  color: #14121e;
+}
+html.light-mode .rule-line { color: rgba(20,18,30,.70) !important; }
+html.light-mode .rule-line span { color: inherit !important; }
+html.light-mode .rule-line strong { color: #14121e !important; }
+html.light-mode #toggle-label,
+html.light-mode .settings-section span { color: #14121e !important; }
 html.light-mode .close-panel-btn { color: rgba(20,18,30,.55); background: rgba(0,0,0,.05); }
 html.light-mode .close-panel-btn:hover { color: #14121e; background: rgba(0,0,0,.10); }
+
+/* ⚠ FIX FOOTERS "INTERFACE LIQUID GLASS ✦ KSOS" et "Prêt à jouer ?" 
+   (utilisaient rgba(255,255,255,.25) inline) */
+html.light-mode #welcome-panel p[style*="rgba(255,255,255"],
+html.light-mode #settings-panel p[style*="rgba(255,255,255"],
+html.light-mode #rules-panel p[style*="rgba(255,255,255"],
+html.light-mode .glass p[style*="rgba(255,255,255"] {
+  color: rgba(20,18,30,.45) !important;
+}
+
 html.light-mode #settings-notch {
-  background: rgba(255,255,255,.75);
-  border-color: rgba(0,0,0,.08);
+  background: rgba(255,255,255,.85);
+  border-color: rgba(0,0,0,.10);
 }
-html.light-mode #settings-notch svg { color: rgba(20,18,30,.55); }
-html.light-mode #settings-notch:hover svg { color: #14121e; }
-html.light-mode #settings-notch .notch-label { color: rgba(20,18,30,.5); }
+html.light-mode #settings-notch svg { color: rgba(20,18,30,.65) !important; }
+html.light-mode #settings-notch:hover svg { color: #14121e !important; }
+html.light-mode #settings-notch .notch-label { color: rgba(20,18,30,.65) !important; }
 html.light-mode .num-btn {
-  background: rgba(255,255,255,.6);
-  border-color: rgba(0,0,0,.08);
-  color: rgba(20,18,30,.55);
+  background: rgba(255,255,255,.7);
+  border-color: rgba(0,0,0,.10);
+  color: rgba(20,18,30,.65);
 }
-html.light-mode .num-btn:hover { background: rgba(255,255,255,.9); color: #14121e; }
+html.light-mode .num-btn:hover { background: rgba(255,255,255,.95); color: #14121e; }
 html.light-mode .sniper-answer {
-  background: linear-gradient(145deg, rgba(255,255,255,.85) 0%, rgba(255,255,255,.5) 100%);
+  background: linear-gradient(145deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.65) 100%);
+  color: #14121e;
 }
-html.light-mode .sniper-answer-text { color: #14121e; }
-html.light-mode .sniper-answer-name { color: rgba(20,18,30,.55); }
-html.light-mode .lb-row { background: rgba(255,255,255,.7); color: #14121e; }
-html.light-mode .extreme-opt { background: rgba(255,255,255,.65); color: #14121e; }
+html.light-mode .sniper-answer-text { color: #14121e !important; }
+html.light-mode .sniper-answer-name { color: rgba(20,18,30,.55) !important; }
+html.light-mode .lb-row { background: rgba(255,255,255,.8); color: #14121e !important; }
+html.light-mode .lb-row .player-name { color: #14121e !important; }
+html.light-mode .extreme-opt { background: rgba(255,255,255,.75); color: #14121e !important; }
+
+/* ⚠ FIX VERIFY ROW (écran "Vérification du classement") */
+html.light-mode .verify-row {
+  background: linear-gradient(145deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.65) 100%);
+  border: 1px solid rgba(0,0,0,.07);
+  border-top: 1px solid rgba(255,255,255,.95);
+  color: #14121e;
+}
+html.light-mode .verify-summary {
+  background: rgba(255,255,255,.85);
+  border-color: rgba(0,0,0,.07);
+  color: #14121e;
+}
+html.light-mode .verify-num-cell .label,
+html.light-mode .verify-content .who { color: rgba(20,18,30,.55) !important; }
+html.light-mode .verify-content .ans { color: #14121e !important; }
+html.light-mode .verify-arrow { color: rgba(20,18,30,.30) !important; }
+html.light-mode .verify-summary .stat .lbl { color: rgba(20,18,30,.55) !important; }
+html.light-mode .verify-num-cell .num { text-shadow: none !important; }
+
+/* ⚠ FIX DUEL en mode clair */
+html.light-mode .duel-arena,
+html.light-mode .duel-tl-card,
+html.light-mode .duel-spec-pool,
+html.light-mode .captain-score-card {
+  background: linear-gradient(145deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.65) 100%);
+  border: 1px solid rgba(0,0,0,.07);
+  border-top: 1px solid rgba(255,255,255,.95);
+  color: #14121e;
+}
+html.light-mode .duel-fighter-name { color: #14121e !important; }
+html.light-mode .duel-fighter.f1 .duel-fighter-name { color: rgb(var(--primary-rgb)) !important; }
+html.light-mode .duel-fighter.f2 .duel-fighter-name { color: rgb(var(--accent-rgb)) !important; }
+html.light-mode .duel-fighter-status.thinking,
+html.light-mode .duel-tl-header .status-pill.thinking { color: rgba(20,18,30,.62) !important; background: rgba(0,0,0,.05) !important; }
+html.light-mode .duel-spec-card {
+  background: rgba(255,255,255,.85) !important;
+  border-color: rgba(0,0,0,.07) !important;
+  color: #14121e !important;
+}
+html.light-mode .duel-spec-card .from { color: rgba(20,18,30,.55) !important; }
+html.light-mode .duel-spec-card .ans  { color: #14121e !important; }
+html.light-mode .duel-spec-pool .pool-title { color: rgba(20,18,30,.55) !important; }
+
+/* ⚠ FIX CAPTAIN SCORE CARD */
+html.light-mode .captain-score-card .crown { filter: none !important; }
+
+/* ⚠ FIX HOST TRANSFER */
+html.light-mode .host-transfer-tile {
+  background: rgba(255,255,255,.75) !important;
+  border-color: rgba(0,0,0,.08) !important;
+  border-top-color: rgba(255,255,255,.95) !important;
+  color: #14121e !important;
+}
+html.light-mode .host-transfer-tile .since { color: rgba(20,18,30,.55) !important; }
+
+/* ⚠ FIX CHAMP COMPTEUR DE CARACTÈRES */
+html.light-mode #ans-text-count,
+html.light-mode #tc-custom-count { color: rgba(20,18,30,.55) !important; }
+
+/* ⚠ FIX BOUTON CLEAR (×) en clair */
+html.light-mode .input-clear-btn {
+  background: rgba(0,0,0,.06) !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: rgba(20,18,30,.55) !important;
+}
+html.light-mode .input-clear-btn:hover {
+  background: rgba(var(--accent-rgb),.15) !important;
+  color: rgb(var(--accent-rgb)) !important;
+}
 
 /* Responsive tweaks */
 @media (max-width: 420px) {
