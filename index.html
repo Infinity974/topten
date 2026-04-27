@@ -1058,6 +1058,27 @@ select.input option { background: #0a0a1e; color: #fff; }
 }
 .mini-card:hover { transform: scale(.95); }
 
+/* ⚠ FIX MOBILE : sur les écrans étroits, on passe la timeline en grille 5x2 (2 lignes de 5)
+   au lieu d'avoir 10 colonnes qui scrollent horizontalement (peu intuitif sur tel). */
+@media (max-width: 600px) {
+  .timeline-wrap { overflow-x: visible; padding: .6rem; }
+  .timeline {
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: auto;
+    gap: 6px;
+    min-width: 0;
+    width: 100%;
+  }
+  .tl-drop { min-height: 60px; }
+  .mini-card { height: 60px; font-size: .6rem; }
+  .tl-num { font-size: .75rem; }
+}
+@media (max-width: 380px) {
+  .timeline { gap: 4px; }
+  .tl-drop { min-height: 54px; }
+  .mini-card { height: 54px; font-size: .56rem; padding: 2px; }
+}
+
 /* ═══════════════════════════════════════════════════════════
    19. SNIPER UI (Intensity Wheel) — creative 1-10
 ═══════════════════════════════════════════════════════════ */
@@ -2096,50 +2117,8 @@ body.low-end-mode .verify-num-cell .num { text-shadow: none !important; }
 .captain-score-card .crown { font-size: 1.5rem; filter: drop-shadow(0 0 8px rgba(var(--gold-rgb),.6)); }
 
 /* ═══════════════════════════════════════════════════════════
-   31. RECONNECTION MODAL & CONNECTION INDICATOR
+   31. RECONNECTION MODAL
 ═══════════════════════════════════════════════════════════ */
-.connection-indicator {
-  position: fixed;
-  top: 1rem; right: 1rem;
-  padding: .35rem .75rem;
-  border-radius: 999px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: .65rem; font-weight: 700;
-  letter-spacing: .08em; text-transform: uppercase;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,.1);
-  color: var(--muted);
-  z-index: 500;
-  display: flex; align-items: center; gap: .4rem;
-  opacity: 0; pointer-events: none;
-  transition: opacity .3s ease;
-}
-.connection-indicator.show { opacity: 1; pointer-events: auto; }
-.connection-indicator .dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--muted);
-}
-.connection-indicator.online .dot {
-  background: rgb(var(--success-rgb));
-  box-shadow: 0 0 8px rgba(var(--success-rgb), .7);
-}
-.connection-indicator.offline .dot {
-  background: rgb(var(--accent-rgb));
-  box-shadow: 0 0 8px rgba(var(--accent-rgb), .7);
-  animation: pulseOffline 1s ease-in-out infinite;
-}
-.connection-indicator.reconnecting .dot {
-  background: rgb(var(--gold-rgb));
-  box-shadow: 0 0 8px rgba(var(--gold-rgb), .7);
-  animation: pulseOffline 1s ease-in-out infinite;
-}
-@keyframes pulseOffline {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .5; transform: scale(.8); }
-}
-
 /* Reconnect prompt modal-specific styling */
 .reconnect-card {
   display: flex; flex-direction: column; align-items: center;
@@ -2264,8 +2243,7 @@ body.low-end-mode .duel-tl-card,
 body.low-end-mode .duel-spec-pool,
 body.low-end-mode .verify-row,
 body.low-end-mode .verify-summary,
-body.low-end-mode .captain-score-card,
-body.low-end-mode .connection-indicator {
+body.low-end-mode .captain-score-card {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -2327,19 +2305,22 @@ body.low-end-mode .timer-fill.danger { animation: none !important; }
 body.low-end-mode .splash-scanline { display: none !important; }
 body.low-end-mode #splash-screen::after { animation: none !important; opacity: .6; }
 body.low-end-mode .dots span { animation: none !important; opacity: .8 !important; }
-body.low-end-mode .connection-indicator.offline .dot { animation: none !important; }
-body.low-end-mode .connection-indicator.reconnecting .dot { animation: none !important; }
 body.low-end-mode .reconnect-icon { animation: none !important; filter: none !important; }
 body.low-end-mode .verify-row { animation: none !important; opacity: 1 !important; }
 body.low-end-mode .verify-badge.exact { text-shadow: none !important; }
 
-/* Compatibilité Mode Fluide + Mode Clair */
+/* ══════════════════════════════════════════════════════════
+   Compatibilité Mode Fluide + Mode Clair (overrides étendus)
+   ══════════════════════════════════════════════════════════ */
 html.light-mode body.low-end-mode {
   background: #f2f0f8 !important;
+  color: #14121e !important;
 }
 html.light-mode body.low-end-mode::before {
   background: radial-gradient(ellipse at 50% 0%, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%) !important;
 }
+
+/* Tous les conteneurs de fond : version claire */
 html.light-mode body.low-end-mode .glass,
 html.light-mode body.low-end-mode .glass2,
 html.light-mode body.low-end-mode .game-hdr,
@@ -2347,17 +2328,187 @@ html.light-mode body.low-end-mode .answer-card,
 html.light-mode body.low-end-mode .timeline-wrap,
 html.light-mode body.low-end-mode .sniper-answer,
 html.light-mode body.low-end-mode .lb-row,
+html.light-mode body.low-end-mode .duel-arena,
+html.light-mode body.low-end-mode .duel-tl-card,
+html.light-mode body.low-end-mode .duel-spec-pool,
+html.light-mode body.low-end-mode .verify-row,
+html.light-mode body.low-end-mode .verify-summary,
+html.light-mode body.low-end-mode .captain-score-card,
 html.light-mode body.low-end-mode #settings-notch {
   background: rgba(255,255,255,.95) !important;
   border: 1px solid rgba(0,0,0,.07) !important;
   border-top: 1px solid #fff !important;
   box-shadow: 0 8px 22px rgba(100,100,140,.13) !important;
+  color: #14121e !important;
 }
+
+/* Modals en clair + fluide */
+html.light-mode body.low-end-mode #modal,
+html.light-mode body.low-end-mode #welcome-panel,
+html.light-mode body.low-end-mode #settings-panel,
+html.light-mode body.low-end-mode #rules-panel,
+html.light-mode body.low-end-mode #adult-panel,
+html.light-mode body.low-end-mode #reconnect-panel,
+html.light-mode body.low-end-mode #host-transfer-panel {
+  background: rgba(255,255,255,.98) !important;
+  border: 1px solid rgba(0,0,0,.08) !important;
+  border-top: 1px solid rgba(255,255,255,.95) !important;
+  color: #14121e !important;
+  box-shadow: 0 24px 60px rgba(80,60,140,.20) !important;
+}
+
+/* Textes dans les modals : doivent être lisibles */
+html.light-mode body.low-end-mode #welcome-panel,
+html.light-mode body.low-end-mode #settings-panel,
+html.light-mode body.low-end-mode #rules-panel,
+html.light-mode body.low-end-mode #adult-panel,
+html.light-mode body.low-end-mode #reconnect-panel,
+html.light-mode body.low-end-mode #host-transfer-panel,
+html.light-mode body.low-end-mode #modal,
+html.light-mode body.low-end-mode .glass,
+html.light-mode body.low-end-mode .glass2 {
+  color: #14121e !important;
+}
+html.light-mode body.low-end-mode #welcome-panel h2,
+html.light-mode body.low-end-mode #settings-panel h2,
+html.light-mode body.low-end-mode #rules-panel h2,
+html.light-mode body.low-end-mode #modal h2,
+html.light-mode body.low-end-mode #reconnect-panel h2,
+html.light-mode body.low-end-mode #host-transfer-panel h2,
+html.light-mode body.low-end-mode .glass h2,
+html.light-mode body.low-end-mode .glass2 h2 {
+  color: #14121e !important;
+}
+html.light-mode body.low-end-mode #welcome-panel p,
+html.light-mode body.low-end-mode #settings-panel p,
+html.light-mode body.low-end-mode #rules-panel p,
+html.light-mode body.low-end-mode #modal p,
+html.light-mode body.low-end-mode #reconnect-panel p,
+html.light-mode body.low-end-mode #host-transfer-panel p,
+html.light-mode body.low-end-mode .glass p {
+  color: rgba(20,18,30,.65) !important;
+}
+html.light-mode body.low-end-mode .rule-line,
+html.light-mode body.low-end-mode .rule-line span {
+  color: rgba(20,18,30,.70) !important;
+}
+html.light-mode body.low-end-mode .rule-line strong,
+html.light-mode body.low-end-mode strong {
+  color: #14121e !important;
+}
+html.light-mode body.low-end-mode .settings-section,
+html.light-mode body.low-end-mode .rule-block {
+  background: rgba(245,243,250,.85) !important;
+  border: 1px solid rgba(0,0,0,.06) !important;
+}
+html.light-mode body.low-end-mode .settings-section span,
+html.light-mode body.low-end-mode .rule-block-title {
+  color: #14121e !important;
+}
+
+/* Inputs en clair + fluide */
 html.light-mode body.low-end-mode .input,
 html.light-mode body.low-end-mode textarea.input,
 html.light-mode body.low-end-mode select.input {
-  background: rgba(255,255,255,.85) !important;
+  background: #ffffff !important;
+  color: #14121e !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+  box-shadow: inset 0 2px 6px rgba(100,100,140,.08) !important;
 }
+html.light-mode body.low-end-mode .input::placeholder,
+html.light-mode body.low-end-mode textarea.input::placeholder {
+  color: rgba(20,18,30,.40) !important;
+}
+
+/* Boutons secondaires */
+html.light-mode body.low-end-mode .btn-secondary {
+  background: rgba(255,255,255,.85) !important;
+  color: #14121e !important;
+  border-color: rgba(0,0,0,.08) !important;
+}
+
+/* Cartes mode/level */
+html.light-mode body.low-end-mode .mode-card,
+html.light-mode body.low-end-mode .config-card,
+html.light-mode body.low-end-mode .level-opt {
+  background: rgba(255,255,255,.92) !important;
+  color: #14121e !important;
+  border: 1px solid rgba(0,0,0,.08) !important;
+}
+
+/* Player items en clair */
+html.light-mode body.low-end-mode .player-item {
+  background: rgba(255,255,255,.85) !important;
+  border-color: rgba(0,0,0,.06) !important;
+  color: #14121e !important;
+}
+
+/* Timeline drop areas en clair */
+html.light-mode body.low-end-mode .tl-drop {
+  background: rgba(0,0,0,.04) !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: rgba(20,18,30,.40) !important;
+}
+
+/* Tile de transfert d'hôte */
+html.light-mode body.low-end-mode .host-transfer-tile {
+  background: rgba(245,243,250,.85) !important;
+  border: 1px solid rgba(0,0,0,.06) !important;
+  color: #14121e !important;
+}
+
+/* Toggle label/switch */
+html.light-mode body.low-end-mode #toggle-label,
+html.light-mode body.low-end-mode .premium-switch + span {
+  color: #14121e !important;
+}
+
+/* === Compatibilité Mode CLAIR seul (sans Fluide) === */
+/* Améliore aussi les textes en mode clair simple */
+html.light-mode .verify-row,
+html.light-mode .verify-summary,
+html.light-mode .duel-tl-card,
+html.light-mode .duel-spec-pool,
+html.light-mode .duel-arena,
+html.light-mode .captain-score-card {
+  background: linear-gradient(145deg, rgba(255,255,255,.85) 0%, rgba(255,255,255,.5) 100%) !important;
+  border: 1px solid rgba(0,0,0,.08) !important;
+  border-top: 1px solid #fff !important;
+  color: #14121e !important;
+  box-shadow: 0 8px 24px rgba(100,100,140,.13) !important;
+}
+html.light-mode .verify-content .ans,
+html.light-mode .verify-content .who,
+html.light-mode .duel-spec-card .ans,
+html.light-mode .duel-spec-card .from,
+html.light-mode .duel-fighter-name {
+  color: #14121e !important;
+}
+html.light-mode .verify-num-cell .label,
+html.light-mode .verify-content .who,
+html.light-mode .duel-spec-card .from {
+  color: rgba(20,18,30,.55) !important;
+}
+
+/* Modals en mode CLAIR seul (sans Fluide) — fix #reconnect-panel et #host-transfer-panel */
+html.light-mode #reconnect-panel,
+html.light-mode #host-transfer-panel {
+  background: linear-gradient(145deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.85) 100%) !important;
+  color: #14121e !important;
+  border-color: rgba(0,0,0,.08) !important;
+  border-top-color: rgba(255,255,255,.9) !important;
+}
+html.light-mode #reconnect-panel h2,
+html.light-mode #host-transfer-panel h2 { color: #14121e !important; }
+html.light-mode #reconnect-panel p,
+html.light-mode #host-transfer-panel p { color: rgba(20,18,30,.55) !important; }
+html.light-mode .host-transfer-tile {
+  background: rgba(255,255,255,.7) !important;
+  color: #14121e !important;
+  border-color: rgba(0,0,0,.06) !important;
+  border-top-color: rgba(255,255,255,.95) !important;
+}
+
 </style>
 </head>
 <body>
@@ -3057,14 +3208,6 @@ html.light-mode body.low-end-mode select.input {
 <div id="toasts"></div>
 
 <!-- ══════════════════════════════════════════════════════════
-     CONNECTION STATUS INDICATOR
-══════════════════════════════════════════════════════════ -->
-<div id="connection-indicator" class="connection-indicator">
-  <div class="dot"></div>
-  <span id="connection-label">En ligne</span>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════
      RECONNECT PROMPT MODAL
 ══════════════════════════════════════════════════════════ -->
 <div id="reconnect-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.78); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); z-index:1100; align-items:center; justify-content:center; padding:1.5rem;">
@@ -3173,6 +3316,17 @@ html.light-mode body.low-end-mode select.input {
     </div>
 
     <button class="btn btn-secondary btn-full" onclick="openRules()" style="margin-bottom:.5rem;">Comment jouer ? 📖</button>
+
+    <!-- ⚠ NOUVEAU : panneau gestion des joueurs (visible uniquement par l'hôte) -->
+    <div id="settings-host-players" style="display:none; border-top:1px solid rgba(255,255,255,.07); padding-top:.85rem; margin-top:.35rem;">
+      <div class="settings-section-title" style="display:flex;align-items:center;gap:.4rem;color:rgb(var(--gold-rgb));margin-bottom:.5rem;">
+        <span>👑</span><span>Gestion des joueurs (Hôte)</span>
+      </div>
+      <p style="font-size:.7rem;color:var(--muted);line-height:1.4;margin-top:0;margin-bottom:.6rem;">
+        Tu peux promouvoir un joueur comme nouvel hôte ou bannir un joueur du salon.
+      </p>
+      <div id="settings-players-list" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+    </div>
 
     <div id="settings-session-btns" style="display:none; border-top:1px solid rgba(255,255,255,.07); padding-top:.85rem; margin-top:.35rem;">
       <button class="btn btn-secondary btn-full" id="btn-return-lobby" style="color:rgba(255,170,30,.8); margin-bottom:.5rem;" onclick="settingsReturnLobby()">↩ Retourner au salon</button>
@@ -3455,6 +3609,13 @@ async function tryReconnect() {
 
   if (!snap.exists()) { clearSession(); return false; }
   const data = snap.val();
+
+  // ⚠ NOUVEAU : Si le joueur est banni du salon, on ne peut pas se reconnecter
+  if (data.banned && data.banned[sess.pid]) {
+    clearSession();
+    return false;
+  }
+
   const player = data.players?.[sess.pid];
 
   if (!player) { clearSession(); return false; }
@@ -3637,26 +3798,15 @@ window.showConfirm = (text, onConfirm) => {
 };
 
 // ═══════════════════════════════════════════════════════════
-//  CONNECTION STATUS INDICATOR
+//  CONNECTION STATUS (l'indicateur visuel a été retiré sur demande,
+//  on garde la fonction comme no-op pour compatibilité)
 // ═══════════════════════════════════════════════════════════
 function showConnectionStatus(state, label) {
-  const ind = document.getElementById('connection-indicator');
-  const lbl = document.getElementById('connection-label');
-  if (!ind) return;
-  ind.classList.remove('online','offline','reconnecting');
-  if (state) ind.classList.add(state);
-  if (lbl && label) lbl.textContent = label;
-  if (state === 'online' || !state) {
-    // Cache après 2s si online
-    ind.classList.add('show');
-    setTimeout(() => ind.classList.remove('show'), 2000);
-  } else {
-    ind.classList.add('show');
-  }
+  // No-op : pas d'indicateur de connexion à afficher
 }
 
-window.addEventListener('online',  () => { if (room.id) showConnectionStatus('online', 'En ligne'); });
-window.addEventListener('offline', () => { if (room.id) showConnectionStatus('offline', 'Hors-ligne'); });
+window.addEventListener('online',  () => { /* no-op */ });
+window.addEventListener('offline', () => { /* no-op */ });
 
 // ═══════════════════════════════════════════════════════════
 //  7. CREATE / JOIN ROOM (Direct from Home)
@@ -3726,6 +3876,11 @@ window.joinRoom = async () => {
     if (!snap.exists()) { toast('Salon introuvable !', 'err'); return; }
     const d = snap.val();
     
+    // ⚠ NOUVEAU : Vérifier si le joueur n'est pas banni
+    if (d.banned && d.banned[pid]) {
+      toast('🚫 Tu as été banni de ce salon', 'err'); return;
+    }
+
     if (d.status !== 'lobby' && d.status !== 'config') {
       toast('La partie a déjà commencé !', 'err'); return;
     }
@@ -4096,10 +4251,19 @@ function dispatch(d) {
       window._capBoardBuilt = false;
       window._specAnsBuilt = false;     // ⚠ AJOUT : reset spectateurs duel
       window._blindValidating = false;  // ⚠ AJOUT : reset auto-validation aveugle
+      window._answeringCountdownActive = false;
+      window._verifyBuilt = null;       // reset cache du round-reveal
     }
-    if (d.status === 'theme-choice') { /* fresh state */ }
+    if (d.status === 'theme-choice') {
+      window._answeringCountdownActive = false;
+    }
     if (d.status === 'answering') {
       if (blitzTimerId) { clearInterval(blitzTimerId); blitzTimerId = null; }
+      window._answeringCountdownActive = false;
+      window._verifyBuilt = null;
+    }
+    if (d.status === 'round-reveal') {
+      window._answeringCountdownActive = false;
     }
     if (d.status === 'lobby' || d.status === 'config') {
       // Reset complet entre parties
@@ -4109,7 +4273,20 @@ function dispatch(d) {
       window._capBoardBuilt = false;
       window._specAnsBuilt = false;
       window._blindValidating = false;
+      window._answeringCountdownActive = false;
+      window._verifyBuilt = null;
       revealAnimDone = false;
+      // ⚠ FIX : nettoyer TOUS les timers actifs au retour au salon (sinon ils continuent à tourner)
+      if (window._ansTimerInt) { clearInterval(window._ansTimerInt); window._ansTimerInt = null; }
+      if (window._ansInterval) { clearInterval(window._ansInterval); window._ansInterval = null; }
+      if (window._ansTimeout)  { clearTimeout(window._ansTimeout);   window._ansTimeout  = null; }
+      if (window._tcInterval)  { clearInterval(window._tcInterval);  window._tcInterval  = null; }
+      if (window._tcTimeout)   { clearTimeout(window._tcTimeout);    window._tcTimeout   = null; }
+      if (window._tvInterval)  { clearInterval(window._tvInterval);  window._tvInterval  = null; }
+      if (window._tvTimeout)   { clearTimeout(window._tvTimeout);    window._tvTimeout   = null; }
+      if (window._tvrTimeout)  { clearTimeout(window._tvrTimeout);   window._tvrTimeout  = null; }
+      if (blitzTimerId)        { clearInterval(blitzTimerId);        blitzTimerId        = null; }
+      window._tcActive = false; window._tvActive = false; window._tvrActive = false;
     }
     lastStatus = d.status;
   }
@@ -4191,7 +4368,46 @@ window.goToConfig = async () => {
 
 window.backToLobby = async () => {
   if (!room.data || room.data.host !== pid) return;
-  await update(ref(db, `rooms/${room.id}`), { status: 'lobby' });
+  // Reset complet : on repart du lobby comme une nouvelle partie
+  const pids = Object.keys(room.data.players || {});
+  const updates = {};
+  updates[`rooms/${room.id}/status`] = 'lobby';
+  updates[`rooms/${room.id}/round`] = 0;
+  updates[`rooms/${room.id}/captainId`] = null;
+  updates[`rooms/${room.id}/captainId2`] = null;
+  updates[`rooms/${room.id}/challengerId`] = null;
+  updates[`rooms/${room.id}/theme`] = null;
+  updates[`rooms/${room.id}/drawnTheme`] = null;
+  updates[`rooms/${room.id}/timerEndsAt`] = null;
+  updates[`rooms/${room.id}/captainGuess`] = null;
+  updates[`rooms/${room.id}/roundResult`] = null;
+  updates[`rooms/${room.id}/liveSort`] = null;
+  updates[`rooms/${room.id}/liveSortDuel`] = null;
+  updates[`rooms/${room.id}/lastRoundPts`] = null;
+  updates[`rooms/${room.id}/captainQueue`] = null;
+  updates[`rooms/${room.id}/duelQueue`] = null;
+  updates[`rooms/${room.id}/duelComputed`] = null;
+  updates[`rooms/${room.id}/duelResult`] = null;
+  updates[`rooms/${room.id}/winningTheme`] = null;
+  updates[`rooms/${room.id}/lives`] = null;  // sera ré-init au lancement suivant
+  updates[`rooms/${room.id}/startedAt`] = null;
+  updates[`rooms/${room.id}/currentDuelNum`] = null;
+  updates[`rooms/${room.id}/totalDuels`] = null;
+  pids.forEach(id => {
+    updates[`rooms/${room.id}/players/${id}/answer`] = null;
+    updates[`rooms/${room.id}/players/${id}/answered`] = false;
+    updates[`rooms/${room.id}/players/${id}/number`] = null;
+    updates[`rooms/${room.id}/players/${id}/ready`] = false;
+    updates[`rooms/${room.id}/players/${id}/score`] = 0;
+    updates[`rooms/${room.id}/players/${id}/themeProposal`] = null;
+    updates[`rooms/${room.id}/players/${id}/vote`] = null;
+    updates[`rooms/${room.id}/players/${id}/duelReady`] = null;
+    updates[`rooms/${room.id}/players/${id}/draftAnswer`] = null;
+    updates[`rooms/${room.id}/players/${id}/draftTurnKey`] = null;
+    updates[`rooms/${room.id}/players/${id}/draftTheme`] = null;
+    updates[`rooms/${room.id}/players/${id}/draftThemeTurnKey`] = null;
+  });
+  await update(ref(db), updates);
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -4986,9 +5202,13 @@ function renderAnswering(d) {
 
       if (remaining <= 0) {
         clearInterval(window._ansTimerInt);
-        if (!isCap && !me?.answered) {
+        window._ansTimerInt = null;
+        // ⚠ FIX : N'auto-soumet QUE si on est encore en phase 'answering'
+        // (sinon : retour au lobby = soumission accidentelle de réponse vide)
+        // Vérifie aussi que la textarea n'est pas déjà désactivée (= déjà soumis ou en cours).
+        if (!isCap && !me?.answered && room.data?.status === 'answering') {
            const txtArea = $s('ans-text');
-           if (txtArea) {
+           if (txtArea && !txtArea.disabled) {
                const currentText = txtArea.value.trim() || "(Pas de réponse)";
                txtArea.value = currentText;
                window.submitAnswer();
@@ -5139,25 +5359,35 @@ function renderAnswering(d) {
      cdText.style.display = allAnswered ? 'block' : 'none';
   }
 
-  if (window._ansInterval) clearInterval(window._ansInterval);
-  if (window._ansTimeout) clearTimeout(window._ansTimeout);
-
-  if (allAnswered) {
+  // ⚠ FIX : N'initialise le compte à rebours QU'UNE SEULE FOIS (au moment de la transition).
+  // Sans ce verrou, le heartbeat re-render relance le décompte en boucle.
+  if (!allAnswered) {
+    // Plus tous prêts → on annule tout (au cas où un joueur dé-valide)
+    if (window._ansInterval) { clearInterval(window._ansInterval); window._ansInterval = null; }
+    if (window._ansTimeout)  { clearTimeout(window._ansTimeout);   window._ansTimeout  = null; }
+    window._answeringCountdownActive = false;
+  } else if (allAnswered && !window._answeringCountdownActive) {
+    // Tous prêts ET pas encore lancé → on lance le compte à rebours UNE seule fois
+    window._answeringCountdownActive = true;
     let timeLeft = 3;
     document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = '3');
     
     window._ansInterval = setInterval(() => {
       timeLeft--;
-      document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = timeLeft);
-      if (timeLeft <= 0) clearInterval(window._ansInterval);
+      document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = Math.max(0, timeLeft));
+      if (timeLeft <= 0) {
+        clearInterval(window._ansInterval);
+        window._ansInterval = null;
+      }
     }, 1000);
 
     if (d.host === pid) {
       window._ansTimeout = setTimeout(() => {
+        window._ansTimeout = null;
         if (room.data?.status === 'answering') {
-           // ✅ CORRECTION 3 : L'hôte vérifie l'avancée en excluant bien les deux Cap'tens !
+           // L'hôte vérifie l'avancée en excluant bien les deux Cap'tens !
            const checkRes = Object.entries(room.data.players || {}).filter(([i]) => i !== room.data.captainId && i !== room.data.captainId2);
-           if (checkRes.every(([, p]) => p.answered)) {
+           if (checkRes.length > 0 && checkRes.every(([, p]) => p.answered)) {
               update(ref(db, `rooms/${room.id}`), { status: 'resolving' });
            }
         }
@@ -5167,6 +5397,15 @@ function renderAnswering(d) {
 }
 // Fonction de validation CORRIGÉE
 window.submitAnswer = async () => {
+  // Sécurité : ne soumet que si on est en phase de réponse
+  if (!room.id || !room.data || room.data.status !== 'answering') return;
+  // Sécurité : le Cap'ten n'a pas de réponse à soumettre
+  const isCap = room.data.captainId === pid || room.data.captainId2 === pid;
+  if (isCap) return;
+  // Sécurité : déjà soumis
+  const me = room.data.players?.[pid];
+  if (me?.answered) return;
+
   const val = $s('ans-text').value.trim();
   if (!val) { toast('Écris une réponse !', 'err'); return; }
   
@@ -6159,6 +6398,18 @@ window.validateExtreme = async () => {
 // ═══════════════════════════════════════════════════════════
 function renderRoundReveal(d) {
   showScreen('reveal');
+  
+  // ⚠ FIX : on construit la vue UNE SEULE FOIS par tour, pas à chaque heartbeat (sinon animations répétées en boucle).
+  // On utilise un identifiant de tour qui change quand on passe à la manche suivante.
+  const roundKey = `${d.round}_${d.captainId}_${d.captainId2 || ''}_${d.startedAt || 0}`;
+  if (window._verifyBuilt === roundKey) {
+    // Déjà construit pour ce tour → on ne fait rien.
+    // (On ne met à jour QUE les boutons d'action de l'hôte qui peuvent dépendre des autres joueurs).
+    buildRevealActions(d, modeInfo(d.mode));
+    return;
+  }
+  window._verifyBuilt = roundKey;
+
   const m = modeInfo(d.mode);
   const players = d.players || {};
   
@@ -6812,6 +7063,7 @@ window.openSettings = () => {
   const sessionBtns = document.getElementById('settings-session-btns');
   const returnBtn = document.getElementById('btn-return-lobby');
   const hostLeaveBtn = document.getElementById('btn-host-leave');
+  const hostPlayersPanel = document.getElementById('settings-host-players');
   
   if (room && room.id) {
     sessionBtns.style.display = 'block';
@@ -6833,11 +7085,76 @@ window.openSettings = () => {
     if (hostLeaveBtn) {
       hostLeaveBtn.style.display = (isHost && hasOthers) ? 'block' : 'none';
     }
+
+    // ⚠ NOUVEAU : Panneau de gestion des joueurs (visible uniquement par l'hôte)
+    if (hostPlayersPanel) {
+      if (isHost && hasOthers) {
+        hostPlayersPanel.style.display = 'block';
+        renderHostPlayersList();
+      } else {
+        hostPlayersPanel.style.display = 'none';
+      }
+    }
   } else {
     sessionBtns.style.display = 'none';
+    if (hostPlayersPanel) hostPlayersPanel.style.display = 'none';
   }
   
   $s('settings-overlay').classList.add('open');
+};
+
+// Rendu de la liste des joueurs (panneau hôte)
+function renderHostPlayersList() {
+  const list = document.getElementById('settings-players-list');
+  if (!list || !room.data) return;
+  list.innerHTML = '';
+  const players = room.data.players || {};
+  // Tri : moi en premier (pour cohérence visuelle), puis par ancienneté
+  const sorted = Object.entries(players)
+    .filter(([id]) => id !== pid)
+    .sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
+  
+  sorted.forEach(([id, p]) => {
+    const tile = document.createElement('div');
+    tile.style.cssText = 'display:flex;align-items:center;gap:.5rem;padding:.55rem .65rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.16);border-radius:10px;';
+    tile.innerHTML = `
+      <div class="player-avatar" style="width:32px;height:32px;flex-shrink:0;font-size:.85rem;">${(p.name || '?').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0;font-weight:600;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.name || '???')}</div>
+      <button class="btn btn-secondary" style="padding:.35rem .55rem;border-radius:8px;font-size:.65rem;min-width:unset;color:rgb(var(--gold-rgb));" title="Promouvoir hôte" onclick="hostPromote('${id}')">👑</button>
+      <button class="btn btn-secondary" style="padding:.35rem .55rem;border-radius:8px;font-size:.65rem;min-width:unset;color:rgb(var(--accent-rgb));" title="Bannir" onclick="hostKick('${id}')">🚫</button>
+    `;
+    list.appendChild(tile);
+  });
+}
+
+// Promouvoir un joueur en hôte
+window.hostPromote = (targetId) => {
+  if (!room.data || room.data.host !== pid) return;
+  const targetName = room.data.players?.[targetId]?.name || 'ce joueur';
+  window.showConfirm(`Promouvoir ${targetName} comme nouvel hôte ?`, async () => {
+    try {
+      await update(ref(db, `rooms/${room.id}`), { host: targetId });
+      toast(`👑 ${targetName} est maintenant hôte`, 'ok');
+      window.closeSettings();
+    } catch(e) { toast('Erreur lors du transfert', 'err'); }
+  });
+};
+
+// Bannir un joueur (le retire ET ajoute son pid à la banlist du salon)
+window.hostKick = (targetId) => {
+  if (!room.data || room.data.host !== pid) return;
+  const targetName = room.data.players?.[targetId]?.name || 'ce joueur';
+  window.showConfirm(`Bannir ${targetName} du salon ?\n(Il ne pourra plus rejoindre)`, async () => {
+    try {
+      const updates = {};
+      updates[`rooms/${room.id}/players/${targetId}`] = null;
+      updates[`rooms/${room.id}/banned/${targetId}`] = true;
+      await update(ref(db), updates);
+      toast(`🚫 ${targetName} a été banni`, 'ok');
+      // Rafraîchir la liste si l'overlay est encore ouvert
+      renderHostPlayersList();
+    } catch(e) { toast('Erreur lors du bannissement', 'err'); }
+  });
 };
 
 window.closeSettings = () => $s('settings-overlay').classList.remove('open');
@@ -6921,15 +7238,44 @@ window.settingsReturnLobby = async () => {
   }
   
   window.closeSettings();
-  window.showConfirm("Annuler la manche et retourner au salon pour tous les joueurs ?", async () => {
+  window.showConfirm("Annuler la partie en cours et retourner au salon ? (Tous les scores et la manche seront perdus)", async () => {
     const pids = Object.keys(room.data.players || {});
     const updates = {};
     updates[`rooms/${room.id}/status`] = 'lobby';
     updates[`rooms/${room.id}/round`] = 0;
-    // On réinitialise les états de jeu...
+    updates[`rooms/${room.id}/captainId`] = null;
+    updates[`rooms/${room.id}/captainId2`] = null;
+    updates[`rooms/${room.id}/challengerId`] = null;
+    updates[`rooms/${room.id}/theme`] = null;
+    updates[`rooms/${room.id}/drawnTheme`] = null;
+    updates[`rooms/${room.id}/timerEndsAt`] = null;
+    updates[`rooms/${room.id}/captainGuess`] = null;
+    updates[`rooms/${room.id}/roundResult`] = null;
+    updates[`rooms/${room.id}/liveSort`] = null;
+    updates[`rooms/${room.id}/liveSortDuel`] = null;
+    updates[`rooms/${room.id}/lastRoundPts`] = null;
+    updates[`rooms/${room.id}/captainQueue`] = null;
+    updates[`rooms/${room.id}/duelQueue`] = null;
+    updates[`rooms/${room.id}/duelComputed`] = null;
+    updates[`rooms/${room.id}/duelResult`] = null;
+    updates[`rooms/${room.id}/winningTheme`] = null;
+    updates[`rooms/${room.id}/lives`] = null;
+    updates[`rooms/${room.id}/startedAt`] = null;
+    updates[`rooms/${room.id}/currentDuelNum`] = null;
+    updates[`rooms/${room.id}/totalDuels`] = null;
     pids.forEach(id => {
       updates[`rooms/${room.id}/players/${id}/answered`] = false;
       updates[`rooms/${room.id}/players/${id}/answer`] = null;
+      updates[`rooms/${room.id}/players/${id}/number`] = null;
+      updates[`rooms/${room.id}/players/${id}/ready`] = false;
+      updates[`rooms/${room.id}/players/${id}/score`] = 0;
+      updates[`rooms/${room.id}/players/${id}/themeProposal`] = null;
+      updates[`rooms/${room.id}/players/${id}/vote`] = null;
+      updates[`rooms/${room.id}/players/${id}/duelReady`] = null;
+      updates[`rooms/${room.id}/players/${id}/draftAnswer`] = null;
+      updates[`rooms/${room.id}/players/${id}/draftTurnKey`] = null;
+      updates[`rooms/${room.id}/players/${id}/draftTheme`] = null;
+      updates[`rooms/${room.id}/players/${id}/draftThemeTurnKey`] = null;
     });
     
     await update(ref(db), updates);
