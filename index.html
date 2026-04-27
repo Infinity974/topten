@@ -636,6 +636,75 @@ select.input option { background: #0a0a1e; color: #fff; }
   border: 1px solid rgba(var(--gold-rgb),.35);
   text-shadow: 0 0 10px rgba(var(--gold-rgb),.45);
 }
+
+/* Boutons d'action de l'hôte dans la liste du salon */
+.lby-action-btn {
+  width: 30px; height: 30px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700;
+  transition: all .15s ease;
+  color: var(--muted);
+  padding: 0;
+}
+.lby-action-btn:hover { transform: scale(1.08); }
+.lby-action-btn.promote { color: rgb(var(--gold-rgb)); }
+.lby-action-btn.promote:hover {
+  background: rgba(var(--gold-rgb),.12);
+  border-color: rgba(var(--gold-rgb),.40);
+  box-shadow: 0 0 12px rgba(var(--gold-rgb),.25);
+}
+.lby-action-btn.kick { color: rgb(var(--accent-rgb)); }
+.lby-action-btn.kick:hover {
+  background: rgba(var(--accent-rgb),.12);
+  border-color: rgba(var(--accent-rgb),.40);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb),.25);
+}
+html.light-mode .lby-action-btn {
+  border: 1px solid rgba(0,0,0,.10);
+  background: rgba(255,255,255,.6);
+}
+html.light-mode .lby-action-btn:hover { background: rgba(255,255,255,.9); }
+
+/* Bouton "×" pour vider rapidement un champ texte */
+.input-clear-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.30);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  transition: all .15s ease;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+.input-clear-btn:hover {
+  background: rgba(var(--accent-rgb),.18);
+  color: rgb(var(--accent-rgb));
+  border-color: rgba(var(--accent-rgb),.35);
+  transform: scale(1.05);
+}
+.input-clear-btn:active { transform: scale(.95); }
+html.light-mode .input-clear-btn {
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(0,0,0,.10);
+  color: rgba(20,18,30,.55);
+}
+html.light-mode .input-clear-btn:hover {
+  background: rgba(var(--accent-rgb),.15);
+  color: rgb(var(--accent-rgb));
+}
 .player-dot {
   width: 10px; height: 10px; border-radius: 50%;
   background: rgba(255,255,255,.15);
@@ -2804,7 +2873,10 @@ html.light-mode .host-transfer-tile {
       </div>
 
       <div class="glass2" style="padding:1.3rem;margin-bottom:1rem;">
-        <textarea id="tc-custom" class="input" rows="4" maxlength="240" placeholder="Écris ton propre sujet... (240 car. max)" style="margin-bottom:.4rem; font-size:1rem; line-height:1.4; resize:none;"></textarea>
+        <div style="position:relative;">
+          <textarea id="tc-custom" class="input" rows="4" maxlength="240" placeholder="Écris ton propre sujet... (240 car. max)" style="margin-bottom:.4rem; font-size:1rem; line-height:1.4; resize:none; padding-right:2.4rem;"></textarea>
+          <button id="btn-tc-clear" class="input-clear-btn" onclick="clearThemeInput()" title="Effacer" aria-label="Effacer le champ" style="display:none;">×</button>
+        </div>
         <div id="tc-custom-count" style="text-align:right;font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:.7rem;">0 / 240</div>
         <button id="btn-draw-theme" class="btn btn-secondary btn-full" onclick="drawThemeAndFill()" style="border-radius:12px; font-size:.82rem;">
           🎲 Piocher un sujet
@@ -2938,8 +3010,11 @@ html.light-mode .host-transfer-tile {
           <div id="typing-counter" style="font-size:0.65rem; color:rgba(255,255,255,0.4); font-family: 'Space Grotesk', sans-serif; font-weight: 700;"></div>
       </div>
       
-      <textarea id="ans-text" class="input mb-2" rows="3" maxlength="200" placeholder="Écris ta réponse ici... (200 car. max)"></textarea>
-      <div id="ans-text-count" style="text-align:right;font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.05em;margin:-.5rem 0 .6rem;">0 / 200</div>
+      <div style="position:relative;" class="mb-2">
+        <textarea id="ans-text" class="input" rows="3" maxlength="200" placeholder="Écris ta réponse ici... (200 car. max)" style="padding-right:2.4rem;"></textarea>
+        <button id="btn-ans-clear" class="input-clear-btn" onclick="clearAnswerInput()" title="Effacer" aria-label="Effacer le champ" style="display:none;">×</button>
+      </div>
+      <div id="ans-text-count" style="text-align:right;font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.05em;margin:-.4rem 0 .6rem;">0 / 200</div>
       
       <button id="btn-submit-ans" class="btn btn-primary btn-full" onclick="submitAnswer()">Valider ✓</button>
       <button id="btn-edit-ans" class="btn btn-secondary btn-full" onclick="unsubmitAnswer()" style="display:none;">✏️ Modifier ma réponse</button>
@@ -3317,17 +3392,6 @@ html.light-mode .host-transfer-tile {
 
     <button class="btn btn-secondary btn-full" onclick="openRules()" style="margin-bottom:.5rem;">Comment jouer ? 📖</button>
 
-    <!-- ⚠ NOUVEAU : panneau gestion des joueurs (visible uniquement par l'hôte) -->
-    <div id="settings-host-players" style="display:none; border-top:1px solid rgba(255,255,255,.07); padding-top:.85rem; margin-top:.35rem;">
-      <div class="settings-section-title" style="display:flex;align-items:center;gap:.4rem;color:rgb(var(--gold-rgb));margin-bottom:.5rem;">
-        <span>👑</span><span>Gestion des joueurs (Hôte)</span>
-      </div>
-      <p style="font-size:.7rem;color:var(--muted);line-height:1.4;margin-top:0;margin-bottom:.6rem;">
-        Tu peux promouvoir un joueur comme nouvel hôte ou bannir un joueur du salon.
-      </p>
-      <div id="settings-players-list" style="display:flex;flex-direction:column;gap:.4rem;"></div>
-    </div>
-
     <div id="settings-session-btns" style="display:none; border-top:1px solid rgba(255,255,255,.07); padding-top:.85rem; margin-top:.35rem;">
       <button class="btn btn-secondary btn-full" id="btn-return-lobby" style="color:rgba(255,170,30,.8); margin-bottom:.5rem;" onclick="settingsReturnLobby()">↩ Retourner au salon</button>
       <button class="btn btn-secondary btn-full" id="btn-host-leave" style="color:rgb(var(--gold-rgb)); margin-bottom:.5rem; display:none;" onclick="hostLeaveWithTransfer()">👑 Quitter et transférer l'hôte</button>
@@ -3610,12 +3674,6 @@ async function tryReconnect() {
   if (!snap.exists()) { clearSession(); return false; }
   const data = snap.val();
 
-  // ⚠ NOUVEAU : Si le joueur est banni du salon, on ne peut pas se reconnecter
-  if (data.banned && data.banned[sess.pid]) {
-    clearSession();
-    return false;
-  }
-
   const player = data.players?.[sess.pid];
 
   if (!player) { clearSession(); return false; }
@@ -3875,11 +3933,6 @@ window.joinRoom = async () => {
     const snap = await get(ref(db, `rooms/${code}`));
     if (!snap.exists()) { toast('Salon introuvable !', 'err'); return; }
     const d = snap.val();
-    
-    // ⚠ NOUVEAU : Vérifier si le joueur n'est pas banni
-    if (d.banned && d.banned[pid]) {
-      toast('🚫 Tu as été banni de ce salon', 'err'); return;
-    }
 
     if (d.status !== 'lobby' && d.status !== 'config') {
       toast('La partie a déjà commencé !', 'err'); return;
@@ -3938,9 +3991,9 @@ function enterRoom(id) {
     }
     room.data = snap.val();
 
-    // Si je ne suis plus dans la liste des joueurs (kick par watchdog) → retour home
+    // Si je ne suis plus dans la liste des joueurs (kick par hôte ou watchdog) → retour home
     if (!room.data.players?.[pid]) {
-      toast('Tu as été déconnecté du salon.', 'err');
+      toast('Tu as quitté le salon (ou été exclu).', 'info');
       cleanRoomLocal();
       showScreen('home');
       return;
@@ -4251,8 +4304,11 @@ function dispatch(d) {
       window._capBoardBuilt = false;
       window._specAnsBuilt = false;     // ⚠ AJOUT : reset spectateurs duel
       window._blindValidating = false;  // ⚠ AJOUT : reset auto-validation aveugle
+      window._blindLastPlacedCount = undefined; // reset du tracker mode aveugle
       window._answeringCountdownActive = false;
       window._verifyBuilt = null;       // reset cache du round-reveal
+      window._duelSpecKey1 = null;       // reset cache timeline spec duel
+      window._duelSpecKey2 = null;
     }
     if (d.status === 'theme-choice') {
       window._answeringCountdownActive = false;
@@ -4273,8 +4329,11 @@ function dispatch(d) {
       window._capBoardBuilt = false;
       window._specAnsBuilt = false;
       window._blindValidating = false;
+      window._blindLastPlacedCount = undefined;
       window._answeringCountdownActive = false;
       window._verifyBuilt = null;
+      window._duelSpecKey1 = null;
+      window._duelSpecKey2 = null;
       revealAnimDone = false;
       // ⚠ FIX : nettoyer TOUS les timers actifs au retour au salon (sinon ils continuent à tourner)
       if (window._ansTimerInt) { clearInterval(window._ansTimerInt); window._ansTimerInt = null; }
@@ -4345,10 +4404,18 @@ function renderLobby(d) {
     const isDisc = p.disconnectedAt && (now - p.disconnectedAt) > 1000;
     const offline = isStale || isDisc;
 
+    // ⚠ NOUVEAU : Si je suis l'hôte ET que ce n'est pas moi, j'affiche les actions promote/kick directement
+    const showHostActions = isHost && id !== pid;
+    const hostActionsHtml = showHostActions ? `
+      <button class="lby-action-btn promote" title="Promouvoir hôte" onclick="hostPromote('${id}')">👑</button>
+      <button class="lby-action-btn kick" title="Exclure du salon" onclick="hostKick('${id}')">✕</button>
+    ` : '';
+
     item.innerHTML = `
       <div class="player-avatar" style="${offline ? 'opacity:.5;filter:grayscale(.7);' : ''}">${(p.name || '?').charAt(0).toUpperCase()}</div>
       <div class="player-name" style="${offline ? 'opacity:.55;' : ''}">${escapeHtml(p.name || '???')}${offline ? ' <span style="font-size:.62rem;color:rgb(var(--accent-rgb));font-family:\'Space Grotesk\',sans-serif;font-weight:700;letter-spacing:.05em;">↻ déconnecté</span>' : ''}</div>
       ${id === d.host ? '<div class="player-host">Hôte</div>' : ''}
+      ${hostActionsHtml}
     `;
     el.appendChild(item);
   });
@@ -4602,6 +4669,14 @@ window.startGame = async () => {
     u[`rooms/${room.id}/captainQueue`] = shuffledQueue;
     u[`rooms/${room.id}/drawnTheme`] = pickRandomTheme(d.level);
 
+    // ⚠ FIX : on initialise TOUJOURS lives/maxLives au lancement d'une partie
+    // (sinon après un retour au salon où on a mis lives=null, on a un crash sur d.lives undefined).
+    const livesVal = (typeof d.maxLives === 'number' && d.maxLives > 0)
+                       ? d.maxLives
+                       : 3; // Par défaut : 3 vies
+    u[`rooms/${room.id}/lives`]    = livesVal;
+    u[`rooms/${room.id}/maxLives`] = livesVal;
+
     // Distribution des numéros (avec gestion de l'Extrême)
     const respondants = ids.filter(i => i !== capId);
     if (d.mode === 'extreme') {
@@ -4615,13 +4690,26 @@ window.startGame = async () => {
     }
   }
 
-  // Reset des joueurs
+  // Reset des joueurs (scores remis à 0 au lancement d'une nouvelle partie)
   ids.forEach(id => {
     u[`rooms/${room.id}/players/${id}/answered`] = false;
     u[`rooms/${room.id}/players/${id}/answer`] = null;
     u[`rooms/${room.id}/players/${id}/ready`] = false;
     u[`rooms/${room.id}/players/${id}/themeProposal`] = null;
+    u[`rooms/${room.id}/players/${id}/duelReady`] = null;
+    u[`rooms/${room.id}/players/${id}/vote`] = null;
+    u[`rooms/${room.id}/players/${id}/draftAnswer`] = null;
+    u[`rooms/${room.id}/players/${id}/draftTurnKey`] = null;
+    u[`rooms/${room.id}/players/${id}/draftTheme`] = null;
+    u[`rooms/${room.id}/players/${id}/draftThemeTurnKey`] = null;
+    u[`rooms/${room.id}/players/${id}/score`] = 0;
   });
+
+  // Cleanup général des champs résiduels
+  u[`rooms/${room.id}/captainGuess`] = null;
+  u[`rooms/${room.id}/lastRoundPts`] = null;
+  u[`rooms/${room.id}/winningTheme`] = null;
+  u[`rooms/${room.id}/theme`] = null;
 
   try { await update(ref(db), u); } catch(e) { toast('Erreur: ' + e.message, 'err'); }
 };
@@ -4818,13 +4906,17 @@ function renderThemeChoice(d) {
         // Bind le listener une seule fois
         if (!tcCustom.dataset.draftBound) {
           tcCustom.dataset.draftBound = '1';
-          // Mise à jour du compteur de caractères
+          // Mise à jour du compteur de caractères + visibilité du bouton clear
           const counter = document.getElementById('tc-custom-count');
+          const clearBtn = document.getElementById('btn-tc-clear');
           const updateCount = () => {
             if (counter) {
               const len = tcCustom.value.length;
               counter.textContent = `${len} / 240`;
               counter.style.color = len > 220 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+            }
+            if (clearBtn) {
+              clearBtn.style.display = (tcCustom.value.length > 0 && !tcCustom.disabled) ? 'flex' : 'none';
             }
           };
           updateCount();
@@ -4843,10 +4935,14 @@ function renderThemeChoice(d) {
         } else {
           // Compteur initial au cas où la draft a été restaurée
           const counter = document.getElementById('tc-custom-count');
+          const clearBtn = document.getElementById('btn-tc-clear');
           if (counter) {
             const len = tcCustom.value.length;
             counter.textContent = `${len} / 240`;
             counter.style.color = len > 220 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+          }
+          if (clearBtn) {
+            clearBtn.style.display = (tcCustom.value.length > 0 && !tcCustom.disabled) ? 'flex' : 'none';
           }
         }
     }
@@ -4944,6 +5040,9 @@ window.drawThemeAndFill = () => {
       counter.textContent = `${len} / 240`;
       counter.style.color = len > 220 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
     }
+    // Affiche le bouton clear
+    const clearBtn = document.getElementById('btn-tc-clear');
+    if (clearBtn) clearBtn.style.display = !inp.disabled ? 'flex' : 'none';
     // Petit effet visuel pour montrer que ça a changé
     inp.style.transition = 'transform 0.1s ease';
     inp.style.transform = 'scale(0.98)';
@@ -4956,6 +5055,54 @@ window.drawThemeAndFill = () => {
         draftThemeTurnKey: tk
       }).catch(()=>{});
     }
+  }
+};
+
+// ⚠ NOUVEAU : Vide le champ thème (efface aussi le brouillon en BDD)
+window.clearThemeInput = () => {
+  const inp = $s('tc-custom');
+  if (!inp || inp.disabled) return;
+  inp.value = '';
+  inp.focus();
+  // Compteur
+  const counter = document.getElementById('tc-custom-count');
+  if (counter) {
+    counter.textContent = '0 / 240';
+    counter.style.color = 'var(--muted)';
+  }
+  // Cache le bouton clear
+  const clearBtn = document.getElementById('btn-tc-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  // Efface aussi le brouillon Firebase
+  if (room.id) {
+    update(ref(db, `rooms/${room.id}/players/${pid}`), {
+      draftTheme: null,
+      draftThemeTurnKey: null
+    }).catch(()=>{});
+  }
+};
+
+// ⚠ NOUVEAU : Vide le champ réponse (efface aussi le brouillon en BDD)
+window.clearAnswerInput = () => {
+  const inp = $s('ans-text');
+  if (!inp || inp.disabled) return;
+  inp.value = '';
+  inp.focus();
+  // Compteur
+  const counter = document.getElementById('ans-text-count');
+  if (counter) {
+    counter.textContent = '0 / 200';
+    counter.style.color = 'var(--muted)';
+  }
+  // Cache le bouton clear
+  const clearBtn = document.getElementById('btn-ans-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  // Efface aussi le brouillon Firebase
+  if (room.id) {
+    update(ref(db, `rooms/${room.id}/players/${pid}`), {
+      draftAnswer: null,
+      draftTurnKey: null
+    }).catch(()=>{});
   }
 };
 
@@ -5318,13 +5465,17 @@ function renderAnswering(d) {
         // Attache le listener UNE seule fois
         if (!txt.dataset.draftBound) {
           txt.dataset.draftBound = '1';
-          // Mise à jour du compteur de caractères (immédiate, pas debounced)
+          // Mise à jour du compteur de caractères + visibilité du bouton clear
           const counter = document.getElementById('ans-text-count');
+          const clearBtn = document.getElementById('btn-ans-clear');
           const updateCount = () => {
             if (counter) {
               const len = txt.value.length;
               counter.textContent = `${len} / 200`;
               counter.style.color = len > 180 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+            }
+            if (clearBtn) {
+              clearBtn.style.display = (txt.value.length > 0 && !txt.disabled) ? 'flex' : 'none';
             }
           };
           updateCount();
@@ -5344,10 +5495,14 @@ function renderAnswering(d) {
         } else {
           // Compteur initial au cas où la draft a été restaurée
           const counter = document.getElementById('ans-text-count');
+          const clearBtn = document.getElementById('btn-ans-clear');
           if (counter) {
             const len = txt.value.length;
             counter.textContent = `${len} / 200`;
             counter.style.color = len > 180 ? 'rgb(var(--accent-rgb))' : 'var(--muted)';
+          }
+          if (clearBtn) {
+            clearBtn.style.display = (txt.value.length > 0 && !txt.disabled) ? 'flex' : 'none';
           }
         }
       }
@@ -5592,8 +5747,18 @@ function renderCaptain(d) {
             ss2.className = 'status-pill ' + (c2Ready ? 'ready' : 'thinking');
           }
 
-          buildStaticTimeline($s('duel-timeline-spec1'), liveSortDuel[d.captainId] || {}, players);
-          buildStaticTimeline($s('duel-timeline-spec2'), liveSortDuel[d.captainId2] || {}, players);
+          // ⚠ FIX : on ne reconstruit la timeline spectateur QUE si les données ont changé.
+          // Sinon, à chaque heartbeat, on faisait innerHTML='' → flicker constant.
+          const sortKey1 = JSON.stringify(liveSortDuel[d.captainId] || {});
+          const sortKey2 = JSON.stringify(liveSortDuel[d.captainId2] || {});
+          if (window._duelSpecKey1 !== sortKey1) {
+            buildStaticTimeline($s('duel-timeline-spec1'), liveSortDuel[d.captainId] || {}, players);
+            window._duelSpecKey1 = sortKey1;
+          }
+          if (window._duelSpecKey2 !== sortKey2) {
+            buildStaticTimeline($s('duel-timeline-spec2'), liveSortDuel[d.captainId2] || {}, players);
+            window._duelSpecKey2 = sortKey2;
+          }
       }
   }
   // --- VUE GLOBALE (CLASSIQUE, AVEUGLE, SNIPER, EXTREME) ---
@@ -5633,9 +5798,22 @@ function renderCaptain(d) {
               // Si mode aveugle et que tout est placé, on auto-valide !
               if (d.mode === 'blind') {
                   $s('btn-validate-classic').style.display = 'none';
-                  if (placedCount === reqCount && !window._blindValidating) {
+                  if (placedCount >= reqCount && !window._blindValidating) {
                       window._blindValidating = true;
-                      setTimeout(() => validateClassic(), 1000); // Valide tout seul après 1 seconde
+                      // ⚠ FIX : auto-validation différée pour laisser le temps au joueur de voir le résultat
+                      setTimeout(() => {
+                        if (room.data?.status === 'resolving' && room.data?.captainId === pid) {
+                          validateClassic();
+                        }
+                      }, 1000);
+                  } else if (placedCount < reqCount) {
+                    // ⚠ FIX BLIND : on rebuild la carte suivante UNIQUEMENT si on a placé une carte
+                    // (déclencheur : le placedCount a augmenté). Sinon flicker à chaque heartbeat.
+                    const lastPlaced = window._blindLastPlacedCount;
+                    if (lastPlaced === undefined || lastPlaced !== placedCount) {
+                      buildClassicCards(respondants);
+                      window._blindLastPlacedCount = placedCount;
+                    }
                   }
               } else {
                   $s('btn-validate-classic').disabled = placedCount < reqCount;
@@ -5652,9 +5830,8 @@ function renderCaptain(d) {
           for (let s = 1; s <= 10; s++) refreshClassicSlot(s, d.liveSort?.[s] || null);
       }
   }
-
-  if (d.mode === 'blind') buildClassicCards(respondants);
-  // (Note : pas de timer actif sur la phase Cap'ten — le chrono n'est utilisé que sur la phase de réponse)
+  // ⚠ FIX : la ligne "if (d.mode === 'blind') buildClassicCards(respondants)" qui était ici
+  // bouclait à chaque heartbeat. Retirée — la rebuild est gérée plus haut, au bon endroit.
 }
 
 // ─── CLASSIC / BLITZ ─────────────────────────────
@@ -6063,36 +6240,70 @@ async function computeDuelScores(d) {
 
     const respondants = Object.entries(d.players).filter(([i]) => i !== c1 && i !== c2);
 
+    // ⚠ NOUVEAU SYSTÈME DE POINTS DUEL (équilibré)
+    //
+    // Joueurs (répondants) :
+    //   • Une "pos exacte" devinée par AU MOINS UN Cap'ten = +1 point.
+    //   • Le joueur ne marque qu'une fois (peu importe si les 2 Cap'tens trouvent).
+    //   • Pas de bonus pour ±1 (sinon trop facile).
+    //
+    // Cap'tens (les 2 qui s'affrontent) :
+    //   • +1 point pour CHAQUE position exacte trouvée.
+    //   • Bonus +2 supplémentaires au plus précis (gagnant du duel).
+    //   • Égalité parfaite : +1 chacun en bonus.
+    //
+    // Exemples :
+    //   - Cap1 trouve 3 exact, Cap2 trouve 1 exact, 4 répondants
+    //     → Cap1 = 3 + 2 (bonus) = 5pts | Cap2 = 1 + 0 = 1pt
+    //     → 4 joueurs à pos exacte (union) marquent +1 pt
+    //   - Cap1 = Cap2 = 2 exact chacun (mêmes positions)
+    //     → Cap1 = 2 + 1 = 3pts | Cap2 = 2 + 1 = 3pts
+    //     → 2 joueurs marquent +1 pt
+
+    let exact1 = 0, exact2 = 0;
     let error1 = 0, error2 = 0;
     let playerPoints = {};
     respondants.forEach(([id]) => playerPoints[id] = 0);
 
     respondants.forEach(([id, p]) => {
         const real = p.number;
+
         const slot1Str = Object.keys(sort1).find(k => sort1[k] === id);
         const guess1 = slot1Str ? parseInt(slot1Str) : 0;
-        if (guess1) {
+        let cap1GotIt = false;
+        if (guess1 > 0) {
             error1 += Math.abs(guess1 - real);
-            if (guess1 === real) playerPoints[id] += 2;
-            else if (Math.abs(guess1 - real) === 1) playerPoints[id] += 1;
-        } else error1 += 10;
+            if (guess1 === real) { exact1++; cap1GotIt = true; }
+        } else {
+            error1 += 10; // pénalité pour case non remplie
+        }
 
         const slot2Str = Object.keys(sort2).find(k => sort2[k] === id);
         const guess2 = slot2Str ? parseInt(slot2Str) : 0;
-        if (guess2) {
+        let cap2GotIt = false;
+        if (guess2 > 0) {
             error2 += Math.abs(guess2 - real);
-            if (guess2 === real) playerPoints[id] += 2;
-            else if (Math.abs(guess2 - real) === 1) playerPoints[id] += 1;
-        } else error2 += 10;
+            if (guess2 === real) { exact2++; cap2GotIt = true; }
+        } else {
+            error2 += 10;
+        }
+
+        // Le joueur marque +1 pt s'il a été trouvé exactement par AU MOINS un Cap'ten
+        if (cap1GotIt || cap2GotIt) playerPoints[id] = 1;
     });
 
-    let cap1Pts = 0, cap2Pts = 0;
-    if (error1 < error2) cap1Pts = 3;
-    else if (error2 < error1) cap2Pts = 3;
-    else { cap1Pts = 1; cap2Pts = 1; }
+    // Score Cap'tens : 1 pt par exact + bonus victoire
+    let cap1Pts = exact1;
+    let cap2Pts = exact2;
+    if (error1 < error2)      cap1Pts += 2;          // bonus gagnant
+    else if (error2 < error1) cap2Pts += 2;
+    else {                                           // égalité parfaite (très rare)
+        cap1Pts += 1;
+        cap2Pts += 1;
+    }
 
     const updates = {};
-    updates[`rooms/${room.id}/duelResult`] = { error1, error2, cap1Pts, cap2Pts };
+    updates[`rooms/${room.id}/duelResult`] = { error1, error2, cap1Pts, cap2Pts, exact1, exact2 };
     updates[`rooms/${room.id}/duelComputed`] = true;
     let allRoundPts = { [c1]: cap1Pts, [c2]: cap2Pts };
     respondants.forEach(([id]) => { if (playerPoints[id] > 0) allRoundPts[id] = playerPoints[id]; });
@@ -6190,7 +6401,9 @@ window.validateClassic = async () => {
       updates[`rooms/${room.id}/captainGuess`] = dragState.placed;
   }
 
-  const newLives = (d.mode === 'sniper') ? d.lives : (isSuccess ? d.lives : Math.max(0, d.lives - 1));
+  // ⚠ FIX : Sécurité contre lives undefined (avant le crash : d.lives - 1 = NaN, donc undefined → erreur Firebase)
+  const currentLives = (typeof d.lives === 'number') ? d.lives : (d.maxLives || 3);
+  const newLives = (d.mode === 'sniper') ? currentLives : (isSuccess ? currentLives : Math.max(0, currentLives - 1));
   updates[`rooms/${room.id}/roundResult`] = isSuccess ? 'correct' : 'wrong';
   updates[`rooms/${room.id}/lives`] = newLives;
   updates[`rooms/${room.id}/status`] = 'round-reveal';
@@ -6383,7 +6596,8 @@ window.validateExtreme = async () => {
   // Vérifie si le Cap'ten a vu juste (extremeGuess.low est son choix pour le 1, high pour le 10)
   const isSuccess = (extremeGuess.low === real1 && extremeGuess.high === real10);
   
-  const newLives = isSuccess ? d.lives : Math.max(0, d.lives - 1);
+  const currentLives = (typeof d.lives === 'number') ? d.lives : (d.maxLives || 3);
+  const newLives = isSuccess ? currentLives : Math.max(0, currentLives - 1);
 
   await update(ref(db, `rooms/${room.id}`), {
     captainGuess: extremeGuess,
@@ -7063,7 +7277,6 @@ window.openSettings = () => {
   const sessionBtns = document.getElementById('settings-session-btns');
   const returnBtn = document.getElementById('btn-return-lobby');
   const hostLeaveBtn = document.getElementById('btn-host-leave');
-  const hostPlayersPanel = document.getElementById('settings-host-players');
   
   if (room && room.id) {
     sessionBtns.style.display = 'block';
@@ -7085,47 +7298,12 @@ window.openSettings = () => {
     if (hostLeaveBtn) {
       hostLeaveBtn.style.display = (isHost && hasOthers) ? 'block' : 'none';
     }
-
-    // ⚠ NOUVEAU : Panneau de gestion des joueurs (visible uniquement par l'hôte)
-    if (hostPlayersPanel) {
-      if (isHost && hasOthers) {
-        hostPlayersPanel.style.display = 'block';
-        renderHostPlayersList();
-      } else {
-        hostPlayersPanel.style.display = 'none';
-      }
-    }
   } else {
     sessionBtns.style.display = 'none';
-    if (hostPlayersPanel) hostPlayersPanel.style.display = 'none';
   }
   
   $s('settings-overlay').classList.add('open');
 };
-
-// Rendu de la liste des joueurs (panneau hôte)
-function renderHostPlayersList() {
-  const list = document.getElementById('settings-players-list');
-  if (!list || !room.data) return;
-  list.innerHTML = '';
-  const players = room.data.players || {};
-  // Tri : moi en premier (pour cohérence visuelle), puis par ancienneté
-  const sorted = Object.entries(players)
-    .filter(([id]) => id !== pid)
-    .sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
-  
-  sorted.forEach(([id, p]) => {
-    const tile = document.createElement('div');
-    tile.style.cssText = 'display:flex;align-items:center;gap:.5rem;padding:.55rem .65rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.16);border-radius:10px;';
-    tile.innerHTML = `
-      <div class="player-avatar" style="width:32px;height:32px;flex-shrink:0;font-size:.85rem;">${(p.name || '?').charAt(0).toUpperCase()}</div>
-      <div style="flex:1;min-width:0;font-weight:600;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.name || '???')}</div>
-      <button class="btn btn-secondary" style="padding:.35rem .55rem;border-radius:8px;font-size:.65rem;min-width:unset;color:rgb(var(--gold-rgb));" title="Promouvoir hôte" onclick="hostPromote('${id}')">👑</button>
-      <button class="btn btn-secondary" style="padding:.35rem .55rem;border-radius:8px;font-size:.65rem;min-width:unset;color:rgb(var(--accent-rgb));" title="Bannir" onclick="hostKick('${id}')">🚫</button>
-    `;
-    list.appendChild(tile);
-  });
-}
 
 // Promouvoir un joueur en hôte
 window.hostPromote = (targetId) => {
@@ -7135,25 +7313,21 @@ window.hostPromote = (targetId) => {
     try {
       await update(ref(db, `rooms/${room.id}`), { host: targetId });
       toast(`👑 ${targetName} est maintenant hôte`, 'ok');
-      window.closeSettings();
     } catch(e) { toast('Erreur lors du transfert', 'err'); }
   });
 };
 
-// Bannir un joueur (le retire ET ajoute son pid à la banlist du salon)
+// ⚠ MODIFIÉ : Exclure un joueur (kick simple, NON-PERMANENT)
+// Le joueur est juste retiré du salon, il peut rejoindre à nouveau s'il veut.
 window.hostKick = (targetId) => {
   if (!room.data || room.data.host !== pid) return;
   const targetName = room.data.players?.[targetId]?.name || 'ce joueur';
-  window.showConfirm(`Bannir ${targetName} du salon ?\n(Il ne pourra plus rejoindre)`, async () => {
+  window.showConfirm(`Exclure ${targetName} du salon ?\n(Il pourra revenir s'il rejoint à nouveau)`, async () => {
     try {
-      const updates = {};
-      updates[`rooms/${room.id}/players/${targetId}`] = null;
-      updates[`rooms/${room.id}/banned/${targetId}`] = true;
-      await update(ref(db), updates);
-      toast(`🚫 ${targetName} a été banni`, 'ok');
-      // Rafraîchir la liste si l'overlay est encore ouvert
-      renderHostPlayersList();
-    } catch(e) { toast('Erreur lors du bannissement', 'err'); }
+      // On retire juste le joueur de la liste — pas de banlist permanente.
+      await remove(ref(db, `rooms/${room.id}/players/${targetId}`));
+      toast(`✕ ${targetName} a été exclu du salon`, 'ok');
+    } catch(e) { toast('Erreur lors de l\'exclusion', 'err'); }
   });
 };
 
