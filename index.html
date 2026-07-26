@@ -2744,6 +2744,51 @@ html.light-mode .host-transfer-tile {
   border-top-color: rgba(255,255,255,.95) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   36. MODE ROULETTE (inspiré de Wavelength)
+═══════════════════════════════════════════════════════════ */
+.roulette-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:1.25rem;
+  padding: .5rem 0 1rem;
+}
+.roulette-concepts {
+  display:flex; justify-content:space-between; width:100%; max-width:420px;
+  padding:0 .5rem; margin-top:-.5rem;
+}
+.roulette-concept {
+  font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:1rem;
+  padding:.4rem .9rem; border-radius:999px;
+  background:rgba(255,255,255,.06); border:1px solid var(--border2);
+  max-width:47%; text-align:center; line-height:1.2;
+}
+.roulette-concept.left  { color: var(--cyan); }
+.roulette-concept.right { color: var(--pink); }
+.roulette-dial-svg { width:100%; max-width:420px; touch-action:none; user-select:none; cursor:grab; }
+.roulette-dial-svg.locked, .roulette-dial-svg.spectator { cursor:default; }
+.roulette-dial-svg:active { cursor:grabbing; }
+.roulette-pointer { cursor:grab; }
+.roulette-pointer:active { cursor:grabbing; }
+.roulette-score-pill {
+  font-family:'Space Grotesk',sans-serif; font-weight:900; font-size:2.2rem;
+  text-align:center;
+}
+.roulette-score-pill.pts-4 { color: var(--gold); }
+.roulette-score-pill.pts-3 { color: var(--green); }
+.roulette-score-pill.pts-2 { color: var(--cyan); }
+.roulette-score-pill.pts-0 { color: var(--red); }
+.roulette-players {
+  display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; width:100%;
+}
+.roulette-player-chip {
+  display:flex; align-items:center; gap:.4rem;
+  padding:.35rem .7rem; border-radius:999px;
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  font-size:.78rem; font-weight:600;
+}
+.roulette-player-chip.active {
+  background: rgba(var(--primary-rgb),.15); border-color: rgba(var(--primary-rgb),.5);
+  color: var(--cyan);
+}
 </style>
 </head>
 <body>
@@ -2927,6 +2972,11 @@ html.light-mode .host-transfer-tile {
           <div class="mode-emoji">⚔️</div>
           <div class="mode-name">Duel</div>
           <div class="mode-badge comp">1v1</div>
+        </div>
+        <div class="mode-card" data-mode="roulette" onclick="cfgSetMode('roulette')">
+          <div class="mode-emoji">🎡</div>
+          <div class="mode-name">Roulette</div>
+          <div class="mode-badge comp">PvP · Points</div>
         </div>
       </div>
       <p id="cfg-mode-desc" style="font-size:.78rem;line-height:1.65;margin-top:.85rem;padding:.75rem .85rem;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.8);"></p>
@@ -3373,6 +3423,43 @@ html.light-mode .host-transfer-tile {
 </div>
 
 <!-- ════════════════════════ SCREEN: REVEAL ════════════════════════ -->
+<!-- ════════════════════════ SCREEN: ROULETTE (Wavelength-like) ════════════════════════ -->
+<div id="screen-roulette" class="screen">
+  <div style="padding-top:.75rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;">
+    <div class="game-hdr">
+      <div>
+        <div class="hdr-round-label">Manche</div>
+        <div class="hdr-round-val"><span id="rlt-round">1</span></div>
+      </div>
+      <div id="rlt-active-name" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;color:var(--muted);"></div>
+      <div class="badge badge-mode">🎡 Roulette</div>
+    </div>
+
+    <div class="roulette-wrap">
+      <div id="rlt-status-text" style="text-align:center;">
+        <h2 style="color:#fff;" id="rlt-title">C'est ton tour !</h2>
+        <p style="margin-top:.35rem;font-size:.85rem;" id="rlt-subtitle">Place le curseur sur l'échelle entre les deux concepts.</p>
+      </div>
+
+      <div class="roulette-concepts">
+        <div class="roulette-concept left" id="rlt-left">Chaud</div>
+        <div class="roulette-concept right" id="rlt-right">Froid</div>
+      </div>
+
+      <div id="rlt-dial-container" style="width:100%;display:flex;justify-content:center;"></div>
+
+      <div id="rlt-reveal-box" style="display:none;text-align:center;">
+        <div class="roulette-score-pill" id="rlt-points">+0 pt</div>
+        <p style="margin-top:.25rem;font-size:.8rem;" id="rlt-reveal-desc"></p>
+      </div>
+
+      <div class="roulette-players" id="rlt-players"></div>
+
+      <div id="rlt-actions" style="width:100%;display:flex;flex-direction:column;gap:.6rem;"></div>
+    </div>
+  </div>
+</div>
+
 <div id="screen-reveal" class="screen">
   <div style="display:flex;flex-direction:column;gap:1.1rem;flex:1;padding-top:.75rem;">
     <div style="text-align:center;padding:.5rem 0;">
@@ -3768,6 +3855,60 @@ const QUESTIONS = {
 };
 
 // ═══════════════════════════════════════════════════════════
+//  2bis. MODE ROULETTE — BANQUE DE CARTES (concepts opposés)
+// ═══════════════════════════════════════════════════════════
+const ROULETTE_CARDS = [
+  { id: 1,  left: "Beau",        right: "Moche" },
+  { id: 2,  left: "Chaud",       right: "Froid" },
+  { id: 3,  left: "Rapide",      right: "Lent" },
+  { id: 4,  left: "Utile",       right: "Inutile" },
+  { id: 5,  left: "Cher",        right: "Bon marché" },
+  { id: 6,  left: "Drôle",       right: "Triste" },
+  { id: 7,  left: "Sain",        right: "Malsain" },
+  { id: 8,  left: "Discret",     right: "Voyant" },
+  { id: 9,  left: "Sûr",         right: "Dangereux" },
+  { id: 10, left: "Simple",      right: "Compliqué" },
+  { id: 11, left: "Populaire",   right: "Confidentiel" },
+  { id: 12, left: "Écolo",       right: "Polluant" },
+  { id: 13, left: "Élégant",     right: "Ringard" },
+  { id: 14, left: "Calme",       right: "Bruyant" },
+  { id: 15, left: "Récent",      right: "Ancien" },
+  { id: 16, left: "Fort",        right: "Faible" },
+  { id: 17, left: "Généreux",    right: "Radin" },
+  { id: 18, left: "Romantique",  right: "Glauque" },
+  { id: 19, left: "Sportif",    right: "Casanier" },
+  { id: 20, left: "Sérieux",     right: "Absurde" }
+];
+
+function pickRandomRouletteCard() {
+  return ROULETTE_CARDS[Math.floor(Math.random() * ROULETTE_CARDS.length)];
+}
+
+// Génère une zone cible cachée pour la manche : un centre (0-100) et des
+// demi-largeurs pour les paliers 4 / 3 / 2 points. Le centre est contraint
+// pour que même la zone la plus large (2 pts) tienne dans le cadran [0,100].
+function generateRouletteTarget() {
+  const halfWidths = { w4: 3, w3: 7, w2: 12 }; // en % de l'arc total (0-100)
+  const margin = halfWidths.w2 + 2;
+  const center = margin + Math.random() * (100 - 2 * margin);
+  return { center: +center.toFixed(2), ...halfWidths };
+}
+
+// Calcule le score en fonction de la distance (en %) entre le curseur du
+// joueur actif et le centre de la zone cible.
+//   Pile au centre (zone 4)  → 4 pts
+//   Proche (zone 3)          → 3 pts
+//   Bord de la zone (zone 2) → 2 pts
+//   En dehors                → 0 pt
+function computeRouletteScore(pointerPos, target) {
+  const dist = Math.abs(pointerPos - target.center);
+  if (dist <= target.w4) return 4;
+  if (dist <= target.w3) return 3;
+  if (dist <= target.w2) return 2;
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════════════
 //  3. LOCAL STATE
 // ═══════════════════════════════════════════════════════════
 let pid = sessionStorage.getItem('pid');
@@ -4034,7 +4175,8 @@ function modeInfo(mode) {
     sniper:   { emoji: '🏹', name: 'Sniper',    coop: false, ranked: true  },
     extreme:  { emoji: '🎭', name: 'Extrême',   coop: true,  ranked: false },
     blind:    { emoji: '🙈', name: 'Aveugle',   coop: true,  ranked: false },
-    duel:     { emoji: '⚔️', name: 'Duel',      coop: false, ranked: true  }
+    duel:     { emoji: '⚔️', name: 'Duel',      coop: false, ranked: true  },
+    roulette: { emoji: '🎡', name: 'Roulette',  coop: false, ranked: true  }
   };
   return m[mode] || m.classic;
 }
@@ -4529,6 +4671,11 @@ function dispatch(d) {
     if (d.status === 'round-reveal') {
       window._answeringCountdownActive = false;
     }
+    if (d.status === 'roulette-round') {
+      window._rltLocalPos = null;
+      window._rltDialBuilt = false;
+      window._rltRevealShown = false;
+    }
     if (d.status === 'lobby' || d.status === 'config') {
       // Reset complet entre parties
       dragState = { selected: null, placed: {} };
@@ -4542,6 +4689,9 @@ function dispatch(d) {
       window._verifyBuilt = null;
       window._duelSpecKey1 = null;
       window._duelSpecKey2 = null;
+      window._rltLocalPos = null;
+      window._rltDialBuilt = false;
+      window._rltRevealShown = false;
       revealAnimDone = false;
       // ⚠ FIX : nettoyer TOUS les timers actifs au retour au salon (sinon ils continuent à tourner)
       if (window._ansTimerInt) { clearInterval(window._ansTimerInt); window._ansTimerInt = null; }
@@ -4570,6 +4720,7 @@ function dispatch(d) {
     case 'leaderboard':  renderLeaderboard(d); break;
     case 'gameover':     renderGameover(d); break;
     case 'theme-vote-result': renderThemeVoteResult(d); break;
+    case 'roulette-round': renderRouletteRound(d); break;
     default:
       // Statut inconnu → on retourne au lobby pour éviter un écran figé
       console.warn('Unknown status:', d.status);
@@ -4731,13 +4882,14 @@ function renderConfigParams(mode, d, isHost) {
     sniper: '🏹 <strong>Sniper</strong> — Chacun pour soi. Devinez le numéro exact de TOUTES les réponses (l\'interface avec tous les boutons affichés en même temps).',
     extreme: '🎭 <strong>Extrême</strong> — La timeline est bloquée ! Le Cap\'ten ne peut placer que la pire (1) et la meilleure (10) réponse.',
     blind: '🙈 <strong>Aveugle (1 par 1)</strong> — Le Cap\'ten reçoit une seule réponse à la fois et doit la placer définitivement sans voir les autres !',
-    duel: '⚔️ <strong>Duel</strong> — Deux Cap\'tens s\'affrontent ! Les joueurs votent pour le thème. Le Cap\'ten le plus précis gagne, et les joueurs marquent des points si leur réponse est bien classée.'
+    duel: '⚔️ <strong>Duel</strong> — Deux Cap\'tens s\'affrontent ! Les joueurs votent pour le thème. Le Cap\'ten le plus précis gagne, et les joueurs marquent des points si leur réponse est bien classée.',
+    roulette: '🎡 <strong>Roulette</strong> — Chacun son tour, place le curseur entre deux concepts opposés pour viser une zone cachée. Plus tu es proche du centre, plus tu marques de points (jusqu\'à 4) !'
   };
   const descEl = $s('cfg-mode-desc');
   if (descEl) descEl.innerHTML = descs[mode] || descs.classic;
 
   const showRounds = mode !== 'survival';
-  const showLives = mode !== 'sniper' && mode !== 'duel';
+  const showLives = mode !== 'sniper' && mode !== 'duel' && mode !== 'roulette';
   
   let html = `<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:1.5rem;">`;
 
@@ -4867,6 +5019,25 @@ window.startGame = async () => {
       u[`rooms/${room.id}/captainId`] = firstMatch[0];
       u[`rooms/${room.id}/captainId2`] = firstMatch[1];
     }
+  }
+  // --- MATCHMAKING MODE ROULETTE ---
+  else if (d.mode === 'roulette') {
+    const shuffledQueue = shuffle([...ids]);
+    const activeId = shuffledQueue.shift();
+    const target = generateRouletteTarget();
+    const card = pickRandomRouletteCard();
+
+    u[`rooms/${room.id}/status`]          = 'roulette-round';
+    u[`rooms/${room.id}/captainId`]       = activeId;
+    u[`rooms/${room.id}/captainQueue`]    = shuffledQueue;
+    u[`rooms/${room.id}/rouletteCard`]    = card;
+    u[`rooms/${room.id}/rouletteTarget`]  = target;
+    u[`rooms/${room.id}/roulettePointer`] = 50;
+    u[`rooms/${room.id}/rouletteLocked`]  = false;
+    u[`rooms/${room.id}/rouletteRevealed`] = false;
+    u[`rooms/${room.id}/roulettePoints`]  = null;
+    u[`rooms/${room.id}/lives`]    = 0;
+    u[`rooms/${room.id}/maxLives`] = 0;
   }
   // --- MATCHMAKING DES AUTRES MODES ---
   else {
@@ -6043,6 +6214,246 @@ function renderCaptain(d) {
 }
 
 // ─── CLASSIC / BLITZ ─────────────────────────────
+// ═══════════════════════════════════════════════════════════
+//  MODE ROULETTE — CADRAN SVG (drag & drop) + RÉVÉLATION + SCORE
+// ═══════════════════════════════════════════════════════════
+const RLT_CX = 200, RLT_CY = 190, RLT_R = 168;
+
+function rltPolar(pos, radius) {
+  const angleDeg = 180 - (Math.max(0, Math.min(100, pos)) / 100) * 180;
+  const rad = angleDeg * Math.PI / 180;
+  return { x: RLT_CX + radius * Math.cos(rad), y: RLT_CY - radius * Math.sin(rad) };
+}
+
+function rltSectorPath(posLow, posHigh, radius) {
+  const p1 = rltPolar(posLow, radius), p2 = rltPolar(posHigh, radius);
+  return `M ${RLT_CX} ${RLT_CY} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${radius} ${radius} 0 0 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} Z`;
+}
+
+function rltTrackPath(radius) {
+  const p1 = rltPolar(0, radius), p2 = rltPolar(100, radius);
+  return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${radius} ${radius} 0 0 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+}
+
+// Convertit une position pointeur (souris/tactile) en valeur 0-100 sur le cadran
+function rltPosFromPointerEvent(svgEl, evt) {
+  const rect = svgEl.getBoundingClientRect();
+  const vb = svgEl.viewBox.baseVal;
+  const scale = vb.width / rect.width;
+  const clientX = (evt.touches ? evt.touches[0].clientX : evt.clientX);
+  const clientY = (evt.touches ? evt.touches[0].clientY : evt.clientY);
+  const x = (clientX - rect.left) * scale;
+  const y = (clientY - rect.top) * scale;
+  let angleDeg = Math.atan2(RLT_CY - y, x - RLT_CX) * 180 / Math.PI;
+  angleDeg = Math.max(0, Math.min(180, angleDeg));
+  return ((180 - angleDeg) / 180) * 100;
+}
+
+function rltBuildSvg(card, interactive) {
+  const track = rltTrackPath(RLT_R);
+  return `
+    <svg class="roulette-dial-svg${interactive ? '' : ' spectator'}" viewBox="0 0 400 210" xmlns="http://www.w3.org/2000/svg">
+      <path id="rlt-track" d="${track}" fill="none" stroke="var(--border2)" stroke-width="34" stroke-linecap="round"/>
+      <g id="rlt-target-zone" style="display:none;"></g>
+      <line id="rlt-needle" x1="${RLT_CX}" y1="${RLT_CY}" x2="${RLT_CX}" y2="${RLT_CY - RLT_R}" stroke="var(--cyan)" stroke-width="4" stroke-linecap="round"/>
+      <circle id="rlt-handle" cx="${RLT_CX}" cy="${RLT_CY - RLT_R}" r="16" fill="var(--cyan)" stroke="#fff" stroke-width="3" class="roulette-pointer"/>
+      <circle cx="${RLT_CX}" cy="${RLT_CY}" r="6" fill="var(--muted)"/>
+    </svg>`;
+}
+
+function rltUpdateNeedle(svgEl, pos) {
+  const tip = rltPolar(pos, RLT_R);
+  svgEl.querySelector('#rlt-needle').setAttribute('x2', tip.x.toFixed(2));
+  svgEl.querySelector('#rlt-needle').setAttribute('y2', tip.y.toFixed(2));
+  svgEl.querySelector('#rlt-handle').setAttribute('cx', tip.x.toFixed(2));
+  svgEl.querySelector('#rlt-handle').setAttribute('cy', tip.y.toFixed(2));
+}
+
+function rltShowTargetZone(svgEl, target) {
+  const g = svgEl.querySelector('#rlt-target-zone');
+  const clamp = v => Math.max(0, Math.min(100, v));
+  const z2 = rltSectorPath(clamp(target.center - target.w2), clamp(target.center + target.w2), RLT_R);
+  const z3 = rltSectorPath(clamp(target.center - target.w3), clamp(target.center + target.w3), RLT_R);
+  const z4 = rltSectorPath(clamp(target.center - target.w4), clamp(target.center + target.w4), RLT_R);
+  g.innerHTML = `
+    <path d="${z2}" fill="var(--cyan)" opacity=".35"/>
+    <path d="${z3}" fill="var(--green)" opacity=".55"/>
+    <path d="${z4}" fill="var(--gold)" opacity=".9"/>
+  `;
+  g.style.display = 'block';
+}
+
+function renderRouletteRound(d) {
+  showScreen('roulette');
+  const m = modeInfo(d.mode);
+  const isActive = d.captainId === pid;
+  const isHost = d.host === pid;
+  const players = d.players || {};
+  const card = d.rouletteCard || { left: '…', right: '…' };
+  const locked = !!d.rouletteLocked;
+  const revealed = !!d.rouletteRevealed;
+
+  $s('rlt-round').textContent = d.round || 1;
+  $s('rlt-left').textContent  = card.left;
+  $s('rlt-right').textContent = card.right;
+  $s('rlt-active-name').textContent = players[d.captainId] ? `🎯 ${players[d.captainId].name}` : '';
+
+  if (isActive) {
+    $s('rlt-title').textContent = revealed ? 'Résultat de ta manche' : (locked ? 'Position verrouillée !' : "C'est ton tour !");
+    $s('rlt-subtitle').textContent = revealed
+      ? 'Compare ta position avec la zone secrète.'
+      : (locked ? "En attente de la révélation…" : 'Fais glisser le curseur, puis valide ta réponse.');
+  } else {
+    $s('rlt-title').textContent = revealed ? 'Manche terminée' : (locked ? 'Position verrouillée' : `${players[d.captainId]?.name || 'Le joueur'} réfléchit…`);
+    $s('rlt-subtitle').textContent = revealed ? '' : 'Regarde où il/elle va placer le curseur !';
+  }
+
+  // Construit le cadran une seule fois par manche (les updates suivants ne recréent pas le drag)
+  const container = $s('rlt-dial-container');
+  if (!window._rltDialBuilt) {
+    container.innerHTML = rltBuildSvg(card, isActive && !locked);
+    window._rltDialBuilt = true;
+    window._rltLocalPos = (typeof d.roulettePointer === 'number') ? d.roulettePointer : 50;
+
+    const svgEl = container.querySelector('svg');
+    rltUpdateNeedle(svgEl, window._rltLocalPos);
+
+    if (isActive && !locked) {
+      let dragging = false;
+      const onMove = (evt) => {
+        if (!dragging) return;
+        evt.preventDefault();
+        window._rltLocalPos = rltPosFromPointerEvent(svgEl, evt);
+        rltUpdateNeedle(svgEl, window._rltLocalPos);
+      };
+      const onStart = (evt) => {
+        dragging = true;
+        window._rltLocalPos = rltPosFromPointerEvent(svgEl, evt);
+        rltUpdateNeedle(svgEl, window._rltLocalPos);
+      };
+      const onEnd = () => { dragging = false; };
+      svgEl.addEventListener('mousedown', onStart);
+      svgEl.addEventListener('touchstart', onStart, { passive: false });
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchmove', onMove, { passive: false });
+      window.addEventListener('mouseup', onEnd);
+      window.addEventListener('touchend', onEnd);
+    }
+  } else if (!isActive || locked) {
+    // Spectateur / position déjà verrouillée → on suit la position enregistrée en base
+    const svgEl = container.querySelector('svg');
+    if (svgEl && typeof d.roulettePointer === 'number') rltUpdateNeedle(svgEl, d.roulettePointer);
+  }
+
+  // Révélation de la zone cible (une seule fois)
+  if (revealed && !window._rltRevealShown) {
+    window._rltRevealShown = true;
+    const svgEl = container.querySelector('svg');
+    if (svgEl) rltShowTargetZone(svgEl, d.rouletteTarget || {});
+  }
+
+  // Bloc de score
+  const revealBox = $s('rlt-reveal-box');
+  if (revealed) {
+    revealBox.style.display = 'block';
+    const pts = d.roulettePoints ?? 0;
+    $s('rlt-points').textContent = `+${pts} pt${pts > 1 ? 's' : ''}`;
+    $s('rlt-points').className = `roulette-score-pill pts-${pts}`;
+    $s('rlt-reveal-desc').textContent = pts === 4 ? '🎯 Pile dans le mille !'
+      : pts === 3 ? '👏 Très proche du centre !'
+      : pts === 2 ? '✅ Sur le bord de la zone.'
+      : '❌ En dehors de la zone, aucun point.';
+  } else {
+    revealBox.style.display = 'none';
+  }
+
+  // Chips joueurs (score courant)
+  const chipsEl = $s('rlt-players');
+  chipsEl.innerHTML = '';
+  Object.entries(players).forEach(([id, p]) => {
+    const chip = document.createElement('div');
+    chip.className = 'roulette-player-chip' + (id === d.captainId ? ' active' : '');
+    chip.textContent = `${id === d.captainId ? '🎯 ' : ''}${p.name} · ${p.score || 0} pts`;
+    chipsEl.appendChild(chip);
+  });
+
+  // Actions (boutons contextuels)
+  const act = $s('rlt-actions');
+  act.innerHTML = '';
+  if (!locked) {
+    if (isActive) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-full';
+      btn.textContent = '🔒 Valider ma position';
+      btn.onclick = () => window.rltLockPosition();
+      act.appendChild(btn);
+    } else {
+      const p2 = document.createElement('p');
+      p2.style.textAlign = 'center';
+      p2.textContent = 'En attente du joueur actif…';
+      act.appendChild(p2);
+    }
+  } else if (!revealed) {
+    if (isActive || isHost) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-success btn-full';
+      btn.textContent = '🎬 Révéler la cible';
+      btn.onclick = () => window.rltRevealTarget();
+      act.appendChild(btn);
+    } else {
+      const p2 = document.createElement('p');
+      p2.style.textAlign = 'center';
+      p2.textContent = 'En attente de la révélation…';
+      act.appendChild(p2);
+    }
+  } else if (isHost) {
+    const queue = d.captainQueue || [];
+    const isEndOfRound = queue.length === 0;
+    const targetRounds = d.maxRounds || 5;
+    const isFinalRound = isEndOfRound && (d.round >= targetRounds);
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary btn-full';
+    if (isFinalRound) {
+      btn.textContent = '🏆 Résultat final';
+      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'gameover' });
+    } else {
+      btn.textContent = '🏆 Voir le classement';
+      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'leaderboard' });
+    }
+    act.appendChild(btn);
+  } else {
+    const p2 = document.createElement('p');
+    p2.style.textAlign = 'center';
+    p2.textContent = "En attente de l'hôte…";
+    act.appendChild(p2);
+  }
+}
+
+// Le joueur actif verrouille sa position : écrit la valeur locale dans Firebase
+window.rltLockPosition = async () => {
+  const d = room.data; if (!d || d.captainId !== pid) return;
+  const pos = Math.max(0, Math.min(100, window._rltLocalPos ?? 50));
+  await update(ref(db, `rooms/${room.id}`), { roulettePointer: pos, rouletteLocked: true });
+};
+
+// Révèle la cible cachée et calcule le score du joueur actif
+window.rltRevealTarget = async () => {
+  const d = room.data; if (!d) return;
+  if (!(d.captainId === pid || d.host === pid)) return;
+  if (d.rouletteRevealed) return;
+  const target = d.rouletteTarget || generateRouletteTarget();
+  const pointer = typeof d.roulettePointer === 'number' ? d.roulettePointer : 50;
+  const pts = computeRouletteScore(pointer, target);
+  const currentScore = (d.players?.[d.captainId]?.score) || 0;
+
+  const u = {};
+  u[`rooms/${room.id}/rouletteRevealed`] = true;
+  u[`rooms/${room.id}/roulettePoints`] = pts;
+  u[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: pts };
+  u[`rooms/${room.id}/players/${d.captainId}/score`] = currentScore + pts;
+  await update(ref(db), u);
+};
+
 function buildClassicCards(respondants) {
   const el = $s('cap-cards');
   if (!el) return;
@@ -7251,7 +7662,7 @@ function renderLeaderboard(d) {
       btn.textContent = 'Manche suivante ✦';
       btn.onclick = window.nextRound;
     } else {
-      btn.textContent = isDuel ? 'Duel Suivant ⚔️' : 'Cap\'ten Suivant 👑';
+      btn.textContent = isDuel ? 'Duel Suivant ⚔️' : (d.mode === 'roulette' ? 'Joueur suivant 🎡' : 'Cap\'ten Suivant 👑');
       btn.onclick = window.nextTurn;
     }
     act.appendChild(btn);
@@ -7330,6 +7741,35 @@ window.startTurn = async (isNewRound) => {
 
       await update(ref(db), u);
       return;
+  }
+
+  // --- LOGIQUE MODE ROULETTE ---
+  if (d.mode === 'roulette') {
+    let queue = (d.captainQueue || []).filter(id => ids.includes(id));
+    let round = d.round || 1;
+
+    if (isNewRound || queue.length === 0) {
+      queue = shuffle([...ids]);
+      if (isNewRound) round += 1;
+    }
+
+    const activeId = queue.shift();
+    const target = generateRouletteTarget();
+    const card = pickRandomRouletteCard();
+
+    u[`rooms/${room.id}/status`]          = 'roulette-round';
+    u[`rooms/${room.id}/captainId`]       = activeId;
+    u[`rooms/${room.id}/captainQueue`]    = queue;
+    u[`rooms/${room.id}/round`]           = round;
+    u[`rooms/${room.id}/rouletteCard`]    = card;
+    u[`rooms/${room.id}/rouletteTarget`]  = target;
+    u[`rooms/${room.id}/roulettePointer`] = 50;
+    u[`rooms/${room.id}/rouletteLocked`]  = false;
+    u[`rooms/${room.id}/rouletteRevealed`] = false;
+    u[`rooms/${room.id}/roulettePoints`]  = null;
+
+    await update(ref(db), u);
+    return;
   }
 
   // --- LOGIQUE CLASSIQUE / AUTRES MODES ---
