@@ -3000,11 +3000,6 @@ html.light-mode .host-transfer-tile {
           <div class="mode-name">Duel</div>
           <div class="mode-badge comp">1v1</div>
         </div>
-        <div class="mode-card" data-mode="roulette" onclick="cfgSetMode('roulette')">
-          <div class="mode-emoji">🎡</div>
-          <div class="mode-name">Roulette</div>
-          <div class="mode-badge comp">PvP · Points</div>
-        </div>
         <div class="mode-card wide" data-mode="wheel" onclick="cfgSetMode('wheel')">
           <div class="mode-emoji">🎰</div>
           <div class="mode-name">Roue Folle</div>
@@ -3455,43 +3450,6 @@ html.light-mode .host-transfer-tile {
 </div>
 
 <!-- ════════════════════════ SCREEN: REVEAL ════════════════════════ -->
-<!-- ════════════════════════ SCREEN: ROULETTE (Wavelength-like) ════════════════════════ -->
-<div id="screen-roulette" class="screen">
-  <div style="padding-top:.75rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;">
-    <div class="game-hdr">
-      <div>
-        <div class="hdr-round-label">Manche</div>
-        <div class="hdr-round-val"><span id="rlt-round">1</span></div>
-      </div>
-      <div id="rlt-active-name" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;color:var(--muted);"></div>
-      <div class="badge badge-mode">🎡 Roulette</div>
-    </div>
-
-    <div class="roulette-wrap">
-      <div id="rlt-status-text" style="text-align:center;">
-        <h2 style="color:#fff;" id="rlt-title">C'est ton tour !</h2>
-        <p style="margin-top:.35rem;font-size:.85rem;" id="rlt-subtitle">Place le curseur sur l'échelle entre les deux concepts.</p>
-      </div>
-
-      <div class="roulette-concepts">
-        <div class="roulette-concept left" id="rlt-left">Chaud</div>
-        <div class="roulette-concept right" id="rlt-right">Froid</div>
-      </div>
-
-      <div id="rlt-dial-container" style="width:100%;display:flex;justify-content:center;"></div>
-
-      <div id="rlt-reveal-box" style="display:none;text-align:center;">
-        <div class="roulette-score-pill" id="rlt-points">+0 pt</div>
-        <p style="margin-top:.25rem;font-size:.8rem;" id="rlt-reveal-desc"></p>
-      </div>
-
-      <div class="roulette-players" id="rlt-players"></div>
-
-      <div id="rlt-actions" style="width:100%;display:flex;flex-direction:column;gap:.6rem;"></div>
-    </div>
-  </div>
-</div>
-
 <!-- ════════════════════════ SCREEN: ROUE FOLLE (spin libre + indice + équipes) ════════════════════════ -->
 <div id="screen-wheel" class="screen">
   <div style="padding-top:.75rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;">
@@ -3510,6 +3468,11 @@ html.light-mode .host-transfer-tile {
       <div style="text-align:center;">
         <h2 style="color:#fff;" id="whl-title">C'est ton tour !</h2>
         <p style="margin-top:.35rem;font-size:.85rem;" id="whl-subtitle"></p>
+      </div>
+
+      <div class="roulette-concepts" id="whl-concepts" style="display:none;">
+        <div class="roulette-concept left" id="whl-left">Chaud</div>
+        <div class="roulette-concept right" id="whl-right">Froid</div>
       </div>
 
       <div id="whl-visual-container" style="width:100%;display:flex;justify-content:center;"></div>
@@ -3954,6 +3917,52 @@ function pickRandomRouletteCard() {
   return ROULETTE_CARDS[Math.floor(Math.random() * ROULETTE_CARDS.length)];
 }
 
+// ═══════════════════════════════════════════════════════════
+//  CHOIX DE THÈME (Roulette / Roue Folle) — écrit soi-même ou tire au hasard,
+//  exactement comme le Cap'ten en mode Top Ten classique.
+// ═══════════════════════════════════════════════════════════
+
+// Construit le HTML du panneau "choisis un thème ou tire-le au hasard"
+function buildThemeChoiceHtml(prefix, draftLeft, draftRight) {
+  return `
+    <div class="wheel-clue-box" style="width:100%;max-width:420px;">
+      <div class="wc-label">✏️ Choisis un thème (ou tire-en un au hasard)</div>
+      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+        <input id="${prefix}-theme-left" class="input" type="text" maxlength="24" placeholder="Concept gauche" value="${escapeHtml(draftLeft || '')}" style="flex:1;text-align:center;">
+        <input id="${prefix}-theme-right" class="input" type="text" maxlength="24" placeholder="Concept droit" value="${escapeHtml(draftRight || '')}" style="flex:1;text-align:center;">
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;width:100%;max-width:420px;">
+      <button type="button" class="btn btn-secondary btn-full" id="${prefix}-theme-draw">🎲 Tirer au hasard</button>
+      <button type="button" class="btn btn-primary btn-full" id="${prefix}-theme-validate">✅ Valider ce thème</button>
+    </div>
+  `;
+}
+
+// Branche les boutons du panneau de choix de thème sur les callbacks fournis
+function wireThemeChoiceButtons(prefix, onDraw, onValidate) {
+  const drawBtn = $s(`${prefix}-theme-draw`);
+  const validateBtn = $s(`${prefix}-theme-validate`);
+  if (drawBtn) drawBtn.onclick = () => {
+    const c = pickRandomRouletteCard();
+    const li = $s(`${prefix}-theme-left`), ri = $s(`${prefix}-theme-right`);
+    if (li) li.value = c.left;
+    if (ri) ri.value = c.right;
+    if (onDraw) onDraw(c);
+  };
+  if (validateBtn) validateBtn.onclick = () => {
+    const li = $s(`${prefix}-theme-left`), ri = $s(`${prefix}-theme-right`);
+    let left = (li?.value || '').trim();
+    let right = (ri?.value || '').trim();
+    if (!left || !right) {
+      const c = pickRandomRouletteCard();
+      left = left || c.left;
+      right = right || c.right;
+    }
+    onValidate({ left, right });
+  };
+}
+
 // Génère une zone cible cachée pour la manche : un centre (0-100) et des
 // demi-largeurs pour les paliers 4 / 3 / 2 points. Le centre est contraint
 // pour que même la zone la plus large (2 pts) tienne dans le cadran [0,100].
@@ -4246,7 +4255,6 @@ function modeInfo(mode) {
     extreme:  { emoji: '🎭', name: 'Extrême',   coop: true,  ranked: false },
     blind:    { emoji: '🙈', name: 'Aveugle',   coop: true,  ranked: false },
     duel:     { emoji: '⚔️', name: 'Duel',      coop: false, ranked: true  },
-    roulette: { emoji: '🎡', name: 'Roulette',  coop: false, ranked: true  },
     wheel:    { emoji: '🎰', name: 'Roue Folle', coop: false, ranked: true, teams: true }
   };
   return m[mode] || m.classic;
@@ -4742,17 +4750,13 @@ function dispatch(d) {
     if (d.status === 'round-reveal') {
       window._answeringCountdownActive = false;
     }
-    if (d.status === 'roulette-round') {
-      window._rltLocalPos = null;
-      window._rltDialBuilt = false;
-      window._rltRevealShown = false;
-    }
     if (d.status === 'wheel-round') {
       window._whlLastPhase = null;
       window._whlDialBuilt = false;
       window._whlRevealShown = false;
       window._whlLocalPos = null;
       window._whlSpinning = false;
+      window._whlThemePhaseBuilt = false;
       if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
     }
     if (d.status === 'lobby' || d.status === 'config') {
@@ -4768,14 +4772,12 @@ function dispatch(d) {
       window._verifyBuilt = null;
       window._duelSpecKey1 = null;
       window._duelSpecKey2 = null;
-      window._rltLocalPos = null;
-      window._rltDialBuilt = false;
-      window._rltRevealShown = false;
       window._whlLastPhase = null;
       window._whlDialBuilt = false;
       window._whlRevealShown = false;
       window._whlLocalPos = null;
       window._whlSpinning = false;
+      window._whlThemePhaseBuilt = false;
       if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
       revealAnimDone = false;
       // ⚠ FIX : nettoyer TOUS les timers actifs au retour au salon (sinon ils continuent à tourner)
@@ -4805,7 +4807,6 @@ function dispatch(d) {
     case 'leaderboard':  renderLeaderboard(d); break;
     case 'gameover':     renderGameover(d); break;
     case 'theme-vote-result': renderThemeVoteResult(d); break;
-    case 'roulette-round': renderRouletteRound(d); break;
     case 'wheel-round': renderWheelRound(d); break;
     default:
       // Statut inconnu → on retourne au lobby pour éviter un écran figé
@@ -4969,14 +4970,13 @@ function renderConfigParams(mode, d, isHost) {
     extreme: '🎭 <strong>Extrême</strong> — La timeline est bloquée ! Le Cap\'ten ne peut placer que la pire (1) et la meilleure (10) réponse.',
     blind: '🙈 <strong>Aveugle (1 par 1)</strong> — Le Cap\'ten reçoit une seule réponse à la fois et doit la placer définitivement sans voir les autres !',
     duel: '⚔️ <strong>Duel</strong> — Deux Cap\'tens s\'affrontent ! Les joueurs votent pour le thème. Le Cap\'ten le plus précis gagne, et les joueurs marquent des points si leur réponse est bien classée.',
-    roulette: '🎡 <strong>Roulette</strong> — Chacun son tour, place le curseur entre deux concepts opposés pour viser une zone cachée. Plus tu es proche du centre, plus tu marques de points (jusqu\'à 4) !',
     wheel: '🎰 <strong>Roue Folle</strong> — Le lanceur fait tourner la roue librement et l\'arrête quand il veut, puis donne un indice sur la valeur secrète obtenue. Choisis plus bas : "Chacun pour soi" (tout le monde devine et marque ses propres points) ou "Équipes" (configure la taille des équipes et l\'attribution).'
   };
   const descEl = $s('cfg-mode-desc');
   if (descEl) descEl.innerHTML = descs[mode] || descs.classic;
 
   const showRounds = mode !== 'survival';
-  const showLives = mode !== 'sniper' && mode !== 'duel' && mode !== 'roulette' && mode !== 'wheel';
+  const showLives = mode !== 'sniper' && mode !== 'duel' && mode !== 'wheel';
   
   let html = `<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:1.5rem;">`;
 
@@ -5196,38 +5196,18 @@ window.startGame = async () => {
       u[`rooms/${room.id}/captainId2`] = firstMatch[1];
     }
   }
-  // --- MATCHMAKING MODE ROULETTE ---
-  else if (d.mode === 'roulette') {
-    const shuffledQueue = shuffle([...ids]);
-    const activeId = shuffledQueue.shift();
-    const target = generateRouletteTarget();
-    const card = pickRandomRouletteCard();
-
-    u[`rooms/${room.id}/status`]          = 'roulette-round';
-    u[`rooms/${room.id}/captainId`]       = activeId;
-    u[`rooms/${room.id}/captainQueue`]    = shuffledQueue;
-    u[`rooms/${room.id}/rouletteCard`]    = card;
-    u[`rooms/${room.id}/rouletteTarget`]  = target;
-    u[`rooms/${room.id}/roulettePointer`] = 50;
-    u[`rooms/${room.id}/rouletteLocked`]  = false;
-    u[`rooms/${room.id}/rouletteRevealed`] = false;
-    u[`rooms/${room.id}/roulettePoints`]  = null;
-    u[`rooms/${room.id}/lives`]    = 0;
-    u[`rooms/${room.id}/maxLives`] = 0;
-  }
   // --- MATCHMAKING MODE ROUE FOLLE (chacun pour soi OU équipes configurables) ---
   else if (d.mode === 'wheel') {
     const teams = computeWheelTeams(ids, d.wheelConfig);
     const queue = shuffle([...ids]);
     const spinnerId = queue.shift();
-    const card = pickRandomRouletteCard();
 
     u[`rooms/${room.id}/status`]        = 'wheel-round';
     u[`rooms/${room.id}/teams`]         = teams;
     u[`rooms/${room.id}/captainId`]     = spinnerId;
     u[`rooms/${room.id}/captainQueue`]  = queue;
-    u[`rooms/${room.id}/wheelCard`]     = card;
-    u[`rooms/${room.id}/wheelPhase`]    = 'spin';
+    u[`rooms/${room.id}/wheelCard`]     = null;
+    u[`rooms/${room.id}/wheelPhase`]    = 'theme';
     u[`rooms/${room.id}/wheelTarget`]   = null;
     u[`rooms/${room.id}/wheelClue`]     = null;
     u[`rooms/${room.id}/wheelGuesses`]  = null;
@@ -6447,10 +6427,20 @@ function rltPosFromPointerEvent(svgEl, evt) {
 
 function rltBuildSvg(card, interactive) {
   const track = rltTrackPath(RLT_R);
+  let ticks = '';
+  for (let i = 0; i <= 10; i++) {
+    const pos = i * 10;
+    const inner = rltPolar(pos, RLT_R - 22);
+    const outer = rltPolar(pos, RLT_R - 8);
+    const labelPt = rltPolar(pos, RLT_R - 40);
+    ticks += `<line x1="${inner.x.toFixed(2)}" y1="${inner.y.toFixed(2)}" x2="${outer.x.toFixed(2)}" y2="${outer.y.toFixed(2)}" stroke="rgba(255,255,255,.35)" stroke-width="2"/>`;
+    ticks += `<text x="${labelPt.x.toFixed(2)}" y="${labelPt.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="rgba(255,255,255,.45)" font-family="'Space Grotesk',sans-serif">${i}</text>`;
+  }
   return `
     <svg class="roulette-dial-svg${interactive ? '' : ' spectator'}" viewBox="0 0 400 210" xmlns="http://www.w3.org/2000/svg">
       <path id="rlt-track" d="${track}" fill="none" stroke="var(--border2)" stroke-width="34" stroke-linecap="round"/>
       <g id="rlt-target-zone" style="display:none;"></g>
+      <g id="rlt-ticks">${ticks}</g>
       <line id="rlt-needle" x1="${RLT_CX}" y1="${RLT_CY}" x2="${RLT_CX}" y2="${RLT_CY - RLT_R}" stroke="var(--cyan)" stroke-width="4" stroke-linecap="round"/>
       <circle id="rlt-handle" cx="${RLT_CX}" cy="${RLT_CY - RLT_R}" r="16" fill="var(--cyan)" stroke="#fff" stroke-width="3" class="roulette-pointer"/>
       <circle cx="${RLT_CX}" cy="${RLT_CY}" r="6" fill="var(--muted)"/>
@@ -6478,177 +6468,6 @@ function rltShowTargetZone(svgEl, target) {
   `;
   g.style.display = 'block';
 }
-
-function renderRouletteRound(d) {
-  showScreen('roulette');
-  const m = modeInfo(d.mode);
-  const isActive = d.captainId === pid;
-  const isHost = d.host === pid;
-  const players = d.players || {};
-  const card = d.rouletteCard || { left: '…', right: '…' };
-  const locked = !!d.rouletteLocked;
-  const revealed = !!d.rouletteRevealed;
-
-  $s('rlt-round').textContent = d.round || 1;
-  $s('rlt-left').textContent  = card.left;
-  $s('rlt-right').textContent = card.right;
-  $s('rlt-active-name').textContent = players[d.captainId] ? `🎯 ${players[d.captainId].name}` : '';
-
-  if (isActive) {
-    $s('rlt-title').textContent = revealed ? 'Résultat de ta manche' : (locked ? 'Position verrouillée !' : "C'est ton tour !");
-    $s('rlt-subtitle').textContent = revealed
-      ? 'Compare ta position avec la zone secrète.'
-      : (locked ? "En attente de la révélation…" : 'Fais glisser le curseur, puis valide ta réponse.');
-  } else {
-    $s('rlt-title').textContent = revealed ? 'Manche terminée' : (locked ? 'Position verrouillée' : `${players[d.captainId]?.name || 'Le joueur'} réfléchit…`);
-    $s('rlt-subtitle').textContent = revealed ? '' : 'Regarde où il/elle va placer le curseur !';
-  }
-
-  // Construit le cadran une seule fois par manche (les updates suivants ne recréent pas le drag)
-  const container = $s('rlt-dial-container');
-  if (!window._rltDialBuilt) {
-    container.innerHTML = rltBuildSvg(card, isActive && !locked);
-    window._rltDialBuilt = true;
-    window._rltLocalPos = (typeof d.roulettePointer === 'number') ? d.roulettePointer : 50;
-
-    const svgEl = container.querySelector('svg');
-    rltUpdateNeedle(svgEl, window._rltLocalPos);
-
-    if (isActive && !locked) {
-      let dragging = false;
-      const onMove = (evt) => {
-        if (!dragging) return;
-        evt.preventDefault();
-        window._rltLocalPos = rltPosFromPointerEvent(svgEl, evt);
-        rltUpdateNeedle(svgEl, window._rltLocalPos);
-      };
-      const onStart = (evt) => {
-        dragging = true;
-        window._rltLocalPos = rltPosFromPointerEvent(svgEl, evt);
-        rltUpdateNeedle(svgEl, window._rltLocalPos);
-      };
-      const onEnd = () => { dragging = false; };
-      svgEl.addEventListener('mousedown', onStart);
-      svgEl.addEventListener('touchstart', onStart, { passive: false });
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('touchmove', onMove, { passive: false });
-      window.addEventListener('mouseup', onEnd);
-      window.addEventListener('touchend', onEnd);
-    }
-  } else if (!isActive || locked) {
-    // Spectateur / position déjà verrouillée → on suit la position enregistrée en base
-    const svgEl = container.querySelector('svg');
-    if (svgEl && typeof d.roulettePointer === 'number') rltUpdateNeedle(svgEl, d.roulettePointer);
-  }
-
-  // Révélation de la zone cible (une seule fois)
-  if (revealed && !window._rltRevealShown) {
-    window._rltRevealShown = true;
-    const svgEl = container.querySelector('svg');
-    if (svgEl) rltShowTargetZone(svgEl, d.rouletteTarget || {});
-  }
-
-  // Bloc de score
-  const revealBox = $s('rlt-reveal-box');
-  if (revealed) {
-    revealBox.style.display = 'block';
-    const pts = d.roulettePoints ?? 0;
-    $s('rlt-points').textContent = `+${pts} pt${pts > 1 ? 's' : ''}`;
-    $s('rlt-points').className = `roulette-score-pill pts-${pts}`;
-    $s('rlt-reveal-desc').textContent = pts === 4 ? '🎯 Pile dans le mille !'
-      : pts === 3 ? '👏 Très proche du centre !'
-      : pts === 2 ? '✅ Sur le bord de la zone.'
-      : '❌ En dehors de la zone, aucun point.';
-  } else {
-    revealBox.style.display = 'none';
-  }
-
-  // Chips joueurs (score courant)
-  const chipsEl = $s('rlt-players');
-  chipsEl.innerHTML = '';
-  Object.entries(players).forEach(([id, p]) => {
-    const chip = document.createElement('div');
-    chip.className = 'roulette-player-chip' + (id === d.captainId ? ' active' : '');
-    chip.textContent = `${id === d.captainId ? '🎯 ' : ''}${p.name} · ${p.score || 0} pts`;
-    chipsEl.appendChild(chip);
-  });
-
-  // Actions (boutons contextuels)
-  const act = $s('rlt-actions');
-  act.innerHTML = '';
-  if (!locked) {
-    if (isActive) {
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-primary btn-full';
-      btn.textContent = '🔒 Valider ma position';
-      btn.onclick = () => window.rltLockPosition();
-      act.appendChild(btn);
-    } else {
-      const p2 = document.createElement('p');
-      p2.style.textAlign = 'center';
-      p2.textContent = 'En attente du joueur actif…';
-      act.appendChild(p2);
-    }
-  } else if (!revealed) {
-    if (isActive || isHost) {
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-success btn-full';
-      btn.textContent = '🎬 Révéler la cible';
-      btn.onclick = () => window.rltRevealTarget();
-      act.appendChild(btn);
-    } else {
-      const p2 = document.createElement('p');
-      p2.style.textAlign = 'center';
-      p2.textContent = 'En attente de la révélation…';
-      act.appendChild(p2);
-    }
-  } else if (isHost) {
-    const queue = d.captainQueue || [];
-    const isEndOfRound = queue.length === 0;
-    const targetRounds = d.maxRounds || 5;
-    const isFinalRound = isEndOfRound && (d.round >= targetRounds);
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-primary btn-full';
-    if (isFinalRound) {
-      btn.textContent = '🏆 Résultat final';
-      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'gameover' });
-    } else {
-      btn.textContent = '🏆 Voir le classement';
-      btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'leaderboard' });
-    }
-    act.appendChild(btn);
-  } else {
-    const p2 = document.createElement('p');
-    p2.style.textAlign = 'center';
-    p2.textContent = "En attente de l'hôte…";
-    act.appendChild(p2);
-  }
-}
-
-// Le joueur actif verrouille sa position : écrit la valeur locale dans Firebase
-window.rltLockPosition = async () => {
-  const d = room.data; if (!d || d.captainId !== pid) return;
-  const pos = Math.max(0, Math.min(100, window._rltLocalPos ?? 50));
-  await update(ref(db, `rooms/${room.id}`), { roulettePointer: pos, rouletteLocked: true });
-};
-
-// Révèle la cible cachée et calcule le score du joueur actif
-window.rltRevealTarget = async () => {
-  const d = room.data; if (!d) return;
-  if (!(d.captainId === pid || d.host === pid)) return;
-  if (d.rouletteRevealed) return;
-  const target = d.rouletteTarget || generateRouletteTarget();
-  const pointer = typeof d.roulettePointer === 'number' ? d.roulettePointer : 50;
-  const pts = computeRouletteScore(pointer, target);
-  const currentScore = (d.players?.[d.captainId]?.score) || 0;
-
-  const u = {};
-  u[`rooms/${room.id}/rouletteRevealed`] = true;
-  u[`rooms/${room.id}/roulettePoints`] = pts;
-  u[`rooms/${room.id}/lastRoundPts`] = { [d.captainId]: pts };
-  u[`rooms/${room.id}/players/${d.captainId}/score`] = currentScore + pts;
-  await update(ref(db), u);
-};
 
 // ═══════════════════════════════════════════════════════════
 //  MODE ROUE FOLLE — ÉQUIPES + ROUE LIBRE + INDICE + DEVINETTE
@@ -6710,51 +6529,31 @@ function wheelEligibleGuessers(d, ids) {
   return ids.filter(id => id !== d.captainId && wheelTeamOf(teams, id) !== spinnerTeam);
 }
 
-// --- Roue graphique (spin libre, façon roue de la fortune) ---
-const WHL_CX = 150, WHL_CY = 170, WHL_R = 130, WHL_SEGMENTS = 10;
+// Le lanceur valide son thème (écrit ou tiré au hasard) et passe à la phase de lancer
+window.whlValidateTheme = async (card) => {
+  const d = room.data; if (!d || d.captainId !== pid) return;
+  if (!card || !card.left || !card.right) return;
+  await update(ref(db, `rooms/${room.id}`), { wheelCard: card, wheelPhase: 'spin' });
+};
 
-
-function whlPolar(angleDeg, radius) {
-  const rad = angleDeg * Math.PI / 180;
-  return { x: WHL_CX + radius * Math.sin(rad), y: WHL_CY - radius * Math.cos(rad) };
-}
-
-// La valeur (0-100) correspondant à la portion de roue actuellement sous le repère fixe (en haut)
-function whlAngleToValue(rotationDeg) {
-  const norm = ((rotationDeg % 360) + 360) % 360;
-  return ((360 - norm) % 360) / 360 * 100;
-}
-
-function whlBuildWheelSvg() {
-  let wedges = '';
-  for (let i = 0; i < WHL_SEGMENTS; i++) {
-    const a0 = (360 / WHL_SEGMENTS) * i, a1 = (360 / WHL_SEGMENTS) * (i + 1);
-    const p0 = whlPolar(a0, WHL_R), p1 = whlPolar(a1, WHL_R);
-    const color = i % 2 === 0 ? 'var(--cyan)' : 'var(--pink)';
-    wedges += `<path d="M ${WHL_CX} ${WHL_CY} L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} A ${WHL_R} ${WHL_R} 0 0 1 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} Z" fill="${color}" opacity=".6"/>`;
-  }
-  return `
-    <svg viewBox="0 0 300 320" class="wheel-svg">
-      <polygon points="150,8 136,36 164,36" fill="var(--gold)" stroke="#fff" stroke-width="2"/>
-      <g id="whl-wheel-group">${wedges}<circle cx="${WHL_CX}" cy="${WHL_CY}" r="8" fill="#fff"/></g>
-      <circle cx="${WHL_CX}" cy="${WHL_CY}" r="130" fill="none" stroke="var(--border2)" stroke-width="4"/>
-    </svg>`;
-}
-
-// Lance la roue : rotation continue jusqu'à ce que le joueur clique sur Stop
+// Lance la roue : l'aiguille oscille librement sur le demi-cercle jusqu'au clic sur Stop
 window.whlSpinStart = () => {
   if (window._whlSpinning) return;
   window._whlSpinning = true;
-  window._whlRotation = window._whlRotation || 0;
-  const group = document.getElementById('whl-wheel-group');
+  window._whlOscPos = (typeof window._whlOscPos === 'number') ? window._whlOscPos : 50;
+  window._whlOscDir = window._whlOscDir || 1;
+  const container = $s('whl-visual-container');
   let lastTs = null;
-  const speedDegPerSec = 480;
+  const speedPerSec = 140; // unités (0-100) par seconde
   const step = (ts) => {
     if (!window._whlSpinning) return;
     if (lastTs !== null) {
       const dt = (ts - lastTs) / 1000;
-      window._whlRotation += speedDegPerSec * dt;
-      if (group) group.setAttribute('transform', `rotate(${window._whlRotation} ${WHL_CX} ${WHL_CY})`);
+      window._whlOscPos += window._whlOscDir * speedPerSec * dt;
+      if (window._whlOscPos >= 100) { window._whlOscPos = 100; window._whlOscDir = -1; }
+      if (window._whlOscPos <= 0) { window._whlOscPos = 0; window._whlOscDir = 1; }
+      const svgEl = container?.querySelector('svg');
+      if (svgEl) rltUpdateNeedle(svgEl, window._whlOscPos);
     }
     lastTs = ts;
     window._whlRafId = requestAnimationFrame(step);
@@ -6763,14 +6562,14 @@ window.whlSpinStart = () => {
   renderWheelRound(room.data); // rafraîchit les boutons (Lancer -> Stop)
 };
 
-// Arrête la roue : la valeur sous le repère devient la cible cachée du tour
+// Arrête la roue : la position de l'aiguille au moment du clic devient la cible cachée du tour
 window.whlSpinStop = async () => {
   if (!window._whlSpinning) return;
   window._whlSpinning = false;
   if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
   const d = room.data; if (!d || d.captainId !== pid) return;
 
-  const value = whlAngleToValue(window._whlRotation || 0);
+  const value = Math.max(0, Math.min(100, window._whlOscPos ?? 50));
   const target = { center: +value.toFixed(2), w4: 3, w3: 7, w2: 12 };
   await update(ref(db, `rooms/${room.id}`), { wheelTarget: target, wheelPhase: 'clue' });
 };
@@ -6822,14 +6621,9 @@ function renderWheelRound(d) {
   const teams = d.teams || {};
   const hasTeams = Object.keys(teams).length > 0;
   const ids = Object.keys(players);
-  const eligibleGuessers = wheelEligibleGuessers(d, ids);
   const isSpinner = d.captainId === pid;
-  const isEligibleGuesser = eligibleGuessers.includes(pid);
-  const guesses = d.wheelGuesses || {};
-  const myGuessLocked = pid in guesses;
   const isHost = d.host === pid;
   const phase = d.wheelPhase || 'spin';
-  const card = d.wheelCard || { left: '…', right: '…' };
 
   $s('whl-round').textContent = d.round || 1;
   $s('whl-active-name').textContent = players[d.captainId] ? `🎰 ${players[d.captainId].name}` : '';
@@ -6851,6 +6645,68 @@ function renderWheelRound(d) {
     });
   }
 
+  // --- Phase "choix du thème" : le lanceur choisit ou tire un thème au hasard ---
+  if (phase === 'theme') {
+    $s('whl-secret-box').style.display = 'none';
+    $s('whl-clue-input-box').style.display = 'none';
+    $s('whl-clue-box').style.display = 'none';
+    $s('whl-reveal-box').style.display = 'none';
+    $s('whl-concepts').style.display = 'none';
+
+    $s('whl-title').textContent = isSpinner ? 'Choisis un thème' : `${players[d.captainId]?.name || 'Le joueur'} choisit un thème…`;
+    $s('whl-subtitle').textContent = isSpinner ? 'Écris tes propres concepts ou tire-en un au hasard, avant de lancer la roue.' : 'Il/elle choisit les deux concepts opposés de cette manche.';
+
+    const container = $s('whl-visual-container');
+    if (window._whlThemePhaseBuilt !== true) {
+      window._whlThemePhaseBuilt = true;
+      window._whlLastPhase = null; // pour que la roue soit reconstruite une fois le thème validé
+      if (isSpinner) {
+        container.innerHTML = buildThemeChoiceHtml('whl', '', '');
+        wireThemeChoiceButtons('whl', null, (chosenCard) => {
+          window.whlValidateTheme(chosenCard);
+        });
+      } else {
+        container.innerHTML = `<p style="text-align:center;color:var(--muted);">⏳ En attente du choix du thème…</p>`;
+      }
+    }
+
+    const chipsEl = $s('whl-players');
+    chipsEl.innerHTML = '';
+    Object.entries(players).forEach(([id, p]) => {
+      const chip = document.createElement('div');
+      chip.className = 'roulette-player-chip' + (id === d.captainId ? ' active' : '');
+      chip.textContent = `${id === d.captainId ? '🎰 ' : ''}${p.name} · ${p.score || 0} pts`;
+      chipsEl.appendChild(chip);
+    });
+
+    const act = $s('whl-actions');
+    act.innerHTML = '';
+    if (!isSpinner) {
+      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+      p2.textContent = 'En attente du choix du thème…';
+      act.appendChild(p2);
+    }
+    return;
+  }
+  window._whlThemePhaseBuilt = false;
+
+  const eligibleGuessers = wheelEligibleGuessers(d, ids);
+  const isEligibleGuesser = eligibleGuessers.includes(pid);
+  const guesses = d.wheelGuesses || {};
+  const myGuessLocked = pid in guesses;
+  const card = d.wheelCard || { left: '…', right: '…' };
+  const onSpinnerSide = hasTeams ? (wheelTeamOf(teams, d.captainId) === wheelTeamOf(teams, pid)) : isSpinner;
+
+  // Libellés des deux concepts opposés, affichés aux extrémités du cadran
+  const conceptsEl = $s('whl-concepts');
+  if (phase === 'spin' || phase === 'clue' || phase === 'guess' || phase === 'revealed') {
+    conceptsEl.style.display = 'flex';
+    $s('whl-left').textContent = card.left;
+    $s('whl-right').textContent = card.right;
+  } else {
+    conceptsEl.style.display = 'none';
+  }
+
   // Titres contextuels selon la phase et le rôle
   const titleEl = $s('whl-title'), subEl = $s('whl-subtitle');
   if (phase === 'spin') {
@@ -6858,7 +6714,7 @@ function renderWheelRound(d) {
     subEl.textContent = isSpinner ? 'Fais-la tourner librement, puis arrête-la quand tu veux.' : 'Il/elle choisit le moment où la roue s\'arrête.';
   } else if (phase === 'clue') {
     titleEl.textContent = isSpinner ? 'Ta valeur secrète !' : 'Le joueur actif réfléchit à son indice…';
-    subEl.textContent = isSpinner ? 'Donne un indice pour aider (ou piéger 😏) les autres joueurs.' : 'Patience, l\'indice arrive.';
+    subEl.textContent = isSpinner ? 'Donne un indice' : 'Patience, l\'indice arrive.';
   } else if (phase === 'guess') {
     titleEl.textContent = isEligibleGuesser ? (myGuessLocked ? 'Réponse envoyée !' : 'À toi de deviner !') : 'Les joueurs devinent…';
     subEl.textContent = isEligibleGuesser
@@ -6877,10 +6733,10 @@ function renderWheelRound(d) {
     window._whlRevealShown = false;
 
     if (phase === 'spin') {
-      container.innerHTML = whlBuildWheelSvg();
-      window._whlRotation = window._whlRotation || 0;
-      const group = document.getElementById('whl-wheel-group');
-      if (group) group.setAttribute('transform', `rotate(${window._whlRotation} ${WHL_CX} ${WHL_CY})`);
+      container.innerHTML = rltBuildSvg(card, false);
+      window._whlOscPos = (typeof window._whlOscPos === 'number') ? window._whlOscPos : 50;
+      const svgEl0 = container.querySelector('svg');
+      if (svgEl0) rltUpdateNeedle(svgEl0, window._whlOscPos);
     } else if (phase === 'clue' || phase === 'guess' || phase === 'revealed') {
       const interactive = isEligibleGuesser && phase === 'guess' && !myGuessLocked;
       container.innerHTML = rltBuildSvg(card, interactive);
@@ -6889,6 +6745,12 @@ function renderWheelRound(d) {
       const svgEl = container.querySelector('svg');
       // On n'affiche une aiguille "en direct" que pour le joueur qui est en train de deviner
       if (isEligibleGuesser) rltUpdateNeedle(svgEl, window._whlLocalPos);
+
+      // Le lanceur (et son équipe) voit tout de suite les bandes de couleur de la zone cachée,
+      // plutôt qu'une valeur numérique — les devineurs, eux, ne voient rien avant la révélation.
+      if ((phase === 'clue' || phase === 'guess') && onSpinnerSide && d.wheelTarget) {
+        rltShowTargetZone(svgEl, d.wheelTarget);
+      }
 
       if (interactive) {
         let dragging = false;
@@ -6914,17 +6776,10 @@ function renderWheelRound(d) {
     }
   }
 
-  // Valeur secrète (visible seulement par le lanceur, et son équipe s'il y en a une)
+  // La valeur secrète n'est plus affichée sous forme de nombre : le lanceur (et son équipe)
+  // la voit directement sous forme de bandes de couleur sur le cadran (voir plus haut).
   const secretBox = $s('whl-secret-box');
-  const onSpinnerSide = hasTeams ? (wheelTeamOf(teams, d.captainId) === wheelTeamOf(teams, pid)) : isSpinner;
-  if ((phase === 'clue' || phase === 'guess') && d.wheelTarget && onSpinnerSide) {
-    secretBox.style.display = 'block';
-    const c = d.wheelTarget.center;
-    const leaning = c < 50 ? card.left : card.right;
-    secretBox.innerHTML = `<div class="wv">${c.toFixed(0)} / 100</div><div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">Plutôt du côté « ${escapeHtml(leaning)} »</div>`;
-  } else {
-    secretBox.style.display = 'none';
-  }
+  secretBox.style.display = 'none';
 
   // Zone de saisie de l'indice (visible uniquement par le lanceur pendant la phase 'clue')
   const clueInputBox = $s('whl-clue-input-box');
@@ -8283,7 +8138,7 @@ function renderLeaderboard(d) {
       btn.textContent = 'Manche suivante ✦';
       btn.onclick = window.nextRound;
     } else {
-      btn.textContent = isDuel ? 'Duel Suivant ⚔️' : (d.mode === 'roulette' ? 'Joueur suivant 🎡' : 'Cap\'ten Suivant 👑');
+      btn.textContent = isDuel ? 'Duel Suivant ⚔️' : (d.mode === 'wheel' ? 'Joueur suivant 🎰' : 'Cap\'ten Suivant 👑');
       btn.onclick = window.nextTurn;
     }
     act.appendChild(btn);
@@ -8364,35 +8219,6 @@ window.startTurn = async (isNewRound) => {
       return;
   }
 
-  // --- LOGIQUE MODE ROULETTE ---
-  if (d.mode === 'roulette') {
-    let queue = (d.captainQueue || []).filter(id => ids.includes(id));
-    let round = d.round || 1;
-
-    if (isNewRound || queue.length === 0) {
-      queue = shuffle([...ids]);
-      if (isNewRound) round += 1;
-    }
-
-    const activeId = queue.shift();
-    const target = generateRouletteTarget();
-    const card = pickRandomRouletteCard();
-
-    u[`rooms/${room.id}/status`]          = 'roulette-round';
-    u[`rooms/${room.id}/captainId`]       = activeId;
-    u[`rooms/${room.id}/captainQueue`]    = queue;
-    u[`rooms/${room.id}/round`]           = round;
-    u[`rooms/${room.id}/rouletteCard`]    = card;
-    u[`rooms/${room.id}/rouletteTarget`]  = target;
-    u[`rooms/${room.id}/roulettePointer`] = 50;
-    u[`rooms/${room.id}/rouletteLocked`]  = false;
-    u[`rooms/${room.id}/rouletteRevealed`] = false;
-    u[`rooms/${room.id}/roulettePoints`]  = null;
-
-    await update(ref(db), u);
-    return;
-  }
-
   // --- LOGIQUE MODE ROUE FOLLE ---
   if (d.mode === 'wheel') {
     let queue = (d.captainQueue || []).filter(id => ids.includes(id));
@@ -8404,14 +8230,13 @@ window.startTurn = async (isNewRound) => {
     }
 
     const spinnerId = queue.shift();
-    const card = pickRandomRouletteCard();
 
     u[`rooms/${room.id}/status`]       = 'wheel-round';
     u[`rooms/${room.id}/captainId`]    = spinnerId;
     u[`rooms/${room.id}/captainQueue`] = queue;
     u[`rooms/${room.id}/round`]        = round;
-    u[`rooms/${room.id}/wheelCard`]    = card;
-    u[`rooms/${room.id}/wheelPhase`]   = 'spin';
+    u[`rooms/${room.id}/wheelCard`]    = null;
+    u[`rooms/${room.id}/wheelPhase`]   = 'theme';
     u[`rooms/${room.id}/wheelTarget`]  = null;
     u[`rooms/${room.id}/wheelClue`]    = null;
     u[`rooms/${room.id}/wheelGuesses`] = null;
