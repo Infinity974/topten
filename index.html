@@ -905,6 +905,7 @@ html.light-mode .input-clear-btn:hover {
   min-height: 150px;
   display: flex; flex-direction: column; justify-content: center; gap: .35rem;
 }
+.mode-card.wide { grid-column: 1 / -1; }
 .mode-card.selected {
   border-color: rgba(var(--primary-rgb),.50);
   border-top: 1px solid rgba(var(--primary-rgb),.75);
@@ -2789,6 +2790,32 @@ html.light-mode .host-transfer-tile {
   background: rgba(var(--primary-rgb),.15); border-color: rgba(var(--primary-rgb),.5);
   color: var(--cyan);
 }
+/* ═══════════════════════════════════════════════════════════
+   37. MODE ROUE FOLLE (wheel) — spin libre + indice + équipes
+═══════════════════════════════════════════════════════════ */
+.wheel-wrap { display:flex; flex-direction:column; align-items:center; gap:1.1rem; padding:.5rem 0 1rem; }
+.wheel-teams-bar { display:flex; gap:.6rem; width:100%; max-width:420px; }
+.wheel-team-pill {
+  flex:1; padding:.6rem .8rem; border-radius:14px; text-align:center;
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+}
+.wheel-team-pill.mine { border-color:rgba(var(--primary-rgb),.5); background:rgba(var(--primary-rgb),.1); }
+.wheel-team-pill .wt-label { font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:700; }
+.wheel-team-pill .wt-names { font-weight:700; font-size:.82rem; color:#fff; margin-top:.15rem; }
+.wheel-team-pill .wt-score { font-family:'Space Grotesk',sans-serif; font-weight:900; font-size:1.15rem; color:var(--gold); margin-top:.2rem; }
+.wheel-svg { width:100%; max-width:280px; }
+.wheel-secret-box {
+  text-align:center; padding:.8rem 1rem; border-radius:14px;
+  background:rgba(var(--gold-rgb),.12); border:1px solid rgba(var(--gold-rgb),.4);
+  font-family:'Space Grotesk',sans-serif;
+}
+.wheel-secret-box .wv { font-size:1.6rem; font-weight:900; color:var(--gold); }
+.wheel-clue-box {
+  width:100%; max-width:420px; padding:.9rem 1rem; border-radius:14px;
+  background:rgba(255,255,255,.05); border:1px solid var(--border); text-align:center;
+}
+.wheel-clue-box .wc-label { font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:700; }
+.wheel-clue-box .wc-text { font-size:1.05rem; font-weight:700; color:#fff; margin-top:.3rem; font-style:italic; }
 </style>
 </head>
 <body>
@@ -2913,7 +2940,7 @@ html.light-mode .host-transfer-tile {
       
       <div id="lby-players" class="player-list"></div>
       
-      <p id="lby-warn" style="font-size:.72rem; color:rgb(var(--gold-rgb)); text-align:center; margin-top:1rem; font-family:'Space Grotesk',sans-serif; font-weight:700;">⚠️ 3 joueurs minimum pour jouer</p>
+      <p id="lby-warn" style="font-size:.72rem; color:rgb(var(--gold-rgb)); text-align:center; margin-top:1rem; font-family:'Space Grotesk',sans-serif; font-weight:700;">⚠️ 2 joueurs minimum pour jouer</p>
     </div>
 
     <div class="spacer"></div>
@@ -2977,6 +3004,11 @@ html.light-mode .host-transfer-tile {
           <div class="mode-emoji">🎡</div>
           <div class="mode-name">Roulette</div>
           <div class="mode-badge comp">PvP · Points</div>
+        </div>
+        <div class="mode-card wide" data-mode="wheel" onclick="cfgSetMode('wheel')">
+          <div class="mode-emoji">🎰</div>
+          <div class="mode-name">Roue Folle</div>
+          <div class="mode-badge comp">Chacun pour soi · Équipes configurables</div>
         </div>
       </div>
       <p id="cfg-mode-desc" style="font-size:.78rem;line-height:1.65;margin-top:.85rem;padding:.75rem .85rem;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.8);"></p>
@@ -3456,6 +3488,44 @@ html.light-mode .host-transfer-tile {
       <div class="roulette-players" id="rlt-players"></div>
 
       <div id="rlt-actions" style="width:100%;display:flex;flex-direction:column;gap:.6rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ SCREEN: ROUE FOLLE (spin libre + indice + équipes) ════════════════════════ -->
+<div id="screen-wheel" class="screen">
+  <div style="padding-top:.75rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;">
+    <div class="game-hdr">
+      <div>
+        <div class="hdr-round-label">Manche</div>
+        <div class="hdr-round-val"><span id="whl-round">1</span></div>
+      </div>
+      <div id="whl-active-name" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;color:var(--muted);"></div>
+      <div class="badge badge-mode">🎰 Roue Folle</div>
+    </div>
+
+    <div class="wheel-wrap">
+      <div class="wheel-teams-bar" id="whl-teams-bar"></div>
+
+      <div style="text-align:center;">
+        <h2 style="color:#fff;" id="whl-title">C'est ton tour !</h2>
+        <p style="margin-top:.35rem;font-size:.85rem;" id="whl-subtitle"></p>
+      </div>
+
+      <div id="whl-visual-container" style="width:100%;display:flex;justify-content:center;"></div>
+
+      <div id="whl-secret-box" class="wheel-secret-box" style="display:none;"></div>
+      <div id="whl-clue-input-box" style="display:none;width:100%;max-width:420px;"></div>
+      <div id="whl-clue-box" class="wheel-clue-box" style="display:none;"></div>
+
+      <div id="whl-reveal-box" style="display:none;text-align:center;">
+        <div class="roulette-score-pill" id="whl-points">+0 pt</div>
+        <p style="margin-top:.25rem;font-size:.8rem;" id="whl-reveal-desc"></p>
+      </div>
+
+      <div class="roulette-players" id="whl-players"></div>
+
+      <div id="whl-actions" style="width:100%;display:flex;flex-direction:column;gap:.6rem;"></div>
     </div>
   </div>
 </div>
@@ -4176,7 +4246,8 @@ function modeInfo(mode) {
     extreme:  { emoji: '🎭', name: 'Extrême',   coop: true,  ranked: false },
     blind:    { emoji: '🙈', name: 'Aveugle',   coop: true,  ranked: false },
     duel:     { emoji: '⚔️', name: 'Duel',      coop: false, ranked: true  },
-    roulette: { emoji: '🎡', name: 'Roulette',  coop: false, ranked: true  }
+    roulette: { emoji: '🎡', name: 'Roulette',  coop: false, ranked: true  },
+    wheel:    { emoji: '🎰', name: 'Roue Folle', coop: false, ranked: true, teams: true }
   };
   return m[mode] || m.classic;
 }
@@ -4676,6 +4747,14 @@ function dispatch(d) {
       window._rltDialBuilt = false;
       window._rltRevealShown = false;
     }
+    if (d.status === 'wheel-round') {
+      window._whlLastPhase = null;
+      window._whlDialBuilt = false;
+      window._whlRevealShown = false;
+      window._whlLocalPos = null;
+      window._whlSpinning = false;
+      if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
+    }
     if (d.status === 'lobby' || d.status === 'config') {
       // Reset complet entre parties
       dragState = { selected: null, placed: {} };
@@ -4692,6 +4771,12 @@ function dispatch(d) {
       window._rltLocalPos = null;
       window._rltDialBuilt = false;
       window._rltRevealShown = false;
+      window._whlLastPhase = null;
+      window._whlDialBuilt = false;
+      window._whlRevealShown = false;
+      window._whlLocalPos = null;
+      window._whlSpinning = false;
+      if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
       revealAnimDone = false;
       // ⚠ FIX : nettoyer TOUS les timers actifs au retour au salon (sinon ils continuent à tourner)
       if (window._ansTimerInt) { clearInterval(window._ansTimerInt); window._ansTimerInt = null; }
@@ -4721,6 +4806,7 @@ function dispatch(d) {
     case 'gameover':     renderGameover(d); break;
     case 'theme-vote-result': renderThemeVoteResult(d); break;
     case 'roulette-round': renderRouletteRound(d); break;
+    case 'wheel-round': renderWheelRound(d); break;
     default:
       // Statut inconnu → on retourne au lobby pour éviter un écran figé
       console.warn('Unknown status:', d.status);
@@ -4743,7 +4829,7 @@ function renderLobby(d) {
   // Affiche ou cache l'avertissement
   const warnEl = $s('lby-warn');
   if (warnEl) {
-    warnEl.style.display = ids.length < 3 ? 'block' : 'none';
+    warnEl.style.display = ids.length < 2 ? 'block' : 'none';
   }
 
   // Liste des joueurs
@@ -4788,7 +4874,7 @@ window.goToConfig = async () => {
   if (!room.data) return;
   if (room.data.host !== pid) return;
   const ids = Object.keys(room.data.players || {});
-  if (ids.length < 3) { toast('Il faut au moins 3 joueurs !', 'err'); return; }
+  if (ids.length < 2) { toast('Il faut au moins 2 joueurs !', 'err'); return; }
   await update(ref(db, `rooms/${room.id}`), { status: 'config' });
 };
 
@@ -4883,13 +4969,14 @@ function renderConfigParams(mode, d, isHost) {
     extreme: '🎭 <strong>Extrême</strong> — La timeline est bloquée ! Le Cap\'ten ne peut placer que la pire (1) et la meilleure (10) réponse.',
     blind: '🙈 <strong>Aveugle (1 par 1)</strong> — Le Cap\'ten reçoit une seule réponse à la fois et doit la placer définitivement sans voir les autres !',
     duel: '⚔️ <strong>Duel</strong> — Deux Cap\'tens s\'affrontent ! Les joueurs votent pour le thème. Le Cap\'ten le plus précis gagne, et les joueurs marquent des points si leur réponse est bien classée.',
-    roulette: '🎡 <strong>Roulette</strong> — Chacun son tour, place le curseur entre deux concepts opposés pour viser une zone cachée. Plus tu es proche du centre, plus tu marques de points (jusqu\'à 4) !'
+    roulette: '🎡 <strong>Roulette</strong> — Chacun son tour, place le curseur entre deux concepts opposés pour viser une zone cachée. Plus tu es proche du centre, plus tu marques de points (jusqu\'à 4) !',
+    wheel: '🎰 <strong>Roue Folle</strong> — Le lanceur fait tourner la roue librement et l\'arrête quand il veut, puis donne un indice sur la valeur secrète obtenue. Choisis plus bas : "Chacun pour soi" (tout le monde devine et marque ses propres points) ou "Équipes" (configure la taille des équipes et l\'attribution).'
   };
   const descEl = $s('cfg-mode-desc');
   if (descEl) descEl.innerHTML = descs[mode] || descs.classic;
 
   const showRounds = mode !== 'survival';
-  const showLives = mode !== 'sniper' && mode !== 'duel' && mode !== 'roulette';
+  const showLives = mode !== 'sniper' && mode !== 'duel' && mode !== 'roulette' && mode !== 'wheel';
   
   let html = `<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:1.5rem;">`;
 
@@ -4932,6 +5019,64 @@ function renderConfigParams(mode, d, isHost) {
     </div>
   </div>`;
 
+  if (mode === 'wheel') {
+    const wc = d.wheelConfig || {};
+    const format = wc.format || 'ffa';
+    const teamSize = wc.teamSize || 2;
+    const assignment = wc.assignment || 'random';
+    const manualTeams = wc.manualTeams || {};
+    const playersObj = d.players || {};
+    const playerIds = Object.keys(playersObj);
+    const playerCount = playerIds.length;
+    const numTeams = format === 'teams' ? Math.max(2, Math.ceil(playerCount / Math.max(2, teamSize))) : 0;
+
+    html += `
+      <div style="margin-top:1.25rem;padding-top:1.1rem;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:.9rem;">
+        <div>
+          <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.1em;">🎰 Format de la Roue Folle</label>
+          <div style="display:flex;gap:.5rem;margin-top:.55rem;">
+            <button type="button" class="btn ${format==='ffa'?'btn-primary':'btn-secondary'} btn-sm" style="flex:1;" onclick="if(${isHost}) window.wheelSetFormat('ffa')" ${!isHost?'disabled':''}>🙋 Chacun pour soi</button>
+            <button type="button" class="btn ${format==='teams'?'btn-primary':'btn-secondary'} btn-sm" style="flex:1;" onclick="if(${isHost}) window.wheelSetFormat('teams')" ${!isHost?'disabled':''}>👥 Équipes</button>
+          </div>
+          <p style="font-size:.7rem;color:var(--muted);margin-top:.5rem;line-height:1.4;">
+            ${format === 'ffa'
+              ? 'Un seul lanceur à chaque tour : tous les autres joueurs devinent chacun de leur côté et marquent leurs propres points selon leur précision.'
+              : 'Le lanceur affronte les joueurs des autres équipes. Configure la taille des équipes et leur composition ci-dessous.'}
+          </p>
+        </div>
+
+        ${format === 'teams' ? `
+        <div style="display:flex;flex-direction:column;gap:.6rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.1em;">Joueurs par équipe</label>
+            <span id="whl-cfg-teamsize-val" style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.1rem;color:#fff;">${teamSize}</span>
+          </div>
+          <input type="range" min="2" max="${Math.max(2, playerCount)}" value="${teamSize}"
+                 style="width:100%;accent-color:rgb(var(--primary-rgb));cursor:pointer;"
+                 oninput="document.getElementById('whl-cfg-teamsize-val').textContent = this.value"
+                 onchange="if(${isHost}) window.wheelSetTeamSize(this.value)" ${!isHost?'disabled':''}>
+          <p style="font-size:.7rem;color:var(--muted);">→ ${numTeams} équipe${numTeams>1?'s':''} au lancement, selon les joueurs présents.</p>
+
+          <div style="display:flex;gap:.5rem;">
+            <button type="button" class="btn ${assignment==='random'?'btn-primary':'btn-secondary'} btn-sm" style="flex:1;" onclick="if(${isHost}) window.wheelSetAssignment('random')" ${!isHost?'disabled':''}>🎲 Aléatoire</button>
+            <button type="button" class="btn ${assignment==='manual'?'btn-primary':'btn-secondary'} btn-sm" style="flex:1;" onclick="if(${isHost}) window.wheelSetAssignment('manual')" ${!isHost?'disabled':''}>✋ Manuel</button>
+          </div>
+
+          ${assignment === 'manual' ? `
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;">
+            ${playerIds.map(id => {
+              const tIdx = ((manualTeams[id] ?? 0) % numTeams + numTeams) % numTeams;
+              const name = playersObj[id]?.name || '?';
+              return `<button type="button" class="roulette-player-chip" style="cursor:${isHost ? 'pointer' : 'default'};border:none;" ${isHost ? `onclick="window.wheelCycleManualTeam('${id}', ${numTeams})"` : ''}>${escapeHtml(name)} · Équipe ${tIdx + 1}</button>`;
+            }).join('')}
+          </div>
+          <p style="font-size:.65rem;color:var(--muted);text-align:center;">Tape sur un joueur pour changer son équipe.</p>
+          ` : ''}
+        </div>` : ''}
+      </div>
+    `;
+  }
+
   container.innerHTML = html;
 }
 
@@ -4941,6 +5086,26 @@ window.updateDbLives = async (val) => {
     await update(ref(db, `rooms/${room.id}`), { lives: parseInt(val), maxLives: parseInt(val) }); 
 };
 window.updateDbTimer  = async (val) => { await update(ref(db, `rooms/${room.id}`), { timerSec: parseInt(val) }); };
+
+// --- Config du format Roue Folle (chacun pour soi / équipes) ---
+window.wheelSetFormat = async (format) => {
+  if (!room.data || room.data.host !== pid) return;
+  await update(ref(db, `rooms/${room.id}/wheelConfig`), { format });
+};
+window.wheelSetTeamSize = async (val) => {
+  if (!room.data || room.data.host !== pid) return;
+  await update(ref(db, `rooms/${room.id}/wheelConfig`), { teamSize: parseInt(val) });
+};
+window.wheelSetAssignment = async (mode) => {
+  if (!room.data || room.data.host !== pid) return;
+  await update(ref(db, `rooms/${room.id}/wheelConfig`), { assignment: mode });
+};
+window.wheelCycleManualTeam = async (playerId, numTeams) => {
+  const d = room.data; if (!d || d.host !== pid) return;
+  const current = (d.wheelConfig?.manualTeams?.[playerId] ?? 0);
+  const next = (current + 1) % Math.max(1, numTeams);
+  await update(ref(db, `rooms/${room.id}/wheelConfig/manualTeams`), { [playerId]: next });
+};
 
 window.cfgSetLevel = async (lv) => {
   if (!room.data || room.data.host !== pid) return;
@@ -4973,6 +5138,17 @@ window.startGame = async () => {
   const players = d.players || {};
   const ids = Object.keys(players);
   if (ids.length < 3 && d.mode === 'duel') { toast('Il faut au moins 3 joueurs !', 'err'); return; }
+  if (d.mode === 'wheel') {
+    if (ids.length < 2) { toast('La Roue Folle nécessite au moins 2 joueurs !', 'err'); return; }
+    const wc = d.wheelConfig || {};
+    if ((wc.format || 'ffa') === 'teams') {
+      const teamSize = Math.max(2, parseInt(wc.teamSize) || 2);
+      if (ids.length < teamSize * 2) {
+        toast(`Il faut au moins ${teamSize * 2} joueurs pour des équipes de ${teamSize} !`, 'err');
+        return;
+      }
+    }
+  }
 
   const u = {};
   u[`rooms/${room.id}/round`] = (d.status === 'gameover') ? 1 : (d.round || 1);
@@ -5036,6 +5212,26 @@ window.startGame = async () => {
     u[`rooms/${room.id}/rouletteLocked`]  = false;
     u[`rooms/${room.id}/rouletteRevealed`] = false;
     u[`rooms/${room.id}/roulettePoints`]  = null;
+    u[`rooms/${room.id}/lives`]    = 0;
+    u[`rooms/${room.id}/maxLives`] = 0;
+  }
+  // --- MATCHMAKING MODE ROUE FOLLE (chacun pour soi OU équipes configurables) ---
+  else if (d.mode === 'wheel') {
+    const teams = computeWheelTeams(ids, d.wheelConfig);
+    const queue = shuffle([...ids]);
+    const spinnerId = queue.shift();
+    const card = pickRandomRouletteCard();
+
+    u[`rooms/${room.id}/status`]        = 'wheel-round';
+    u[`rooms/${room.id}/teams`]         = teams;
+    u[`rooms/${room.id}/captainId`]     = spinnerId;
+    u[`rooms/${room.id}/captainQueue`]  = queue;
+    u[`rooms/${room.id}/wheelCard`]     = card;
+    u[`rooms/${room.id}/wheelPhase`]    = 'spin';
+    u[`rooms/${room.id}/wheelTarget`]   = null;
+    u[`rooms/${room.id}/wheelClue`]     = null;
+    u[`rooms/${room.id}/wheelGuesses`]  = null;
+    u[`rooms/${room.id}/wheelPoints`]   = null;
     u[`rooms/${room.id}/lives`]    = 0;
     u[`rooms/${room.id}/maxLives`] = 0;
   }
@@ -6454,6 +6650,431 @@ window.rltRevealTarget = async () => {
   await update(ref(db), u);
 };
 
+// ═══════════════════════════════════════════════════════════
+//  MODE ROUE FOLLE — ÉQUIPES + ROUE LIBRE + INDICE + DEVINETTE
+// ═══════════════════════════════════════════════════════════
+
+// Calcule les équipes selon la config choisie en salle :
+//  - format 'ffa' (chacun pour soi) → pas d'équipes, retourne {}
+//  - format 'teams' + assignment 'manual' → respecte le mapping choisi par l'hôte
+//  - format 'teams' + assignment 'random' → répartition aléatoire selon la taille d'équipe
+function computeWheelTeams(ids, wheelConfig) {
+  const cfg = wheelConfig || {};
+  if ((cfg.format || 'ffa') !== 'teams') return {};
+
+  const teamSize = Math.max(2, parseInt(cfg.teamSize) || 2);
+  const numTeams = Math.max(2, Math.ceil(ids.length / teamSize));
+
+  if (cfg.assignment === 'manual' && cfg.manualTeams) {
+    const teams = {};
+    for (let i = 0; i < numTeams; i++) teams[i] = [];
+    // Range les joueurs connectés selon leur équipe choisie (repli sur l'équipe 0 si absente/invalide)
+    ids.forEach(id => {
+      let t = cfg.manualTeams[id];
+      if (typeof t !== 'number' || t < 0 || t >= numTeams) t = 0;
+      teams[t].push(id);
+    });
+    // Retire les équipes qui se retrouveraient vides (ex: joueur déconnecté)
+    Object.keys(teams).forEach(k => { if (teams[k].length === 0) delete teams[k]; });
+    return teams;
+  }
+
+  // Aléatoire : répartition équilibrée en paquets de teamSize
+  const shuffled = shuffle([...ids]);
+  const teams = {};
+  let idx = 0;
+  while (shuffled.length) {
+    teams[idx] = shuffled.splice(0, teamSize);
+    idx++;
+  }
+  return teams;
+}
+
+function wheelTeamOf(teams, playerId) {
+  for (const key of Object.keys(teams || {})) {
+    if ((teams[key] || []).includes(playerId)) return key;
+  }
+  return null;
+}
+
+// Liste des joueurs éligibles pour deviner ce tour :
+//  - format 'ffa' → tout le monde sauf le lanceur
+//  - format 'teams' → tout le monde qui n'est PAS dans l'équipe du lanceur
+function wheelEligibleGuessers(d, ids) {
+  const teams = d.teams || {};
+  const hasTeams = Object.keys(teams).length > 0;
+  if (!hasTeams) {
+    return ids.filter(id => id !== d.captainId);
+  }
+  const spinnerTeam = wheelTeamOf(teams, d.captainId);
+  return ids.filter(id => id !== d.captainId && wheelTeamOf(teams, id) !== spinnerTeam);
+}
+
+// --- Roue graphique (spin libre, façon roue de la fortune) ---
+const WHL_CX = 150, WHL_CY = 170, WHL_R = 130, WHL_SEGMENTS = 10;
+
+
+function whlPolar(angleDeg, radius) {
+  const rad = angleDeg * Math.PI / 180;
+  return { x: WHL_CX + radius * Math.sin(rad), y: WHL_CY - radius * Math.cos(rad) };
+}
+
+// La valeur (0-100) correspondant à la portion de roue actuellement sous le repère fixe (en haut)
+function whlAngleToValue(rotationDeg) {
+  const norm = ((rotationDeg % 360) + 360) % 360;
+  return ((360 - norm) % 360) / 360 * 100;
+}
+
+function whlBuildWheelSvg() {
+  let wedges = '';
+  for (let i = 0; i < WHL_SEGMENTS; i++) {
+    const a0 = (360 / WHL_SEGMENTS) * i, a1 = (360 / WHL_SEGMENTS) * (i + 1);
+    const p0 = whlPolar(a0, WHL_R), p1 = whlPolar(a1, WHL_R);
+    const color = i % 2 === 0 ? 'var(--cyan)' : 'var(--pink)';
+    wedges += `<path d="M ${WHL_CX} ${WHL_CY} L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} A ${WHL_R} ${WHL_R} 0 0 1 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} Z" fill="${color}" opacity=".6"/>`;
+  }
+  return `
+    <svg viewBox="0 0 300 320" class="wheel-svg">
+      <polygon points="150,8 136,36 164,36" fill="var(--gold)" stroke="#fff" stroke-width="2"/>
+      <g id="whl-wheel-group">${wedges}<circle cx="${WHL_CX}" cy="${WHL_CY}" r="8" fill="#fff"/></g>
+      <circle cx="${WHL_CX}" cy="${WHL_CY}" r="130" fill="none" stroke="var(--border2)" stroke-width="4"/>
+    </svg>`;
+}
+
+// Lance la roue : rotation continue jusqu'à ce que le joueur clique sur Stop
+window.whlSpinStart = () => {
+  if (window._whlSpinning) return;
+  window._whlSpinning = true;
+  window._whlRotation = window._whlRotation || 0;
+  const group = document.getElementById('whl-wheel-group');
+  let lastTs = null;
+  const speedDegPerSec = 480;
+  const step = (ts) => {
+    if (!window._whlSpinning) return;
+    if (lastTs !== null) {
+      const dt = (ts - lastTs) / 1000;
+      window._whlRotation += speedDegPerSec * dt;
+      if (group) group.setAttribute('transform', `rotate(${window._whlRotation} ${WHL_CX} ${WHL_CY})`);
+    }
+    lastTs = ts;
+    window._whlRafId = requestAnimationFrame(step);
+  };
+  window._whlRafId = requestAnimationFrame(step);
+  renderWheelRound(room.data); // rafraîchit les boutons (Lancer -> Stop)
+};
+
+// Arrête la roue : la valeur sous le repère devient la cible cachée du tour
+window.whlSpinStop = async () => {
+  if (!window._whlSpinning) return;
+  window._whlSpinning = false;
+  if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
+  const d = room.data; if (!d || d.captainId !== pid) return;
+
+  const value = whlAngleToValue(window._whlRotation || 0);
+  const target = { center: +value.toFixed(2), w4: 3, w3: 7, w2: 12 };
+  await update(ref(db, `rooms/${room.id}`), { wheelTarget: target, wheelPhase: 'clue' });
+};
+
+// Le lanceur valide son indice textuel
+window.whlSubmitClue = async () => {
+  const d = room.data; if (!d || d.captainId !== pid) return;
+  const input = $s('whl-clue-input');
+  const clue = (input?.value || '').trim();
+  if (!clue) { toast('Écris un indice avant de valider !', 'err'); return; }
+  await update(ref(db, `rooms/${room.id}`), { wheelClue: clue, wheelPhase: 'guess' });
+};
+
+// Le devineur (n'importe quel joueur éligible) verrouille sa position sur le cadran
+window.whlLockGuess = async () => {
+  const d = room.data; if (!d) return;
+  const ids = Object.keys(d.players || {});
+  const eligible = wheelEligibleGuessers(d, ids);
+  if (!eligible.includes(pid)) return;
+  if (d.wheelGuesses && (pid in d.wheelGuesses)) return; // déjà envoyé
+  const pos = Math.max(0, Math.min(100, window._whlLocalPos ?? 50));
+  await update(ref(db, `rooms/${room.id}/wheelGuesses`), { [pid]: pos });
+};
+
+// Révèle la cible, calcule le score de CHAQUE devineur ayant répondu et le crédite individuellement
+window.whlReveal = async () => {
+  const d = room.data; if (!d) return;
+  if (!(d.captainId === pid || d.host === pid)) return;
+  if (d.wheelPhase === 'revealed') return;
+  const target = d.wheelTarget;
+  const guesses = d.wheelGuesses || {};
+
+  const u = {};
+  u[`rooms/${room.id}/wheelPhase`] = 'revealed';
+  const lastPts = {};
+  Object.entries(guesses).forEach(([guesserId, guessPos]) => {
+    const pts = computeRouletteScore(guessPos, target);
+    const cur = (d.players?.[guesserId]?.score) || 0;
+    u[`rooms/${room.id}/players/${guesserId}/score`] = cur + pts;
+    lastPts[guesserId] = pts;
+  });
+  u[`rooms/${room.id}/lastRoundPts`] = lastPts;
+  await update(ref(db), u);
+};
+
+function renderWheelRound(d) {
+  showScreen('wheel');
+  const players = d.players || {};
+  const teams = d.teams || {};
+  const hasTeams = Object.keys(teams).length > 0;
+  const ids = Object.keys(players);
+  const eligibleGuessers = wheelEligibleGuessers(d, ids);
+  const isSpinner = d.captainId === pid;
+  const isEligibleGuesser = eligibleGuessers.includes(pid);
+  const guesses = d.wheelGuesses || {};
+  const myGuessLocked = pid in guesses;
+  const isHost = d.host === pid;
+  const phase = d.wheelPhase || 'spin';
+  const card = d.wheelCard || { left: '…', right: '…' };
+
+  $s('whl-round').textContent = d.round || 1;
+  $s('whl-active-name').textContent = players[d.captainId] ? `🎰 ${players[d.captainId].name}` : '';
+
+  // Bandeau d'équipes (masqué en mode "chacun pour soi")
+  const teamsBar = $s('whl-teams-bar');
+  teamsBar.innerHTML = '';
+  teamsBar.style.display = hasTeams ? 'flex' : 'none';
+  if (hasTeams) {
+    Object.keys(teams).sort((a, b) => +a - +b).forEach(key => {
+      const members = teams[key] || [];
+      const names = members.map(id => players[id]?.name || '?').join(' & ');
+      const score = members.reduce((s, id) => s + (players[id]?.score || 0), 0);
+      const mine = members.includes(pid);
+      const pill = document.createElement('div');
+      pill.className = 'wheel-team-pill' + (mine ? ' mine' : '');
+      pill.innerHTML = `<div class="wt-label">Équipe ${+key + 1}</div><div class="wt-names">${escapeHtml(names || '—')}</div><div class="wt-score">${score} pts</div>`;
+      teamsBar.appendChild(pill);
+    });
+  }
+
+  // Titres contextuels selon la phase et le rôle
+  const titleEl = $s('whl-title'), subEl = $s('whl-subtitle');
+  if (phase === 'spin') {
+    titleEl.textContent = isSpinner ? 'Lance la roue !' : `${players[d.captainId]?.name || 'Le joueur'} lance la roue…`;
+    subEl.textContent = isSpinner ? 'Fais-la tourner librement, puis arrête-la quand tu veux.' : 'Il/elle choisit le moment où la roue s\'arrête.';
+  } else if (phase === 'clue') {
+    titleEl.textContent = isSpinner ? 'Ta valeur secrète !' : 'Le joueur actif réfléchit à son indice…';
+    subEl.textContent = isSpinner ? 'Donne un indice pour aider (ou piéger 😏) les autres joueurs.' : 'Patience, l\'indice arrive.';
+  } else if (phase === 'guess') {
+    titleEl.textContent = isEligibleGuesser ? (myGuessLocked ? 'Réponse envoyée !' : 'À toi de deviner !') : 'Les joueurs devinent…';
+    subEl.textContent = isEligibleGuesser
+      ? (myGuessLocked ? 'En attente des autres joueurs…' : 'Place le curseur là où tu penses que la valeur se trouve.')
+      : `${Object.keys(guesses).length} / ${eligibleGuessers.length} ont répondu.`;
+  } else {
+    titleEl.textContent = 'Résultat de la manche';
+    subEl.textContent = '';
+  }
+
+  // Rebuild complet du bloc visuel uniquement quand la phase change
+  const container = $s('whl-visual-container');
+  if (window._whlLastPhase !== phase) {
+    window._whlLastPhase = phase;
+    window._whlDialBuilt = false;
+    window._whlRevealShown = false;
+
+    if (phase === 'spin') {
+      container.innerHTML = whlBuildWheelSvg();
+      window._whlRotation = window._whlRotation || 0;
+      const group = document.getElementById('whl-wheel-group');
+      if (group) group.setAttribute('transform', `rotate(${window._whlRotation} ${WHL_CX} ${WHL_CY})`);
+    } else if (phase === 'clue' || phase === 'guess' || phase === 'revealed') {
+      const interactive = isEligibleGuesser && phase === 'guess' && !myGuessLocked;
+      container.innerHTML = rltBuildSvg(card, interactive);
+      window._whlDialBuilt = true;
+      window._whlLocalPos = (typeof guesses[pid] === 'number') ? guesses[pid] : 50;
+      const svgEl = container.querySelector('svg');
+      // On n'affiche une aiguille "en direct" que pour le joueur qui est en train de deviner
+      if (isEligibleGuesser) rltUpdateNeedle(svgEl, window._whlLocalPos);
+
+      if (interactive) {
+        let dragging = false;
+        const onMove = (evt) => {
+          if (!dragging) return;
+          evt.preventDefault();
+          window._whlLocalPos = rltPosFromPointerEvent(svgEl, evt);
+          rltUpdateNeedle(svgEl, window._whlLocalPos);
+        };
+        const onStart = (evt) => {
+          dragging = true;
+          window._whlLocalPos = rltPosFromPointerEvent(svgEl, evt);
+          rltUpdateNeedle(svgEl, window._whlLocalPos);
+        };
+        const onEnd = () => { dragging = false; };
+        svgEl.addEventListener('mousedown', onStart);
+        svgEl.addEventListener('touchstart', onStart, { passive: false });
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
+      }
+    }
+  }
+
+  // Valeur secrète (visible seulement par le lanceur, et son équipe s'il y en a une)
+  const secretBox = $s('whl-secret-box');
+  const onSpinnerSide = hasTeams ? (wheelTeamOf(teams, d.captainId) === wheelTeamOf(teams, pid)) : isSpinner;
+  if ((phase === 'clue' || phase === 'guess') && d.wheelTarget && onSpinnerSide) {
+    secretBox.style.display = 'block';
+    const c = d.wheelTarget.center;
+    const leaning = c < 50 ? card.left : card.right;
+    secretBox.innerHTML = `<div class="wv">${c.toFixed(0)} / 100</div><div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">Plutôt du côté « ${escapeHtml(leaning)} »</div>`;
+  } else {
+    secretBox.style.display = 'none';
+  }
+
+  // Zone de saisie de l'indice (visible uniquement par le lanceur pendant la phase 'clue')
+  const clueInputBox = $s('whl-clue-input-box');
+  if (phase === 'clue' && isSpinner) {
+    clueInputBox.style.display = 'block';
+    clueInputBox.innerHTML = `
+      <input id="whl-clue-input" class="input" type="text" maxlength="80" placeholder="Ton indice (ex: 'un peu comme un sauna')" style="width:100%;text-align:center;">
+    `;
+  } else {
+    clueInputBox.style.display = 'none';
+  }
+
+  // Affichage de l'indice donné (une fois soumis)
+  const clueBox = $s('whl-clue-box');
+  if (d.wheelClue && (phase === 'guess' || phase === 'revealed')) {
+    clueBox.style.display = 'block';
+    clueBox.innerHTML = `<div class="wc-label">💬 Indice</div><div class="wc-text">« ${escapeHtml(d.wheelClue)} »</div>`;
+  } else {
+    clueBox.style.display = 'none';
+  }
+
+  // Révélation finale : zone cible + marqueurs de chaque devineur + détail des points
+  if (phase === 'revealed' && !window._whlRevealShown) {
+    window._whlRevealShown = true;
+    const svgEl = container.querySelector('svg');
+    if (svgEl && d.wheelTarget) {
+      rltShowTargetZone(svgEl, d.wheelTarget);
+      // Petit marqueur pour chaque réponse envoyée
+      Object.entries(guesses).forEach(([guesserId, pos]) => {
+        const pts = (d.lastRoundPts || {})[guesserId] ?? 0;
+        const tip = rltPolar(pos, RLT_R - 22);
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', tip.x.toFixed(2));
+        dot.setAttribute('cy', tip.y.toFixed(2));
+        dot.setAttribute('r', 7);
+        dot.setAttribute('fill', pts > 0 ? 'var(--green)' : 'var(--red)');
+        dot.setAttribute('stroke', '#fff');
+        dot.setAttribute('stroke-width', 2);
+        svgEl.appendChild(dot);
+      });
+    }
+  }
+  const revealBox = $s('whl-reveal-box');
+  if (phase === 'revealed') {
+    revealBox.style.display = 'block';
+    const rows = Object.entries(guesses).map(([guesserId, pos]) => {
+      const pts = (d.lastRoundPts || {})[guesserId] ?? 0;
+      const name = players[guesserId]?.name || '?';
+      return `<div style="display:flex;justify-content:space-between;gap:.5rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span>🕵️ ${escapeHtml(name)}</span>
+        <span class="roulette-score-pill pts-${pts}" style="font-size:1rem;">+${pts} pt${pts > 1 ? 's' : ''}</span>
+      </div>`;
+    }).join('');
+    $s('whl-points').textContent = '🎯 Résultats';
+    $s('whl-points').className = 'roulette-score-pill';
+    $s('whl-reveal-desc').innerHTML = rows || '<span style="color:var(--muted);">Personne n\'a proposé de réponse.</span>';
+  } else {
+    revealBox.style.display = 'none';
+  }
+
+  // Chips joueurs
+  const chipsEl = $s('whl-players');
+  chipsEl.innerHTML = '';
+  Object.entries(players).forEach(([id, p]) => {
+    const role = id === d.captainId ? '🎰 ' : (eligibleGuessers.includes(id) ? (id in guesses ? '✅ ' : '🕵️ ') : '');
+    const chip = document.createElement('div');
+    chip.className = 'roulette-player-chip' + (id === d.captainId || eligibleGuessers.includes(id) ? ' active' : '');
+    chip.textContent = `${role}${p.name} · ${p.score || 0} pts`;
+    chipsEl.appendChild(chip);
+  });
+
+  // Actions contextuelles
+  const act = $s('whl-actions');
+  act.innerHTML = '';
+  if (phase === 'spin') {
+    if (isSpinner) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-full';
+      if (window._whlSpinning) {
+        btn.className = 'btn btn-danger btn-full';
+        btn.textContent = '🛑 Stop !';
+        btn.onclick = () => window.whlSpinStop();
+      } else {
+        btn.textContent = '🎰 Lancer la roue';
+        btn.onclick = () => window.whlSpinStart();
+      }
+      act.appendChild(btn);
+    } else {
+      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+      p2.textContent = 'En attente du lancer…';
+      act.appendChild(p2);
+    }
+  } else if (phase === 'clue') {
+    if (isSpinner) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-full';
+      btn.textContent = '✅ Valider mon indice';
+      btn.onclick = () => window.whlSubmitClue();
+      act.appendChild(btn);
+    } else {
+      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+      p2.textContent = "En attente de l'indice…";
+      act.appendChild(p2);
+    }
+  } else if (phase === 'guess') {
+    if (isEligibleGuesser && !myGuessLocked) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-full';
+      btn.textContent = '🔒 Valider ma réponse';
+      btn.onclick = () => window.whlLockGuess();
+      act.appendChild(btn);
+    } else if (isEligibleGuesser && myGuessLocked) {
+      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+      p2.textContent = '✅ Réponse envoyée, en attente des autres…';
+      act.appendChild(p2);
+    } else if (isSpinner || isHost) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-success btn-full';
+      btn.textContent = `🎬 Révéler la cible (${Object.keys(guesses).length}/${eligibleGuessers.length})`;
+      btn.onclick = () => window.whlReveal();
+      act.appendChild(btn);
+    } else {
+      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+      p2.textContent = `En attente des réponses (${Object.keys(guesses).length}/${eligibleGuessers.length})…`;
+      act.appendChild(p2);
+    }
+  } else if (phase === 'revealed') {
+    if (isHost) {
+      const queue = d.captainQueue || [];
+      const isEndOfRound = queue.length === 0;
+      const targetRounds = d.maxRounds || 5;
+      const isFinalRound = isEndOfRound && (d.round >= targetRounds);
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-full';
+      if (isFinalRound) {
+        btn.textContent = '🏆 Résultat final';
+        btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'gameover' });
+      } else {
+        btn.textContent = '🏆 Voir le classement';
+        btn.onclick = () => update(ref(db, `rooms/${room.id}`), { status: 'leaderboard' });
+      }
+      act.appendChild(btn);
+    } else {
+      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+      p2.textContent = "En attente de l'hôte…";
+      act.appendChild(p2);
+    }
+  }
+}
+
 function buildClassicCards(respondants) {
   const el = $s('cap-cards');
   if (!el) return;
@@ -7767,6 +8388,34 @@ window.startTurn = async (isNewRound) => {
     u[`rooms/${room.id}/rouletteLocked`]  = false;
     u[`rooms/${room.id}/rouletteRevealed`] = false;
     u[`rooms/${room.id}/roulettePoints`]  = null;
+
+    await update(ref(db), u);
+    return;
+  }
+
+  // --- LOGIQUE MODE ROUE FOLLE ---
+  if (d.mode === 'wheel') {
+    let queue = (d.captainQueue || []).filter(id => ids.includes(id));
+    let round = d.round || 1;
+
+    if (isNewRound || queue.length === 0) {
+      queue = shuffle([...ids]);
+      if (isNewRound) round += 1;
+    }
+
+    const spinnerId = queue.shift();
+    const card = pickRandomRouletteCard();
+
+    u[`rooms/${room.id}/status`]       = 'wheel-round';
+    u[`rooms/${room.id}/captainId`]    = spinnerId;
+    u[`rooms/${room.id}/captainQueue`] = queue;
+    u[`rooms/${room.id}/round`]        = round;
+    u[`rooms/${room.id}/wheelCard`]    = card;
+    u[`rooms/${room.id}/wheelPhase`]   = 'spin';
+    u[`rooms/${room.id}/wheelTarget`]  = null;
+    u[`rooms/${room.id}/wheelClue`]    = null;
+    u[`rooms/${room.id}/wheelGuesses`] = null;
+    u[`rooms/${room.id}/wheelPoints`]  = null;
 
     await update(ref(db), u);
     return;
