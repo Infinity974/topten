@@ -3954,19 +3954,21 @@ function buildThemeChoiceHtml(prefix, draftLeft, draftRight) {
     </button>`).join('');
 
   return `
-    <div class="theme-choice-panel">
-      <div class="wc-label">✏️ Écris ton propre thème</div>
-      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-        <input id="${prefix}-theme-left" class="input" type="text" maxlength="24" placeholder="Concept gauche" value="${escapeHtml(draftLeft || '')}" style="flex:1;text-align:center;">
-        <input id="${prefix}-theme-right" class="input" type="text" maxlength="24" placeholder="Concept droit" value="${escapeHtml(draftRight || '')}" style="flex:1;text-align:center;">
-      </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%;">
+      <div class="theme-choice-panel">
+        <div class="wc-label">✏️ Écris ton propre thème</div>
+        <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+          <input id="${prefix}-theme-left" class="input" type="text" maxlength="24" placeholder="Concept gauche" value="${escapeHtml(draftLeft || '')}" style="flex:1;text-align:center;">
+          <input id="${prefix}-theme-right" class="input" type="text" maxlength="24" placeholder="Concept droit" value="${escapeHtml(draftRight || '')}" style="flex:1;text-align:center;">
+        </div>
 
-      <div class="wc-label" style="margin-top:1rem;">🎴 Ou choisis un thème pré-fait</div>
-      <div class="theme-preset-grid" id="${prefix}-theme-grid">${presets}</div>
-    </div>
-    <div style="display:flex;gap:.6rem;width:100%;max-width:460px;">
-      <button type="button" class="btn btn-secondary btn-full" id="${prefix}-theme-draw">🎲 Aléatoire</button>
-      <button type="button" class="btn btn-primary btn-full" id="${prefix}-theme-validate">✅ Valider ce thème</button>
+        <div class="wc-label" style="margin-top:1rem;">🎴 Ou choisis un thème pré-fait</div>
+        <div class="theme-preset-grid" id="${prefix}-theme-grid">${presets}</div>
+      </div>
+      <div style="display:flex;gap:.6rem;width:100%;max-width:460px;">
+        <button type="button" class="btn btn-secondary btn-full" id="${prefix}-theme-draw">🎲 Aléatoire</button>
+        <button type="button" class="btn btn-primary btn-full" id="${prefix}-theme-validate">✅ Valider ce thème</button>
+      </div>
     </div>
   `;
 }
@@ -4804,6 +4806,9 @@ function dispatch(d) {
       window._whlRotation = 0;
       window._whlThemePhaseBuilt = false;
       if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
+      if (window._whlRevealInterval) { clearInterval(window._whlRevealInterval); window._whlRevealInterval = null; }
+      if (window._whlRevealTimeout)  { clearTimeout(window._whlRevealTimeout);   window._whlRevealTimeout  = null; }
+      window._whlRevealCountdownActive = false;
     }
     if (d.status === 'lobby' || d.status === 'config') {
       // Reset complet entre parties
@@ -4826,6 +4831,9 @@ function dispatch(d) {
       window._whlRotation = 0;
       window._whlThemePhaseBuilt = false;
       if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
+      if (window._whlRevealInterval) { clearInterval(window._whlRevealInterval); window._whlRevealInterval = null; }
+      if (window._whlRevealTimeout)  { clearTimeout(window._whlRevealTimeout);   window._whlRevealTimeout  = null; }
+      window._whlRevealCountdownActive = false;
       revealAnimDone = false;
       // ⚠ FIX : nettoyer TOUS les timers actifs au retour au salon (sinon ils continuent à tourner)
       if (window._ansTimerInt) { clearInterval(window._ansTimerInt); window._ansTimerInt = null; }
@@ -6467,7 +6475,14 @@ function rltPosFromPointerEvent(svgEl, evt) {
   const clientY = (evt.touches ? evt.touches[0].clientY : evt.clientY);
   const x = (clientX - rect.left) * scale;
   const y = (clientY - rect.top) * scale;
-  let angleDeg = Math.atan2(RLT_CY - y, x - RLT_CX) * 180 / Math.PI;
+  // On plafonne y à la hauteur du pivot : un doigt qui déborde légèrement sous le cadran
+  // (très fréquent près des extrémités 0 et 10 sur mobile) ne doit jamais faire basculer
+  // l'angle de l'autre côté du cercle — sans ce clamp, atan2 peut renvoyer un angle négatif
+  // qui se faisait alors écraser à 0 (donc "10/droite") au lieu de rester proche de "0/gauche".
+  const yClamped = Math.min(y, RLT_CY);
+  const dx = x - RLT_CX, dy = RLT_CY - yClamped;
+  if (dx === 0 && dy === 0) return 50; // exactement sur le pivot : direction indéfinie, on prend le centre
+  let angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
   angleDeg = Math.max(0, Math.min(180, angleDeg));
   return ((180 - angleDeg) / 180) * 100;
 }
@@ -6814,12 +6829,18 @@ function renderWheelRound(d) {
     subEl.textContent = '';
   }
 
-  // Rebuild complet du bloc visuel uniquement quand la phase change
+  // Rebuild complet du bloc visuel quand la phase OU l'état verrouillé du joueur change
+  // (inclure l'état verrouillé est essentiel : sinon, une fois la réponse validée, les anciens
+  // écouteurs de glisser-déposer restent actifs et le curseur reste déplaçable — bug corrigé ici)
   const container = $s('whl-visual-container');
-  if (window._whlLastPhase !== phase) {
-    window._whlLastPhase = phase;
+  const renderKey = phase + ':' + (isEligibleGuesser ? (myGuessLocked ? 'locked' : 'unlocked') : 'spectator');
+  if (window._whlLastPhase !== renderKey) {
+    window._whlLastPhase = renderKey;
     window._whlDialBuilt = false;
     window._whlRevealShown = false;
+
+    // Nettoie les écouteurs globaux de la manche précédente pour éviter toute fuite/interférence
+    if (window._whlCleanupListeners) { window._whlCleanupListeners(); window._whlCleanupListeners = null; }
 
     if (phase === 'spin') {
       container.innerHTML = whlBuildSpinSvg();
@@ -6861,6 +6882,12 @@ function renderWheelRound(d) {
         window.addEventListener('touchmove', onMove, { passive: false });
         window.addEventListener('mouseup', onEnd);
         window.addEventListener('touchend', onEnd);
+        window._whlCleanupListeners = () => {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('touchmove', onMove);
+          window.removeEventListener('mouseup', onEnd);
+          window.removeEventListener('touchend', onEnd);
+        };
       }
     }
   }
@@ -6974,36 +7001,61 @@ function renderWheelRound(d) {
       act.appendChild(p2);
     }
   } else if (phase === 'guess') {
-    if (isEligibleGuesser && !myGuessLocked) {
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-primary btn-full';
-      btn.textContent = '🔒 Valider ma réponse';
-      btn.onclick = () => window.whlLockGuess();
-      act.appendChild(btn);
-    } else if (isEligibleGuesser && myGuessLocked) {
-      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
-      p2.textContent = '✅ Réponse envoyée, en attente des autres…';
+    const answeredCount = Object.keys(guesses).length;
+    const allAnswered = eligibleGuessers.length > 0 && answeredCount >= eligibleGuessers.length;
+
+    if (allAnswered) {
+      const p2 = document.createElement('p');
+      p2.style.textAlign = 'center';
+      p2.style.fontWeight = '700';
+      p2.innerHTML = `🎬 Révélation de la cible dans <span class="cd-timer-val">3</span>s…`;
       act.appendChild(p2);
-    } else if (isSpinner || isHost) {
-      const answered = Object.keys(guesses).length;
-      const allAnswered = answered >= eligibleGuessers.length && eligibleGuessers.length > 0;
-      const btn = document.createElement('button');
-      if (allAnswered) {
-        btn.className = 'btn btn-success btn-full';
-        btn.textContent = '🎬 Révéler la cible';
-        btn.onclick = () => window.whlReveal();
-      } else {
-        btn.className = 'btn btn-secondary btn-full';
-        btn.disabled = true;
-        btn.style.opacity = '.5';
-        btn.style.cursor = 'not-allowed';
-        btn.textContent = `⏳ En attente des réponses (${answered}/${eligibleGuessers.length})`;
+
+      // ⚠ On ne relance le décompte QU'UNE SEULE FOIS (verrou), sinon le heartbeat
+      // périodique (re-render toutes les ~8s) le relancerait en boucle.
+      if (!window._whlRevealCountdownActive) {
+        window._whlRevealCountdownActive = true;
+        let timeLeft = 3;
+        document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = timeLeft);
+
+        window._whlRevealInterval = setInterval(() => {
+          timeLeft--;
+          document.querySelectorAll('.cd-timer-val').forEach(el => el.textContent = Math.max(0, timeLeft));
+          if (timeLeft <= 0) { clearInterval(window._whlRevealInterval); window._whlRevealInterval = null; }
+        }, 1000);
+
+        // Seul l'hôte (ou le lanceur) déclenche réellement la révélation, une fois le délai écoulé
+        if (isSpinner || isHost) {
+          window._whlRevealTimeout = setTimeout(() => {
+            window._whlRevealTimeout = null;
+            const rd = room.data;
+            if (rd?.status === 'wheel-round' && rd?.wheelPhase === 'guess') {
+              window.whlReveal();
+            }
+          }, 3200);
+        }
       }
-      act.appendChild(btn);
     } else {
-      const p2 = document.createElement('p'); p2.style.textAlign = 'center';
-      p2.textContent = `En attente des réponses (${Object.keys(guesses).length}/${eligibleGuessers.length})…`;
-      act.appendChild(p2);
+      // Pas encore tous prêts (ou un joueur a quitté) → on annule un décompte en cours
+      if (window._whlRevealInterval) { clearInterval(window._whlRevealInterval); window._whlRevealInterval = null; }
+      if (window._whlRevealTimeout)  { clearTimeout(window._whlRevealTimeout);   window._whlRevealTimeout  = null; }
+      window._whlRevealCountdownActive = false;
+
+      if (isEligibleGuesser && !myGuessLocked) {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-primary btn-full';
+        btn.textContent = '🔒 Valider ma réponse';
+        btn.onclick = () => window.whlLockGuess();
+        act.appendChild(btn);
+      } else if (isEligibleGuesser && myGuessLocked) {
+        const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+        p2.textContent = '✅ Réponse envoyée, en attente des autres…';
+        act.appendChild(p2);
+      } else {
+        const p2 = document.createElement('p'); p2.style.textAlign = 'center';
+        p2.textContent = `En attente des réponses (${answeredCount}/${eligibleGuessers.length})…`;
+        act.appendChild(p2);
+      }
     }
   } else if (phase === 'revealed') {
     if (isHost) {
