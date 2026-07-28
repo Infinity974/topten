@@ -2816,6 +2816,30 @@ html.light-mode .host-transfer-tile {
 }
 .wheel-clue-box .wc-label { font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:700; }
 .wheel-clue-box .wc-text { font-size:1.05rem; font-weight:700; color:#fff; margin-top:.3rem; font-style:italic; }
+
+.theme-choice-panel {
+  width:100%; max-width:460px; padding:1rem 1.1rem; border-radius:16px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+}
+.theme-choice-panel .wc-label { font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:700; }
+.theme-preset-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-top:.6rem;
+  max-height:220px; overflow-y:auto; padding-right:.15rem;
+}
+.theme-preset-btn {
+  display:flex; align-items:center; justify-content:center; gap:.3rem;
+  padding:.55rem .5rem; border-radius:10px; cursor:pointer;
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  font-size:.74rem; font-weight:700; color:#fff; text-align:center;
+  transition:background .15s, border-color .15s;
+}
+.theme-preset-btn:hover { background:rgba(255,255,255,.09); }
+.theme-preset-btn.selected {
+  background:rgba(var(--primary-rgb),.18); border-color:rgba(var(--primary-rgb),.6);
+}
+.theme-preset-btn .tp-left { color: var(--cyan); }
+.theme-preset-btn .tp-right { color: var(--pink); }
+.theme-preset-btn .tp-sep { color:var(--muted); font-size:.7rem; }
 </style>
 </head>
 <body>
@@ -3922,18 +3946,26 @@ function pickRandomRouletteCard() {
 //  exactement comme le Cap'ten en mode Top Ten classique.
 // ═══════════════════════════════════════════════════════════
 
-// Construit le HTML du panneau "choisis un thème ou tire-le au hasard"
+// Construit le HTML du panneau "choisis un thème ou tire-le au hasard" (design v2 : + de choix)
 function buildThemeChoiceHtml(prefix, draftLeft, draftRight) {
+  const presets = ROULETTE_CARDS.map(c => `
+    <button type="button" class="theme-preset-btn" data-left="${escapeHtml(c.left)}" data-right="${escapeHtml(c.right)}">
+      <span class="tp-left">${escapeHtml(c.left)}</span><span class="tp-sep">↔</span><span class="tp-right">${escapeHtml(c.right)}</span>
+    </button>`).join('');
+
   return `
-    <div class="wheel-clue-box" style="width:100%;max-width:420px;">
-      <div class="wc-label">✏️ Choisis un thème (ou tire-en un au hasard)</div>
+    <div class="theme-choice-panel">
+      <div class="wc-label">✏️ Écris ton propre thème</div>
       <div style="display:flex;gap:.5rem;margin-top:.6rem;">
         <input id="${prefix}-theme-left" class="input" type="text" maxlength="24" placeholder="Concept gauche" value="${escapeHtml(draftLeft || '')}" style="flex:1;text-align:center;">
         <input id="${prefix}-theme-right" class="input" type="text" maxlength="24" placeholder="Concept droit" value="${escapeHtml(draftRight || '')}" style="flex:1;text-align:center;">
       </div>
+
+      <div class="wc-label" style="margin-top:1rem;">🎴 Ou choisis un thème pré-fait</div>
+      <div class="theme-preset-grid" id="${prefix}-theme-grid">${presets}</div>
     </div>
-    <div style="display:flex;gap:.6rem;width:100%;max-width:420px;">
-      <button type="button" class="btn btn-secondary btn-full" id="${prefix}-theme-draw">🎲 Tirer au hasard</button>
+    <div style="display:flex;gap:.6rem;width:100%;max-width:460px;">
+      <button type="button" class="btn btn-secondary btn-full" id="${prefix}-theme-draw">🎲 Aléatoire</button>
       <button type="button" class="btn btn-primary btn-full" id="${prefix}-theme-validate">✅ Valider ce thème</button>
     </div>
   `;
@@ -3943,11 +3975,24 @@ function buildThemeChoiceHtml(prefix, draftLeft, draftRight) {
 function wireThemeChoiceButtons(prefix, onDraw, onValidate) {
   const drawBtn = $s(`${prefix}-theme-draw`);
   const validateBtn = $s(`${prefix}-theme-validate`);
+  const grid = $s(`${prefix}-theme-grid`);
+
+  if (grid) grid.querySelectorAll('.theme-preset-btn').forEach(btn => {
+    btn.onclick = () => {
+      const li = $s(`${prefix}-theme-left`), ri = $s(`${prefix}-theme-right`);
+      if (li) li.value = btn.dataset.left;
+      if (ri) ri.value = btn.dataset.right;
+      grid.querySelectorAll('.theme-preset-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+  });
+
   if (drawBtn) drawBtn.onclick = () => {
     const c = pickRandomRouletteCard();
     const li = $s(`${prefix}-theme-left`), ri = $s(`${prefix}-theme-right`);
     if (li) li.value = c.left;
     if (ri) ri.value = c.right;
+    if (grid) grid.querySelectorAll('.theme-preset-btn').forEach(b => b.classList.remove('selected'));
     if (onDraw) onDraw(c);
   };
   if (validateBtn) validateBtn.onclick = () => {
@@ -4756,6 +4801,7 @@ function dispatch(d) {
       window._whlRevealShown = false;
       window._whlLocalPos = null;
       window._whlSpinning = false;
+      window._whlRotation = 0;
       window._whlThemePhaseBuilt = false;
       if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
     }
@@ -4777,6 +4823,7 @@ function dispatch(d) {
       window._whlRevealShown = false;
       window._whlLocalPos = null;
       window._whlSpinning = false;
+      window._whlRotation = 0;
       window._whlThemePhaseBuilt = false;
       if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
       revealAnimDone = false;
@@ -6536,24 +6583,62 @@ window.whlValidateTheme = async (card) => {
   await update(ref(db, `rooms/${room.id}`), { wheelCard: card, wheelPhase: 'spin' });
 };
 
-// Lance la roue : l'aiguille oscille librement sur le demi-cercle jusqu'au clic sur Stop
+// Construit la roue à formes colorées (cercle complet, mais rognée visuellement au demi-cercle du
+// haut) qui tourne derrière un repère FIXE — exactement comme une vraie roue de la fortune.
+function whlBuildSpinSvg() {
+  const cx = RLT_CX, cy = RLT_CY, r = RLT_R - 16;
+  const nSeg = 16;
+  const palette = ['var(--cyan)', 'var(--pink)', 'var(--gold)', 'var(--green)'];
+  let wedges = '';
+  for (let i = 0; i < nSeg; i++) {
+    const a0 = (360 / nSeg) * i, a1 = (360 / nSeg) * (i + 1);
+    const rad0 = a0 * Math.PI / 180, rad1 = a1 * Math.PI / 180;
+    const p0 = { x: cx + r * Math.sin(rad0), y: cy - r * Math.cos(rad0) };
+    const p1 = { x: cx + r * Math.sin(rad1), y: cy - r * Math.cos(rad1) };
+    wedges += `<path d="M ${cx} ${cy} L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} A ${r} ${r} 0 0 1 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} Z" fill="${palette[i % palette.length]}" opacity=".6"/>`;
+  }
+  const track = rltTrackPath(RLT_R);
+  let ticks = '';
+  for (let i = 0; i <= 10; i++) {
+    const pos = i * 10;
+    const inner = rltPolar(pos, RLT_R - 22);
+    const outer = rltPolar(pos, RLT_R - 8);
+    const labelPt = rltPolar(pos, RLT_R - 40);
+    ticks += `<line x1="${inner.x.toFixed(2)}" y1="${inner.y.toFixed(2)}" x2="${outer.x.toFixed(2)}" y2="${outer.y.toFixed(2)}" stroke="rgba(255,255,255,.55)" stroke-width="2"/>`;
+    ticks += `<text x="${labelPt.x.toFixed(2)}" y="${labelPt.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="rgba(255,255,255,.65)" font-family="'Space Grotesk',sans-serif">${i}</text>`;
+  }
+  return `
+    <svg class="roulette-dial-svg spectator" viewBox="0 0 400 210" xmlns="http://www.w3.org/2000/svg">
+      <g id="whl-spin-group" transform="rotate(0 ${cx} ${cy})">${wedges}</g>
+      <path d="${track}" fill="none" stroke="var(--border2)" stroke-width="10" stroke-linecap="round"/>
+      <g id="whl-ticks">${ticks}</g>
+      <line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - RLT_R}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy - RLT_R}" r="12" fill="#fff" stroke="var(--cyan)" stroke-width="3"/>
+      <circle cx="${cx}" cy="${cy}" r="8" fill="var(--muted)"/>
+    </svg>`;
+}
+
+// Convertit la rotation actuelle de la roue en valeur 0-100 sous le repère fixe
+function whlAngleToValue(rotationDeg) {
+  const norm = ((rotationDeg % 360) + 360) % 360;
+  return ((360 - norm) % 360) / 360 * 100;
+}
+
+// Lance la roue : le disque coloré tourne librement derrière le repère fixe, jusqu'au clic sur Stop
 window.whlSpinStart = () => {
   if (window._whlSpinning) return;
   window._whlSpinning = true;
-  window._whlOscPos = (typeof window._whlOscPos === 'number') ? window._whlOscPos : 50;
-  window._whlOscDir = window._whlOscDir || 1;
+  window._whlRotation = window._whlRotation || 0;
   const container = $s('whl-visual-container');
   let lastTs = null;
-  const speedPerSec = 140; // unités (0-100) par seconde
+  const speedDegPerSec = 260;
   const step = (ts) => {
     if (!window._whlSpinning) return;
     if (lastTs !== null) {
       const dt = (ts - lastTs) / 1000;
-      window._whlOscPos += window._whlOscDir * speedPerSec * dt;
-      if (window._whlOscPos >= 100) { window._whlOscPos = 100; window._whlOscDir = -1; }
-      if (window._whlOscPos <= 0) { window._whlOscPos = 0; window._whlOscDir = 1; }
-      const svgEl = container?.querySelector('svg');
-      if (svgEl) rltUpdateNeedle(svgEl, window._whlOscPos);
+      window._whlRotation += speedDegPerSec * dt;
+      const group = container?.querySelector('#whl-spin-group');
+      if (group) group.setAttribute('transform', `rotate(${window._whlRotation} ${RLT_CX} ${RLT_CY})`);
     }
     lastTs = ts;
     window._whlRafId = requestAnimationFrame(step);
@@ -6562,14 +6647,14 @@ window.whlSpinStart = () => {
   renderWheelRound(room.data); // rafraîchit les boutons (Lancer -> Stop)
 };
 
-// Arrête la roue : la position de l'aiguille au moment du clic devient la cible cachée du tour
+// Arrête la roue : la valeur actuellement sous le repère fixe devient la cible cachée du tour
 window.whlSpinStop = async () => {
   if (!window._whlSpinning) return;
   window._whlSpinning = false;
   if (window._whlRafId) { cancelAnimationFrame(window._whlRafId); window._whlRafId = null; }
   const d = room.data; if (!d || d.captainId !== pid) return;
 
-  const value = Math.max(0, Math.min(100, window._whlOscPos ?? 50));
+  const value = whlAngleToValue(window._whlRotation || 0);
   const target = { center: +value.toFixed(2), w4: 3, w3: 7, w2: 12 };
   await update(ref(db, `rooms/${room.id}`), { wheelTarget: target, wheelPhase: 'clue' });
 };
@@ -6599,8 +6684,11 @@ window.whlReveal = async () => {
   const d = room.data; if (!d) return;
   if (!(d.captainId === pid || d.host === pid)) return;
   if (d.wheelPhase === 'revealed') return;
-  const target = d.wheelTarget;
+  const ids = Object.keys(d.players || {});
+  const eligibleGuessers = wheelEligibleGuessers(d, ids);
   const guesses = d.wheelGuesses || {};
+  if (eligibleGuessers.length > 0 && Object.keys(guesses).length < eligibleGuessers.length) return;
+  const target = d.wheelTarget;
 
   const u = {};
   u[`rooms/${room.id}/wheelPhase`] = 'revealed';
@@ -6657,7 +6745,8 @@ function renderWheelRound(d) {
     $s('whl-subtitle').textContent = isSpinner ? 'Écris tes propres concepts ou tire-en un au hasard, avant de lancer la roue.' : 'Il/elle choisit les deux concepts opposés de cette manche.';
 
     const container = $s('whl-visual-container');
-    if (window._whlThemePhaseBuilt !== true) {
+    const alreadyBuilt = isSpinner ? !!$s('whl-theme-left') : !!container.querySelector('p');
+    if (!alreadyBuilt) {
       window._whlThemePhaseBuilt = true;
       window._whlLastPhase = null; // pour que la roue soit reconstruite une fois le thème validé
       if (isSpinner) {
@@ -6733,10 +6822,10 @@ function renderWheelRound(d) {
     window._whlRevealShown = false;
 
     if (phase === 'spin') {
-      container.innerHTML = rltBuildSvg(card, false);
-      window._whlOscPos = (typeof window._whlOscPos === 'number') ? window._whlOscPos : 50;
-      const svgEl0 = container.querySelector('svg');
-      if (svgEl0) rltUpdateNeedle(svgEl0, window._whlOscPos);
+      container.innerHTML = whlBuildSpinSvg();
+      window._whlRotation = (typeof window._whlRotation === 'number') ? window._whlRotation : 0;
+      const group0 = container.querySelector('#whl-spin-group');
+      if (group0) group0.setAttribute('transform', `rotate(${window._whlRotation} ${RLT_CX} ${RLT_CY})`);
     } else if (phase === 'clue' || phase === 'guess' || phase === 'revealed') {
       const interactive = isEligibleGuesser && phase === 'guess' && !myGuessLocked;
       container.innerHTML = rltBuildSvg(card, interactive);
@@ -6896,10 +6985,20 @@ function renderWheelRound(d) {
       p2.textContent = '✅ Réponse envoyée, en attente des autres…';
       act.appendChild(p2);
     } else if (isSpinner || isHost) {
+      const answered = Object.keys(guesses).length;
+      const allAnswered = answered >= eligibleGuessers.length && eligibleGuessers.length > 0;
       const btn = document.createElement('button');
-      btn.className = 'btn btn-success btn-full';
-      btn.textContent = `🎬 Révéler la cible (${Object.keys(guesses).length}/${eligibleGuessers.length})`;
-      btn.onclick = () => window.whlReveal();
+      if (allAnswered) {
+        btn.className = 'btn btn-success btn-full';
+        btn.textContent = '🎬 Révéler la cible';
+        btn.onclick = () => window.whlReveal();
+      } else {
+        btn.className = 'btn btn-secondary btn-full';
+        btn.disabled = true;
+        btn.style.opacity = '.5';
+        btn.style.cursor = 'not-allowed';
+        btn.textContent = `⏳ En attente des réponses (${answered}/${eligibleGuessers.length})`;
+      }
       act.appendChild(btn);
     } else {
       const p2 = document.createElement('p'); p2.style.textAlign = 'center';
